@@ -74,7 +74,7 @@ const MOBILE_EXTRA = [["about", "About", "info"], ["download", "Get the app", "r
 
 function layout({ slug, title, description, body }) {
   const url = slug === "index" ? `${SITE}/` : `${SITE}/${slug}`;
-  const fullTitle = slug === "index" ? "Memento — AI document memory for Android" : `${title} — Memento`;
+  const fullTitle = slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`;
   const link = ([s, label, ic], mobile) =>
     `<a href="/${s}"${s === slug ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}</a>`;
   return `<!doctype html>
@@ -120,7 +120,7 @@ ${body}
     <div class="cols">
       <div>
         <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
-        <p class="tagline">Capture anything. Find it forever. AI document memory for Android.</p>
+        <p class="tagline">More than a notepad. Your paperwork, remembered.</p>
       </div>
       <div><h4>Product</h4><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a></div>
       <div><h4>Company</h4><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
@@ -157,7 +157,7 @@ page("index", "Home",
   "Memento captures receipts, warranties, bills and IDs, reads them with AI, reminds you before dates expire and backs everything up to your Google Drive.",
   `    <div class="hero">
       <div>
-        <span class="eyebrow reveal">${icon("auto_awesome")} AI document memory</span>
+        <span class="eyebrow reveal">${icon("edit_note")} More than a notepad</span>
         <h1 class="reveal">Capture anything.<br><em>Find it forever.</em></h1>
         <p class="lead reveal">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>. Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
         <div class="cta reveal">${btn("/download", "Get early access", "primary", "rocket_launch")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
@@ -383,7 +383,7 @@ ${ctaBand()}`);
 
 // Download
 page("download", "Get the app",
-  "Memento is coming to Google Play. Get early access to the AI document memory app for Android.",
+  "Memento is coming to Google Play. Get early access to Memento, the app that remembers your paperwork.",
   `    <div class="hero">
       <div>
         <span class="badge-soon reveal">${icon("schedule")} Coming soon to Google Play</span>
@@ -408,7 +408,7 @@ ${ctaBand("Be first in line.", "Early access is free. We'll only email you about
 
 // About
 page("about", "About",
-  "Memento is an AI document memory app by HM Dev Studio. Learn what we believe in and why we built it.",
+  "Memento is more than a notepad: it remembers your paperwork for you. Made by HM Dev Studio. Learn what we believe in and why we built it.",
   `    ${pageHero({ eyebrow: "About", eyebrowIcon: "info", title: "Built so you never have to <em>search a drawer</em> again.", lead: "Receipts fade, warranty cards disappear and deadlines sneak up. Memento exists to remember the important stuff for you." })}
 
     <section class="prose reveal">
