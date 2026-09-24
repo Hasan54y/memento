@@ -5,134 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Memento — AI document memory for Android</title>
   <meta name="description" content="Memento captures receipts, warranties, bills and IDs, reads them with AI, reminds you before dates expire and backs everything up to your Google Drive.">
+  <link rel="canonical" href="https://mementoapp.online/">
   <meta name="theme-color" content="#000000">
-  <meta property="og:title" content="Memento — capture anything, find it whenever you need it">
-  <meta property="og:description" content="AI reads your receipts, warranties and documents, reminds you before they expire, and keeps them private.">
-  <meta property="og:image" content="https://mementoapp.online/assets/og.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Memento">
+  <meta property="og:title" content="Memento — AI document memory for Android">
+  <meta property="og:description" content="Memento captures receipts, warranties, bills and IDs, reads them with AI, reminds you before dates expire and backs everything up to your Google Drive.">
   <meta property="og:url" content="https://mementoapp.online/">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:image" content="https://mementoapp.online/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/site.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&amp;icon_names=account_circle,add_a_photo,add_to_drive,auto_awesome,auto_stories,badge,bolt,category,chat,close,contact_page,crop_free,delete,description,document_scanner,download,edit_note,fact_check,file_save,flight,forum,gavel,help,home,image,info,key,lock,login,mail,manage_accounts,mark_email_unread,menu,money_off,notifications_active,phone_android,play_circle,policy,psychology,rate_review,receipt_long,refresh,request_quote,rocket_launch,schedule,search,self_improvement,send,settings_backup_restore,shop,star,straighten,tips_and_updates,verified_user,visibility_off,wb_sunny,wifi,workspace_premium&amp;display=block" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script src="/assets/site.js" defer></script>
 </head>
 <body>
+  <div class="progress" aria-hidden="true"></div>
   <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
-
   <header class="nav wrap">
     <div class="bar glass">
-      <a class="brand" href="#top"><img src="assets/logo.svg" alt="">Memento</a>
-      <nav class="links">
-        <a class="hide-sm" href="#features">Features</a>
-        <a class="hide-sm" href="#privacy">Privacy</a>
-        <a class="hide-sm" href="#faq">FAQ</a>
-      </nav>
-      <a class="btn btn-primary btn-sm" href="#download">Early access</a>
+      <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
+      <nav class="links" aria-label="Main"><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Backup</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></nav>
+      <a class="btn btn-primary" href="/download" style="min-height:40px;padding:0 16px;font-size:14px">Get the app</a>
+      <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false"><span class="ms open" aria-hidden="true">menu</span><span class="ms close" aria-hidden="true">close</span></button>
     </div>
+    <nav class="mobile-nav glass" aria-label="Mobile"><a href="/features"><span class="ms" aria-hidden="true">auto_awesome</span>Features</a><a href="/how-it-works"><span class="ms" aria-hidden="true">tips_and_updates</span>How it works</a><a href="/backup"><span class="ms" aria-hidden="true">add_to_drive</span>Backup</a><a href="/reviews"><span class="ms" aria-hidden="true">rate_review</span>Reviews</a><a href="/faq"><span class="ms" aria-hidden="true">help</span>FAQ</a><a href="/contact"><span class="ms" aria-hidden="true">mail</span>Contact</a><a href="/about"><span class="ms" aria-hidden="true">info</span>About</a><a href="/download"><span class="ms" aria-hidden="true">rocket_launch</span>Get the app</a></nav>
   </header>
-
-  <main id="top" class="wrap">
+  <main class="wrap">
     <div class="hero">
-      <div class="reveal">
-        <span class="eyebrow">✦ AI document memory</span>
-        <h1>Capture anything.<br><em>Find it forever.</em></h1>
-        <p class="lead">Snap a receipt, warranty, bill or ID. Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
-        <div class="cta" id="download">
-          <a class="btn btn-primary" href="mailto:admin@mementoapp.online?subject=Memento%20early%20access&amp;body=Hi!%20I%27d%20like%20to%20try%20Memento%20when%20it%27s%20available.">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18a.38.38 0 10-.66-.38l-1.87 3.23a11.43 11.43 0 00-9.82 0L5.22 5.92a.38.38 0 10-.66.38L6.4 9.48A10.78 10.78 0 001 18h22a10.78 10.78 0 00-5.4-8.52zM7 15.25a1.25 1.25 0 111.25-1.25A1.25 1.25 0 017 15.25zm10 0A1.25 1.25 0 1118.25 14 1.25 1.25 0 0117 15.25z"/></svg>
-            Get early access
-          </a>
-          <a class="btn btn-ghost" href="https://www.trustpilot.com/evaluate/mementoapp.online" target="_blank" rel="noopener">★ Review on Trustpilot</a>
-        </div>
-        <div class="meta"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>Google Play soon</span></div>
+      <div>
+        <span class="eyebrow reveal"><span class="ms" aria-hidden="true">auto_awesome</span> AI document memory</span>
+        <h1 class="reveal">Capture anything.<br><em>Find it forever.</em></h1>
+        <p class="lead reveal">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>. Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
+        <div class="cta reveal"><a class="btn btn-primary" href="/download"><span class="ms" aria-hidden="true">rocket_launch</span>Get early access</a><a class="btn btn-ghost" href="/how-it-works"><span class="ms" aria-hidden="true">play_circle</span>See how it works</a></div>
+        <div class="meta reveal"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>Google Play soon</span></div>
       </div>
       <div class="phones reveal" aria-hidden="true">
-        <div class="phone back"><img src="assets/screen-capture.png" alt="" loading="lazy"></div>
-        <div class="phone front"><img src="assets/screen-home.png" alt="" loading="lazy"></div>
+        <div class="phone back"><img src="/assets/screen-detail.png" alt="" width="540" height="1200"></div>
+        <div class="phone front"><img src="/assets/screen-home.png" alt="" width="540" height="1200"></div>
       </div>
     </div>
 
-    <section id="features">
-      <div class="section-head reveal">
-        <h2>Your paperwork, handled.</h2>
-        <p>Traditional apps make you organize. Memento does the organizing for you.</p>
-      </div>
+    <div class="marquee reveal" aria-label="Documents Memento understands">
+      <div class="track"><span class="chip glass" style="--c:#1fe05a"><span class="ms" aria-hidden="true">receipt_long</span>Purchase receipts</span><span class="chip glass" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">verified_user</span>Warranties</span><span class="chip glass" style="--c:#ffb547"><span class="ms" aria-hidden="true">request_quote</span>Bills</span><span class="chip glass" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">flight</span>Travel tickets</span><span class="chip glass" style="--c:#a78bfa"><span class="ms" aria-hidden="true">workspace_premium</span>Certificates</span><span class="chip glass" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">badge</span>ID cards</span><span class="chip glass" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">contact_page</span>Contacts & addresses</span><span class="chip glass" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">category</span>Anything else</span><span class="chip glass" style="--c:#1fe05a"><span class="ms" aria-hidden="true">receipt_long</span>Purchase receipts</span><span class="chip glass" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">verified_user</span>Warranties</span><span class="chip glass" style="--c:#ffb547"><span class="ms" aria-hidden="true">request_quote</span>Bills</span><span class="chip glass" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">flight</span>Travel tickets</span><span class="chip glass" style="--c:#a78bfa"><span class="ms" aria-hidden="true">workspace_premium</span>Certificates</span><span class="chip glass" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">badge</span>ID cards</span><span class="chip glass" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">contact_page</span>Contacts & addresses</span><span class="chip glass" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">category</span>Anything else</span></div>
+    </div>
+
+    <section>
+      <div class="section-head reveal"><h2>Your paperwork, <em>handled.</em></h2><p>Traditional apps make you organize. Memento does the organizing for you.</p></div>
       <div class="grid">
-        <article class="card glass reveal"><div class="icon">📷</div><h3>Scan multi-page documents</h3><p>Use the in-app camera or import photos. Add as many pages as a document needs.</p></article>
-        <article class="card glass reveal"><div class="icon">✨</div><h3>AI fills in the details</h3><p>Store, price, purchase date, warranty, ID numbers, due dates — extracted automatically.</p></article>
-        <article class="card glass reveal"><div class="icon">🔔</div><h3>Reminders before it's too late</h3><p>Get notified before warranties, bills and passports expire, even when the app is closed.</p></article>
-        <article class="card glass reveal"><div class="icon">🔎</div><h3>Search everything</h3><p>Find any document or note by store, product, category or date in seconds.</p></article>
-        <article class="card glass reveal"><div class="icon">📝</div><h3>Rich notes</h3><p>Write notes with bold, lists, colors and highlights. Pin, color and share them.</p></article>
-        <article class="card glass reveal"><div class="icon">☁️</div><h3>Google Drive backup</h3><p>Private backup in your own Drive. Restore everything on a new phone in one tap.</p></article>
-        <article class="card glass reveal"><div class="icon">📤</div><h3>Save as PDF, Excel, TXT</h3><p>Export any document as a PDF, spreadsheet, text file or images to your gallery.</p></article>
-        <article class="card glass reveal"><div class="icon">🌙</div><h3>Beautiful day and night</h3><p>A clean, premium design with dark and light themes.</p></article>
-        <article class="card glass reveal"><div class="icon">🔒</div><h3>Private by design</h3><p>Your documents live on your device. No ads, no trackers, no selling your data.</p></article>
+        <a class="card glass spot reveal" href="/features#capture"><div class="icon" style="--c:#1fe05a"><span class="ms" aria-hidden="true">document_scanner</span></div><h3>Scan in seconds</h3><p>Use the in-app camera or import photos. Add as many pages as a document needs.</p></a>
+        <a class="card glass spot reveal" href="/how-it-works"><div class="icon" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">auto_awesome</span></div><h3>AI fills in the details</h3><p>Store, price, dates, warranty, ID numbers — extracted automatically. You just review.</p></a>
+        <a class="card glass spot reveal" href="/features#reminders"><div class="icon" style="--c:#ffb547"><span class="ms" aria-hidden="true">notifications_active</span></div><h3>Reminders that matter</h3><p>Get notified before warranties, bills and passports expire, even when the app is closed.</p></a>
+        <a class="card glass spot reveal" href="/features#search"><div class="icon" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">search</span></div><h3>Find anything</h3><p>Search every title, detail and note, and filter by category in a tap.</p></a>
+        <a class="card glass spot reveal" href="/backup"><div class="icon" style="--c:#a78bfa"><span class="ms" aria-hidden="true">add_to_drive</span></div><h3>Private Drive backup</h3><p>Back up to your own Google Drive and restore everything on a new phone.</p></a>
+        <a class="card glass spot reveal" href="/features#export"><div class="icon" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">file_save</span></div><h3>Save as PDF, Excel, TXT</h3><p>Export any document as a PDF, spreadsheet, text file, or images to your gallery.</p></a>
+      </div>
+    </section>
+
+    <section>
+      <div class="stats">
+        <div class="stat glass spot reveal"><div class="num" data-count="8">8</div><div class="label">document categories</div></div>
+        <div class="stat glass spot reveal"><div class="num" data-count="6">6</div><div class="label">reminder timings</div></div>
+        <div class="stat glass spot reveal"><div class="num" data-count="4">4</div><div class="label">ways to save a file</div></div>
+        <div class="stat glass spot reveal"><div class="num" data-count="0">0</div><div class="label">ads, ever</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head reveal"><h2>A quick look</h2><p>A clean, premium design that stays out of your way — in dark and light.</p></div>
+      <div class="strip">
+        <figure class="reveal"><div class="shot tilt"><img src="/assets/screen-home.png" alt="Memento home screen" loading="lazy" width="540" height="1200"></div><figcaption>Everything at a glance</figcaption></figure>
+        <figure class="reveal"><div class="shot tilt scan"><img src="/assets/screen-ai.png" alt="AI filling in a receipt" loading="lazy" width="540" height="1200"></div><figcaption>AI reads the document</figcaption></figure>
+        <figure class="reveal"><div class="shot tilt"><img src="/assets/screen-search.png" alt="Searching saved documents" loading="lazy" width="540" height="1200"></div><figcaption>Find it in seconds</figcaption></figure>
       </div>
     </section>
 
     <section>
       <div class="section-head reveal"><h2>How it works</h2></div>
       <div class="steps">
-        <div class="step glass reveal"><h3>Capture</h3><p>Tap the + button and scan a document or import photos.</p></div>
-        <div class="step glass reveal"><h3>Let AI read it</h3><p>Memento fills in the category, title, details and important dates. Review and save.</p></div>
-        <div class="step glass reveal"><h3>Relax</h3><p>Search anytime, get reminded before deadlines, and keep it all backed up.</p></div>
+        <div class="step glass spot reveal"><span class="ms step-icon" aria-hidden="true">add_a_photo</span><h3>Capture</h3><p>Tap the + button and scan a document or import photos.</p></div>
+        <div class="step glass spot reveal"><span class="ms step-icon" aria-hidden="true">auto_awesome</span><h3>Let AI read it</h3><p>Memento fills in the category, title, details and important dates. Review and save.</p></div>
+        <div class="step glass spot reveal"><span class="ms step-icon" aria-hidden="true">self_improvement</span><h3>Relax</h3><p>Search anytime, get reminded before deadlines, and keep it all backed up.</p></div>
+      </div>
+      <a class="more reveal" href="/how-it-works">Learn how it works</a>
+    </section>
+
+    <section>
+      <div class="band glass spot reveal">
+        <div><h2>Your data stays yours.</h2><p>Documents live on your phone. Photos go to Google's Gemini AI only to read them for you. Backups go to your own Google Drive, and Memento can only see the backup file it creates.</p></div>
+        <div class="cta"><a class="btn btn-ghost" href="/backup"><span class="ms" aria-hidden="true">add_to_drive</span>About backups</a><a class="btn btn-ghost" href="/privacy"><span class="ms" aria-hidden="true">policy</span>Privacy Policy</a></div>
       </div>
     </section>
 
-    <section id="privacy">
-      <div class="band glass reveal">
-        <div>
-          <h2>Your data stays yours.</h2>
-          <p>Documents are stored on your phone. Photos are sent to Google's Gemini AI only to read them for you. Backups go to your own Google Drive, and Memento can only see the backup files it creates.</p>
-        </div>
-        <a class="btn btn-ghost" href="privacy.html">Read the Privacy Policy</a>
+    <section>
+      <div class="band glass spot reveal">
+        <div><div class="stars" aria-hidden="true"><span class="ms fill" aria-hidden="true">star</span><span class="ms fill" aria-hidden="true">star</span><span class="ms fill" aria-hidden="true">star</span><span class="ms fill" aria-hidden="true">star</span><span class="ms fill" aria-hidden="true">star</span></div><h2>Love Memento? Tell the world.</h2><p>Your review on Trustpilot helps other people discover Memento and helps us improve it.</p></div>
+        <div class="cta"><a class="btn btn-primary" href="https://www.trustpilot.com/evaluate/mementoapp.online" target="_blank" rel="noopener"><span class="ms" aria-hidden="true">rate_review</span>Write a review</a><a class="btn btn-ghost" href="/reviews">More ways to review</a></div>
       </div>
     </section>
-
-    <section id="reviews">
-      <div class="band glass reveal">
-        <div>
-          <div class="stars" aria-hidden="true">★★★★★</div>
-          <h2>Love Memento? Tell the world.</h2>
-          <p>Your review on Trustpilot helps other people discover Memento and helps us improve it.</p>
-        </div>
-        <div class="cta">
-          <a class="btn btn-primary" href="https://www.trustpilot.com/evaluate/mementoapp.online" target="_blank" rel="noopener">Write a review</a>
-          <a class="btn btn-ghost" href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Read reviews</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="faq">
-      <div class="section-head reveal"><h2>Questions</h2></div>
-      <details class="glass reveal"><summary>Is Memento free?</summary><p>Yes. Memento is free to download and use, with no ads.</p></details>
-      <details class="glass reveal"><summary>Do I need an account?</summary><p>You sign in inside the app with email or Google so your documents stay tied to you and can be backed up and restored. This website doesn't need any sign-in.</p></details>
-      <details class="glass reveal"><summary>Where are my documents stored?</summary><p>On your phone, in Memento's private storage. If you turn on backup, a copy goes to your own Google Drive.</p></details>
-      <details class="glass reveal"><summary>How accurate is the AI?</summary><p>Very good for clear photos, but always double-check important numbers and dates against the original. You can edit anything it fills in.</p></details>
-      <details class="glass reveal"><summary>When can I get it?</summary><p>Memento is coming to Google Play soon. Tap “Get early access” or email <a href="mailto:admin@mementoapp.online">admin@mementoapp.online</a> and we'll let you know as soon as it's available. Once installed, the app checks this website for updates and tells you when a new version is ready.</p></details>
-      <details class="glass reveal"><summary>How do I contact you?</summary><p>Email <a href="mailto:admin@mementoapp.online">admin@mementoapp.online</a>. You can also send feedback from Profile → Send feedback in the app.</p></details>
-    </section>
+<section><div class="cta-band glass spot reveal">
+      <h2>Ready when your paperwork is.</h2>
+      <p>Memento is coming to Google Play. Get early access and we'll tell you the moment it's ready.</p>
+      <div class="cta"><a class="btn btn-primary" href="/download"><span class="ms" aria-hidden="true">rocket_launch</span>Get the app</a><a class="btn btn-ghost" href="/features">Explore features</a></div>
+    </div></section>
   </main>
-
   <footer class="wrap">
-    <div class="row">
-      <a class="brand" href="#top"><img src="assets/logo.svg" alt="">Memento</a>
-      <nav>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <a href="mailto:admin@mementoapp.online">admin@mementoapp.online</a>
-        <a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a>
-      </nav>
+    <div class="cols">
+      <div>
+        <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
+        <p class="tagline">Capture anything. Find it forever. AI document memory for Android.</p>
+      </div>
+      <div><h4>Product</h4><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a></div>
+      <div><h4>Company</h4><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
+      <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a></div>
+    </div>
+    <div class="bottom">
       <span>© <span id="year">2026</span> HM Dev Studio</span>
+      <a href="mailto:admin@mementoapp.online">admin@mementoapp.online</a>
     </div>
   </footer>
-
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-    }), { threshold: 0.12 });
-    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-  </script>
 </body>
 </html>
