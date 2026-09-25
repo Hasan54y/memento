@@ -100,6 +100,7 @@ function layout({ slug, title, description, body }) {
   <link href="__ICON_FONT__" rel="stylesheet">
   <link rel="stylesheet" href="/assets/site.css">
   <script src="/assets/site.js" defer></script>
+  <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 <body>
   <div class="progress" aria-hidden="true"></div>
@@ -223,7 +224,7 @@ page("index", "Home",
     <section>
       <div class="band glass spot reveal">
         <div><div class="stars" aria-hidden="true">${icon("star", "fill").repeat(5)}</div><h2>Love Memento? Tell the world.</h2><p>Your review on Trustpilot helps other people discover Memento and helps us improve it.</p></div>
-        <div class="cta">${btn(TRUSTPILOT_WRITE, "Write a review", "primary", "rate_review", ' target="_blank" rel="noopener"')}${btn("/reviews", "More ways to review", "ghost")}</div>
+        <div class="cta" style="min-width:230px"><div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6ab5020f20b30165e430b08f" data-style-height="52px" data-style-width="100%" data-token="eab3e8b8-be97-44ea-b1a7-c9f49fda1ae9"><a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a></div></div>
       </div>
     </section>
 ${ctaBand()}`);
@@ -337,7 +338,7 @@ page("reviews", "Reviews",
 
     <section>
       <div class="grid">
-        <article class="card glass spot reveal"><div class="icon" style="--c:#00b67a">${icon("star")}</div><h3>Trustpilot</h3><p>Share your experience publicly on Trustpilot.</p><div class="cta" style="margin-top:18px">${btn(TRUSTPILOT_WRITE, "Write a review", "primary", "", ' target="_blank" rel="noopener"')}${btn(TRUSTPILOT_READ, "Read reviews", "ghost", "", ' target="_blank" rel="noopener"')}</div></article>
+        <article class="card glass spot reveal"><div class="icon" style="--c:#00b67a">${icon("star")}</div><h3>Trustpilot</h3><p>Share your experience publicly on Trustpilot.</p><div style="margin-top:18px"><div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6ab5020f20b30165e430b08f" data-style-height="52px" data-style-width="100%" data-token="eab3e8b8-be97-44ea-b1a7-c9f49fda1ae9"><a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a></div></div><div class="cta" style="margin-top:14px">${btn(TRUSTPILOT_READ, "Read reviews", "ghost", "", ' target="_blank" rel="noopener"')}</div></article>
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("shop")}</div><h3>Google Play</h3><p>Rate Memento on the Play Store once it's published.</p><div style="margin-top:18px"><span class="badge-soon">${icon("schedule")} Coming soon</span></div></article>
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.mint}">${icon("forum")}</div><h3>In the app</h3><p>Profile → Send feedback. Rate with stars and tell us what to improve.</p><a class="more" href="/contact">Or contact us</a></article>
       </div>
