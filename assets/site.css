@@ -173,7 +173,6 @@ a.card:hover { transform: translateY(-3px); border-color: rgba(31, 224, 90, 0.35
 @media (max-width: 760px) { .band { grid-template-columns: 1fr; padding: 28px; } }
 .band h2 { font-size: clamp(28px, 3.6vw, 40px); margin-bottom: 8px; }
 .band p { margin: 0; color: var(--muted); }
-.stars { color: #00b67a; font-size: 22px; letter-spacing: 3px; }
 .cta-band { text-align: center; padding: 56px 28px; background: radial-gradient(120% 140% at 50% 0%, rgba(31, 224, 90, 0.18), rgba(255, 255, 255, 0.04) 60%); }
 .cta-band h2 { font-size: clamp(30px, 4.2vw, 46px); margin-bottom: 10px; }
 .cta-band p { color: var(--muted); margin: 0 auto 26px; max-width: 520px; }
