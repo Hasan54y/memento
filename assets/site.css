@@ -348,3 +348,7 @@ h1 em, h2 em { background-image: linear-gradient(100deg, #fff 0%, #7cef9c 30%, v
   .phone.back { transform: translateX(-88%) rotate(-7deg); }
   .phone.front { transform: translateX(-18%) rotate(3deg); }
 }
+
+/* Trustpilot Review Collector: the iframe is white, so present it as a tidy rounded badge */
+.trustpilot-widget { display: block; width: 100%; max-width: 300px; background: #fff; border-radius: 14px; overflow: hidden; padding: 4px 0; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); }
+.band .trustpilot-widget { margin-left: auto; }
