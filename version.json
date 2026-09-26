@@ -1,6 +1,6 @@
 {
-  "versionCode": 2,
-  "versionName": "1.0.0",
-  "downloadUrl": "https://mementoapp.online/",
-  "notes": "New look, Google Drive backup, save as PDF/Excel/TXT, and more."
+  "versionCode": 7,
+  "versionName": "1.1.0",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento",
+  "notes": "Grocery lists with automatic totals, links and photos in notes, amount due on bills, full text from letters and notices, and reminders at the time you choose."
 }
