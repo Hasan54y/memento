@@ -72,9 +72,36 @@ const NAV = [
 ];
 const MOBILE_EXTRA = [["about", "About", "info"], ["download", "Get the app", "rocket_launch"]];
 
+// Titles shown in Google results: lead with what people search for, keep under ~60 characters.
+const SEO_TITLES = {
+  index: "Memento: Receipt, Warranty & Bill Reminder App for Android",
+  features: "Scan Receipts, Track Warranties & Bills | Memento",
+  "how-it-works": "How Memento Reads Receipts & Documents | Memento",
+  backup: "Back Up Receipts & Documents to Google Drive | Memento",
+  faq: "FAQ: Document Organizer & Warranty Tracker App | Memento",
+  download: "Download Memento for Android | Memento",
+  reviews: "Memento Reviews | Memento",
+};
+const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Studio", url: `${SITE}/`, logo: `${SITE}/assets/logo.svg`, email: EMAIL,
+  sameAs: [TRUSTPILOT_READ, "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"] };
+const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Memento", operatingSystem: "Android 8.0+", applicationCategory: "ProductivityApplication",
+  description: "Scan receipts, warranty cards, bills and IDs. Memento reads the details, reminds you before dates expire and backs everything up to your own Google Drive.",
+  url: `${SITE}/`, image: `${SITE}/assets/og.png`, publisher: { "@id": `${SITE}/#org` },
+  installUrl: "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
+const FAQS = [];
+function jsonLd(slug, title, url) {
+  const graph = [ORG, { "@type": "WebSite", "@id": `${SITE}/#site`, name: "Memento", url: `${SITE}/`, publisher: { "@id": `${SITE}/#org` }, inLanguage: "en" }];
+  if (slug === "index" || slug === "download" || slug === "features") graph.push(APP);
+  if (slug !== "index" && slug !== "404") graph.push({ "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` }, { "@type": "ListItem", position: 2, name: title, item: url }] });
+  if (slug === "faq" && FAQS.length) graph.push({ "@type": "FAQPage", mainEntity: FAQS.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+  return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph })}</script>`;
+}
+
 function layout({ slug, title, description, body }) {
   const url = slug === "index" ? `${SITE}/` : `${SITE}/${slug}`;
-  const fullTitle = slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`;
+  const fullTitle = SEO_TITLES[slug] || (slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`);
   const link = ([s, label, ic], mobile) =>
     `<a href="/${s}"${s === slug ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}</a>`;
   return `<!doctype html>
@@ -92,7 +119,16 @@ function layout({ slug, title, description, body }) {
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${url}">
   <meta property="og:image" content="${SITE}/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Memento app: your paperwork, remembered">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${fullTitle}">
+  <meta name="twitter:description" content="${description}">
+  <meta name="twitter:image" content="${SITE}/assets/og.png">
+  ${slug === "404" ? '<meta name="robots" content="noindex">' : ""}
+  ${jsonLd(slug, title, url)}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -348,7 +384,7 @@ page("reviews", "Reviews",
 ${ctaBand()}`);
 
 // FAQ
-const faq = (q, a) => `<details class="glass reveal"><summary>${q}</summary><p>${a}</p></details>`;
+const faq = (q, a) => (FAQS.push([q.replace(/<[^>]+>/g, ""), a.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&")]), `<details class="glass reveal"><summary>${q}</summary><p>${a}</p></details>`);
 page("faq", "FAQ",
   "Answers about Memento: pricing, accounts, AI accuracy, privacy, Google Drive backup, reminders and exporting.",
   `    ${pageHero({ eyebrow: "FAQ", eyebrowIcon: "help", title: "Questions, <em>answered.</em>", lead: `Can't find what you're looking for? <a href="/contact">Contact us</a>.` })}
