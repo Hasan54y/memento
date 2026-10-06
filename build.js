@@ -576,136 +576,135 @@ ${list.map((s) => `      <section class="glass reveal"><h2>${esc(s.heading)}</h2
 const nPrivacy = legal("privacy", "Privacy Policy", sections("PrivacySections"), "How Memento handles your account, documents, AI processing and backups.", "policy");
 const nTerms = legal("terms", "Terms of Service", sections("TermsSections"), "The terms for using the Memento app.", "gavel");
 
-// ---------- Free tools (Bangla, for people in Bangladesh) ----------
+// ---------- Free tools ----------
 // Everything runs in the visitor's browser: no uploads, no server.
-SEO_TITLES["tools/index"] = "ফ্রি টুলস: ছবি রিসাইজ, PDF ও আরও | Memento";
-SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resize | ছবি ও স্বাক্ষর রিসাইজ";
+SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Memento";
+SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
 
 function memoBand() {
   return `<section><div class="band glass spot reveal">
-      <div><h2>সার্টিফিকেট, NID, রশিদ: সব <em>এক জায়গায়।</em></h2><p>পরের আবেদনের সময় আর কাগজ খুঁজতে হবে না। Memento-তে ডকুমেন্টের ছবি তুলে রাখুন, Memento নিজেই দরকারি তথ্যগুলো লিখে রাখে আর এক সার্চে খুঁজে দেয়।</p></div>
-      <div class="cta">${btn("/", "Memento দেখুন", "primary", "rocket_launch")}</div>
+      <div><h2>Certificates, IDs, receipts: <em>all in one place.</em></h2><p>Never dig through drawers before the next application. Snap your documents into Memento, and it fills in the details and finds any of them in one search.</p></div>
+      <div class="cta">${btn("/", "Meet Memento", "primary", "rocket_launch")}</div>
     </div></section>`;
 }
 
 const TOOLS = [
-  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "ছবি ও স্বাক্ষর রিসাইজ", text: "চাকরির আবেদনের ছবি 300×300 আর স্বাক্ষর 300×80, ঠিক KB-এর মধ্যে।" },
-  { icon: "picture_as_pdf", color: C.coral, title: "ছবি থেকে PDF ও PDF ছোট করা", text: "কয়েকটা ছবি এক PDF-এ, আর PDF-কে নির্দিষ্ট KB-এর নিচে।" },
-  { icon: "cake", color: C.amber, title: "বয়স ক্যালকুলেটর", text: "সার্কুলারের তারিখে আপনার বয়স কত বছর, মাস, দিন।" },
-  { icon: "translate", color: C.sky, title: "বিজয় ↔ ইউনিকোড", text: "পুরনো বিজয়ের লেখা ইউনিকোডে, আর ইউনিকোড থেকে বিজয়ে।" },
-  { icon: "payments", color: C.violet, title: "টাকা কথায়", text: "যেকোনো অঙ্ক বাংলা ও ইংরেজি কথায়, চেক বা ভাউচারের জন্য।" },
+  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer", text: "Job application photo at 300×300 and signature at 300×80, under the KB limit." },
+  { icon: "picture_as_pdf", color: C.coral, title: "Image to PDF & PDF compressor", text: "Combine photos into one PDF, and shrink a PDF under a set size." },
+  { icon: "cake", color: C.amber, title: "Age calculator", text: "Your exact age in years, months and days on a circular's cut-off date." },
+  { icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter", text: "Convert old Bijoy Bangla text to Unicode, and back." },
+  { icon: "payments", color: C.violet, title: "Amount in words", text: "Write any amount in English and Bangla words, for cheques and invoices." },
 ];
 
 page("tools/index", "Free tools",
-  "চাকরির আবেদন আর কাগজপত্রের কাজের জন্য ফ্রি অনলাইন টুল। ছবি ও স্বাক্ষর রিসাইজসহ সব টুল আপনার ব্রাউজারেই চলে, কোনো ফাইল আপলোড হয় না।",
-  `    ${pageHero({ eyebrow: "ফ্রি টুলস", eyebrowIcon: "handyman", title: "কাগজপত্রের ঝামেলা, <em>এক মিনিটে শেষ।</em>", lead: "আবেদন ফর্ম, ছবি, PDF: ছোট ছোট কাজের জন্য ফ্রি টুল। সব কাজ আপনার ফোন বা কম্পিউটারেই হয়, কোনো ফাইল কোথাও আপলোড হয় না।" })}
+  "Free online tools for job applications and paperwork: resize photos and signatures, and more. Everything runs in your browser; no files are uploaded.",
+  `    ${pageHero({ eyebrow: "Free tools", eyebrowIcon: "handyman", title: "Paperwork chores, <em>done in a minute.</em>", lead: "Application forms, photos, PDFs: free tools for the small jobs. Everything happens on your phone or computer, and no file is ever uploaded." })}
 
     <section style="padding-top:32px">
       <div class="grid">
         ${TOOLS.map((t) => t.slug
           ? card({ icon: t.icon, color: t.color, title: t.title, text: t.text, href: `/tools/${t.slug}` })
-          : `<article class="card glass spot reveal soon"><div class="icon" style="--c:${t.color}">${icon(t.icon)}</div><h3>${t.title}</h3><p>${t.text}</p><span class="badge-soon">${icon("schedule")} শীঘ্রই আসছে</span></article>`).join("\n        ")}
+          : `<article class="card glass spot reveal soon"><div class="icon" style="--c:${t.color}">${icon(t.icon)}</div><h3>${t.title}</h3><p>${t.text}</p><span class="badge-soon">${icon("schedule")} Coming soon</span></article>`).join("\n        ")}
       </div>
     </section>
-${memoBand()}`, { lang: "bn" });
+${memoBand()}`);
 
 const RESIZER_FAQS = [];
 const rfaq = faqInto(RESIZER_FAQS);
-page("tools/photo-signature-resizer", "ছবি ও স্বাক্ষর রিসাইজ",
-  "চাকরির আবেদনের ছবি 300×300 (100 KB) ও স্বাক্ষর 300×80 (60 KB) এক মিনিটে ঠিক মাপে করুন। ফ্রি, কোনো আপলোড নেই: সব কাজ আপনার ফোনেই হয়।",
-  `    ${pageHero({ eyebrow: "ফ্রি টুল", eyebrowIcon: "photo_size_select_large", title: "আবেদনের ছবি ও স্বাক্ষর, <em>ঠিক মাপে।</em>", lead: "ছবি দিন, ফ্রেমে ঠিক করে বসান, ডাউনলোড করুন। মাপ আর KB-এর হিসাব এই টুল নিজেই করে দেয়।" })}
+page("tools/photo-signature-resizer", "Photo & signature resizer",
+  "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB) in a minute. Free, and nothing is uploaded: it all happens on your device.",
+  `    ${pageHero({ eyebrow: "Free tool", eyebrowIcon: "photo_size_select_large", title: "Application photo & signature, <em>the right size.</em>", lead: "Add a picture, frame it, download. The tool takes care of the pixels and the KB limit for you." })}
 
     <section class="tool-section">
       <div class="tool glass" id="resizer">
-        <div class="modes" role="tablist" aria-label="কী বানাবেন">
-          <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}ছবি <small>300×300</small></button>
-          <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}স্বাক্ষর <small>300×80</small></button>
-          <button type="button" role="tab" data-mode="custom" aria-selected="false">${icon("tune")}নিজের মাপ</button>
+        <div class="modes" role="tablist" aria-label="What are you making?">
+          <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}Photo <small>300×300</small></button>
+          <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}Signature <small>300×80</small></button>
+          <button type="button" role="tab" data-mode="custom" aria-selected="false">${icon("tune")}Custom size</button>
         </div>
         <div class="custom" hidden>
-          <label>প্রস্থ (px)<input id="cw" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
-          <label>উচ্চতা (px)<input id="ch" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
-          <label>সর্বোচ্চ KB<input id="ckb" type="number" inputmode="numeric" min="5" max="10000" value="100" placeholder="সীমা নেই"></label>
+          <label>Width (px)<input id="cw" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+          <label>Height (px)<input id="ch" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+          <label>Max KB<input id="ckb" type="number" inputmode="numeric" min="5" max="10000" value="100" placeholder="No limit"></label>
         </div>
 
         <div class="tool-grid">
           <div class="stage">
             <label class="drop" id="drop">
               ${icon("add_photo_alternate")}
-              <strong data-drop-title>ছবি বেছে নিন</strong>
-              <span class="sub">অথবা এখানে টেনে আনুন / পেস্ট করুন। JPG, PNG বা WebP।</span>
+              <strong data-drop-title>Choose a photo</strong>
+              <span class="sub">or drag it here, or paste it. JPG, PNG or WebP.</span>
               <input id="file" type="file" accept="image/*">
             </label>
             <div class="editor" hidden>
-              <div class="frame"><canvas id="view" aria-label="ছবিটি টেনে সরান, জুম করে ফ্রেমে বসান"></canvas></div>
-              <p class="hint-line">${icon("pan_tool")} টেনে সরান, জুম করে ফ্রেমে বসান। সবুজ দাগগুলো শুধু সাহায্যের জন্য, ছবিতে আসবে না।</p>
+              <div class="frame"><canvas id="view" aria-label="Drag and zoom to frame the picture"></canvas></div>
+              <p class="hint-line">${icon("pan_tool")} Drag to move, zoom to fit. The green guides are only here to help; they won't appear in the file.</p>
               <div class="controls">
-                <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="জুম">${icon("zoom_in")}</label>
-                <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}ঘোরান</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}অন্য ছবি</button>
+                <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
+                <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New picture</button>
               </div>
               <div class="controls">
-                <label class="check"><input id="clean" type="checkbox">কাগজ সাদা ও লেখা গাঢ় করুন</label>
-                <label class="zoom strength" hidden>হালকা<input id="strength" type="range" min="0" max="100" value="60" aria-label="কতটা পরিষ্কার">বেশি</label>
+                <label class="check"><input id="clean" type="checkbox">Whiten paper, darken ink</label>
+                <label class="zoom strength" hidden>Light<input id="strength" type="range" min="0" max="100" value="60" aria-label="Cleanup strength">Strong</label>
               </div>
             </div>
             <p class="err" id="err" role="alert" hidden></p>
           </div>
 
           <div class="result" aria-live="polite">
-            <h3>${icon("task_alt")} ফলাফল</h3>
-            <div class="out"><img id="out" alt="রিসাইজ করা ছবির প্রিভিউ" hidden><span class="empty">ছবি দিলে এখানে দেখা যাবে</span></div>
+            <h3>${icon("task_alt")} Result</h3>
+            <div class="out"><img id="out" alt="Preview of the resized picture" hidden><span class="empty">Your result will appear here</span></div>
             <ul class="facts">
-              <li><span>মাপ</span><b id="f-dim">—</b></li>
-              <li><span>ফাইল সাইজ</span><b id="f-size">—</b></li>
-              <li><span>ফরম্যাট</span><b>JPG</b></li>
+              <li><span>Size</span><b id="f-dim">—</b></li>
+              <li><span>File size</span><b id="f-size">—</b></li>
+              <li><span>Format</span><b>JPG</b></li>
             </ul>
-            <a class="btn btn-primary" id="dl" href="#" aria-disabled="true">${icon("download")}ডাউনলোড</a>
+            <a class="btn btn-primary" id="dl" href="#" aria-disabled="true">${icon("download")}Download</a>
           </div>
         </div>
-        <p class="privacy-note">${icon("lock")} আপনার ছবি কোথাও আপলোড হয় না। পুরো কাজটা আপনার ব্রাউজারের ভেতরেই হয়।</p>
+        <p class="privacy-note">${icon("lock")} Your picture is never uploaded. All the work happens inside your browser.</p>
       </div>
     </section>
 
     <section>
-      <div class="section-head reveal"><h2>কীভাবে ব্যবহার করবেন</h2></div>
+      <div class="section-head reveal"><h2>How to use it</h2></div>
       <div class="steps">
-        <div class="step glass spot reveal">${icon("touch_app", "step-icon")}<h3>ধরন বেছে নিন</h3><p>ছবি (300×300), স্বাক্ষর (300×80), অথবা সার্কুলারে অন্য মাপ চাইলে "নিজের মাপ"।</p></div>
-        <div class="step glass spot reveal">${icon("crop", "step-icon")}<h3>ফ্রেমে বসান</h3><p>ছবি দিন, টেনে আর জুম করে মুখ বা স্বাক্ষরটা ফ্রেমের মাঝে আনুন।</p></div>
-        <div class="step glass spot reveal">${icon("download", "step-icon")}<h3>ডাউনলোড করুন</h3><p>মাপ আর KB ঠিক আছে কিনা দেখে নিন, তারপর ডাউনলোড করে আবেদনে আপলোড করুন।</p></div>
+        <div class="step glass spot reveal">${icon("touch_app", "step-icon")}<h3>Pick a type</h3><p>Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else.</p></div>
+        <div class="step glass spot reveal">${icon("crop", "step-icon")}<h3>Frame it</h3><p>Add your picture, then drag and zoom until your face or signature sits in the middle.</p></div>
+        <div class="step glass spot reveal">${icon("download", "step-icon")}<h3>Download</h3><p>Check the size and KB, download, and upload the file to your application.</p></div>
       </div>
     </section>
 
     <section>
-      <div class="section-head reveal"><h2>ভালো ফলের জন্য</h2><p>পরিষ্কার ছবি দিলে রিসাইজের পরেও ছবি পরিষ্কার থাকে।</p></div>
+      <div class="section-head reveal"><h2>For the best result</h2><p>A clear original stays clear after resizing.</p></div>
       <div class="grid">
-        ${card({ icon: "light_mode", color: C.amber, title: "আলোতে তুলুন", text: "দিনের আলোয় বা উজ্জ্বল ঘরে, মুখে যেন ছায়া না পড়ে।" })}
-        ${card({ icon: "wallpaper", color: C.sky, title: "হালকা ব্যাকগ্রাউন্ড", text: "সাদা বা হালকা রঙের দেয়ালের সামনে দাঁড়ান। সার্কুলারে আলাদা কিছু চাইলে সেটাই মানুন।" })}
-        ${card({ icon: "face", color: C.mint, title: "মুখ মাঝখানে", text: "মাথার ওপরে আর কাঁধ পর্যন্ত একটু জায়গা রাখুন, মুখ সোজা ক্যামেরার দিকে।" })}
-        ${card({ icon: "edit", color: C.violet, title: "সাদা কাগজে স্বাক্ষর", text: "কালো বা নীল কলমে সাদা কাগজে স্বাক্ষর করে সোজা ওপর থেকে ছবি তুলুন।" })}
-        ${card({ icon: "auto_fix_high", color: C.green, title: "কাগজ সাদা করুন", text: "স্বাক্ষরের কাগজ ধূসর দেখালে \"কাগজ সাদা ও লেখা গাঢ় করুন\" চালু করুন।" })}
-        ${card({ icon: "fact_check", color: C.coral, title: "সার্কুলার মিলিয়ে নিন", text: "প্রতিটি আবেদনের মাপ আলাদা হতে পারে। আপলোডের আগে সার্কুলারের মাপ দেখে নিন।" })}
+        ${card({ icon: "light_mode", color: C.amber, title: "Good light", text: "Daylight or a bright room, with no shadows on your face." })}
+        ${card({ icon: "wallpaper", color: C.sky, title: "Plain, light background", text: "Stand in front of a white or light wall. If the circular asks for something else, follow it." })}
+        ${card({ icon: "face", color: C.mint, title: "Face in the middle", text: "Leave a little room above your head and down to your shoulders, looking straight at the camera." })}
+        ${card({ icon: "edit", color: C.violet, title: "Sign on white paper", text: "Sign with a black or blue pen on white paper, and take the photo straight from above." })}
+        ${card({ icon: "auto_fix_high", color: C.green, title: "Whiten the paper", text: "If the paper looks grey, turn on \"Whiten paper, darken ink\"." })}
+        ${card({ icon: "fact_check", color: C.coral, title: "Check the circular", text: "Every application can ask for different sizes. Check the circular before you upload." })}
       </div>
     </section>
 
     <section class="faq" style="padding-top:24px">
-      <div class="faq-group"><h2 class="reveal">সাধারণ প্রশ্ন</h2>
-        ${rfaq("চাকরির আবেদনে ছবি ও স্বাক্ষরের মাপ কত লাগে?", "Teletalk-এর মাধ্যমে হওয়া বেশিরভাগ সরকারি চাকরির আবেদনে ছবি 300×300 পিক্সেল (সর্বোচ্চ 100 KB) আর স্বাক্ষর 300×80 পিক্সেল (সর্বোচ্চ 60 KB) চাওয়া হয়। তবে প্রতিটি সার্কুলারে মাপ আলাদা হতে পারে, তাই আবেদনের আগে সার্কুলার দেখে নিন। অন্য মাপ লাগলে \"নিজের মাপ\" ব্যবহার করুন।")}
-        ${rfaq("আমার ছবি কি কোথাও আপলোড হয়?", "না। ছবি রিসাইজের পুরো কাজটা আপনার ব্রাউজারের ভেতরেই হয়। ছবি আমাদের বা অন্য কারও সার্ভারে যায় না।")}
-        ${rfaq("মোবাইল থেকে ব্যবহার করা যাবে?", "হ্যাঁ। ফোনের ব্রাউজারে খুলে গ্যালারি থেকে ছবি দিন বা নতুন ছবি তুলুন। দুই আঙুলে জুম করা যায়।")}
-        ${rfaq("ডাউনলোড করা ফাইল কোথায় পাব?", "সাধারণত ফোন বা কম্পিউটারের Downloads ফোল্ডারে। ফাইলের নাম হবে photo-300x300.jpg বা signature-300x80.jpg।")}
-        ${rfaq("রিসাইজের পর ছবি ঝাপসা লাগছে কেন?", "মূল ছবি ঝাপসা বা খুব ছোট হলে রিসাইজের পরেও ঝাপসা দেখায়। ভালো আলোতে তোলা পরিষ্কার ছবি ব্যবহার করুন।")}
-        ${rfaq("এটা কি সত্যিই ফ্রি?", "হ্যাঁ, পুরোপুরি ফ্রি। কোনো অ্যাকাউন্ট বা সাইন-ইন লাগে না।")}
+      <div class="faq-group"><h2 class="reveal">Questions</h2>
+        ${rfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
+        ${rfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
+        ${rfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
+        ${rfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}
+        ${rfaq("Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light.")}
+        ${rfaq("Is it really free?", "Yes, completely free. No account or sign-in needed.")}
       </div>
     </section>
 ${memoBand()}`, {
-  lang: "bn",
   scripts: ["resizer.js"],
   faqs: RESIZER_FAQS,
-  schema: [{ "@type": "WebApplication", name: "ছবি ও স্বাক্ষর রিসাইজ", url: urlOf("tools/photo-signature-resizer"), inLanguage: "bn",
+  schema: [{ "@type": "WebApplication", name: "Photo & signature resizer", url: urlOf("tools/photo-signature-resizer"), inLanguage: "en",
     applicationCategory: "MultimediaApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript",
-    description: "চাকরির আবেদনের ছবি 300×300 ও স্বাক্ষর 300×80 পিক্সেলে, নির্দিষ্ট KB-এর মধ্যে রিসাইজ করার ফ্রি টুল।",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "BDT" }, publisher: { "@id": `${SITE}/#org` } }],
+    description: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels, under a set KB limit.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }, publisher: { "@id": `${SITE}/#org` } }],
 });
 
 // 404

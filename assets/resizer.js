@@ -6,9 +6,9 @@
   const $ = (s) => root.querySelector(s);
 
   const PRESETS = {
-    photo: { w: 300, h: 300, kb: 100, file: "photo", clean: false, drop: "ছবি বেছে নিন" },
-    sign: { w: 300, h: 80, kb: 60, file: "signature", clean: true, drop: "স্বাক্ষরের ছবি বেছে নিন" },
-    custom: { file: "image", clean: false, drop: "ছবি বেছে নিন" },
+    photo: { w: 300, h: 300, kb: 100, file: "photo", clean: false, drop: "Choose a photo" },
+    sign: { w: 300, h: 80, kb: 60, file: "signature", clean: true, drop: "Choose a signature picture" },
+    custom: { file: "image", clean: false, drop: "Choose a picture" },
   };
   const MAX_SRC = 2400; // longest side kept from the original; plenty for any form photo
   const MIN_ZOOM = 0.5, MAX_ZOOM = 4;
@@ -52,7 +52,7 @@
     try { pic = await createImageBitmap(file, { imageOrientation: "from-image" }); }
     catch { try { pic = await decodeViaImg(file); } catch { pic = null; } }
     if (!pic) {
-      showError("এই ফাইলটি খোলা যাচ্ছে না। JPG, PNG বা WebP ছবি দিন। iPhone-এর HEIC ছবি হলে আগে JPG করে নিন, অথবা স্ক্রিনশট নিয়ে সেটা দিন।");
+      showError("This file can't be opened. Use a JPG, PNG or WebP picture. For an iPhone HEIC photo, convert it to JPG first or use a screenshot of it.");
       return;
     }
     const pw = pic.naturalWidth || pic.width, ph = pic.naturalHeight || pic.height;
@@ -206,7 +206,7 @@
     exportSeq++;
     out.hidden = true;
     empty.hidden = false;
-    empty.textContent = msg || "ছবি দিলে এখানে দেখা যাবে";
+    empty.textContent = msg || "Your result will appear here";
     fDim.textContent = "—"; fDim.className = "";
     fSize.textContent = "—"; fSize.className = "";
     dl.setAttribute("aria-disabled", "true");
@@ -222,7 +222,7 @@
   async function exportFile() {
     const s = states[mode], t = target();
     if (!s) return resetOutput();
-    if (!t) return resetOutput("প্রস্থ ও উচ্চতা 20 থেকে 5000 পিক্সেলের মধ্যে দিন");
+    if (!t) return resetOutput("Width and height must be between 20 and 5000 pixels");
     const seq = ++exportSeq;
     const c = canvas(t.w, t.h);
     clampPos(s, t.w, t.h);
@@ -249,9 +249,9 @@
     const fits = blob.size <= limit;
     fDim.textContent = `${t.w} × ${t.h} px ✓`;
     fDim.className = "ok";
-    fSize.textContent = t.kb ? `${kb(blob.size)} ${fits ? "✓" : "✗"} (সর্বোচ্চ ${t.kb} KB)` : kb(blob.size);
+    fSize.textContent = t.kb ? `${kb(blob.size)} ${fits ? "✓" : "✗"} (max ${t.kb} KB)` : kb(blob.size);
     fSize.className = fits ? "ok" : "bad";
-    if (!fits) showError(`এই মাপে ছবিটি ${t.kb} KB-এর নিচে নামানো যাচ্ছে না। প্রস্থ-উচ্চতা কমান বা KB-এর সীমা বাড়ান।`);
+    if (!fits) showError(`At this size the picture can't get under ${t.kb} KB. Use a smaller width and height or a higher KB limit.`);
     dl.href = outUrl;
     dl.download = `${PRESETS[mode].file}-${t.w}x${t.h}.jpg`;
     dl.setAttribute("aria-disabled", fits ? "false" : "true");
@@ -285,7 +285,7 @@
   [cw, ch, ckb].forEach((el) => el.addEventListener("input", () => {
     showError("");
     if (!states[mode]) return;
-    if (!target()) return resetOutput("প্রস্থ ও উচ্চতা 20 থেকে 5000 পিক্সেলের মধ্যে দিন");
+    if (!target()) return resetOutput("Width and height must be between 20 and 5000 pixels");
     sizeView();
     render();
     scheduleExport();
