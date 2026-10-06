@@ -68,6 +68,7 @@ const NAV = [
   ["backup", "Backup", "add_to_drive"],
   ["reviews", "Reviews", "rate_review"],
   ["faq", "FAQ", "help"],
+  ["tools/", "Tools", "handyman"],
   ["contact", "Contact", "mail"],
 ];
 const MOBILE_EXTRA = [["about", "About", "info"], ["download", "Get the app", "rocket_launch"]];
@@ -90,22 +91,31 @@ const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Mement
   installUrl: "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
 const FAQS = [];
-function jsonLd(slug, title, url) {
+// "tools/index" is served at /tools/, everything else at its clean slug
+const urlOf = (slug) => slug === "index" ? `${SITE}/` : slug.endsWith("/index") ? `${SITE}/${slug.slice(0, -5)}` : `${SITE}/${slug}`;
+function jsonLd(slug, title, url, faqs = [], extra = []) {
   const graph = [ORG, { "@type": "WebSite", "@id": `${SITE}/#site`, name: "Memento", url: `${SITE}/`, publisher: { "@id": `${SITE}/#org` }, inLanguage: "en" }];
   if (slug === "index" || slug === "download" || slug === "features") graph.push(APP);
-  if (slug !== "index" && slug !== "404") graph.push({ "@type": "BreadcrumbList", itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` }, { "@type": "ListItem", position: 2, name: title, item: url }] });
-  if (slug === "faq" && FAQS.length) graph.push({ "@type": "FAQPage", mainEntity: FAQS.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+  if (slug !== "index" && slug !== "404") {
+    const crumbs = [["Home", `${SITE}/`]];
+    if (slug.startsWith("tools/") && slug !== "tools/index") crumbs.push(["Free tools", urlOf("tools/index")]);
+    crumbs.push([title, url]);
+    graph.push({ "@type": "BreadcrumbList", itemListElement: crumbs.map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, item })) });
+  }
+  if (faqs.length) graph.push({ "@type": "FAQPage", mainEntity: faqs.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+  graph.push(...extra);
   return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph })}</script>`;
 }
 
-function layout({ slug, title, description, body }) {
-  const url = slug === "index" ? `${SITE}/` : `${SITE}/${slug}`;
+function layout({ slug, title, description, body, lang = "en", scripts = [], faqs, schema }) {
+  const url = urlOf(slug);
+  const bn = lang === "bn";
   const fullTitle = SEO_TITLES[slug] || (slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`);
+  const isActive = (s) => s === slug || (s.endsWith("/") && slug.startsWith(s));
   const link = ([s, label, ic], mobile) =>
-    `<a href="/${s}"${s === slug ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}</a>`;
+    `<a href="/${s}"${isActive(s) ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}</a>`;
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -122,20 +132,21 @@ function layout({ slug, title, description, body }) {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Memento app: your paperwork, remembered">
-  <meta property="og:locale" content="en_US">
+  <meta property="og:locale" content="${bn ? "bn_BD" : "en_US"}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${SITE}/assets/og.png">
   ${slug === "404" ? '<meta name="robots" content="noindex">' : ""}
-  ${jsonLd(slug, title, url)}
+  ${jsonLd(slug, title, url, faqs, schema)}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700${bn ? "&family=Hind+Siliguri:wght@400;500;600;700" : ""}&display=swap" rel="stylesheet">
   <link href="__ICON_FONT__" rel="stylesheet">
   <link rel="stylesheet" href="/assets/site.css">
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js" defer></script>${scripts.map((s) => `
+  <script src="/assets/${s}" defer></script>`).join("")}
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 <body>
@@ -159,7 +170,7 @@ ${body}
         <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
         <p class="tagline">More than a notepad. Your paperwork, remembered.</p>
       </div>
-      <div><h4>Product</h4><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a></div>
+      <div><h4>Product</h4><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a></div>
       <div><h4>Company</h4><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
       <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
@@ -175,7 +186,7 @@ ${body}
 
 // ---------- Pages ----------
 const pages = [];
-const page = (slug, title, description, body) => pages.push({ slug, title, description, body });
+const page = (slug, title, description, body, opts = {}) => pages.push({ slug, title, description, body, ...opts });
 
 const DOC_TYPES = [
   ["receipt_long", "Purchase receipts", C.green],
@@ -384,7 +395,9 @@ page("reviews", "Reviews",
 ${ctaBand()}`);
 
 // FAQ
-const faq = (q, a) => (FAQS.push([q.replace(/<[^>]+>/g, ""), a.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&")]), `<details class="glass reveal"><summary>${q}</summary><p>${a}</p></details>`);
+// Each FAQ answer is also collected for the page's FAQPage structured data
+const faqInto = (list) => (q, a) => (list.push([q.replace(/<[^>]+>/g, ""), a.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&")]), `<details class="glass reveal"><summary>${q}</summary><p>${a}</p></details>`);
+const faq = faqInto(FAQS);
 page("faq", "FAQ",
   "Answers about Memento: pricing, accounts, AI accuracy, privacy, Google Drive backup, reminders and exporting.",
   `    ${pageHero({ eyebrow: "FAQ", eyebrowIcon: "help", title: "Questions, <em>answered.</em>", lead: `Can't find what you're looking for? <a href="/contact">Contact us</a>.` })}
@@ -416,7 +429,7 @@ page("faq", "FAQ",
         ${faq("How do I contact you?", `Email <a href="mailto:${EMAIL}">${EMAIL}</a>, use the <a href="/contact">contact form</a>, or send feedback from Profile → Send feedback in the app.`)}
       </div>
     </div>
-${ctaBand()}`);
+${ctaBand()}`, { faqs: FAQS });
 
 // Download
 page("download", "Get the app",
@@ -563,6 +576,138 @@ ${list.map((s) => `      <section class="glass reveal"><h2>${esc(s.heading)}</h2
 const nPrivacy = legal("privacy", "Privacy Policy", sections("PrivacySections"), "How Memento handles your account, documents, AI processing and backups.", "policy");
 const nTerms = legal("terms", "Terms of Service", sections("TermsSections"), "The terms for using the Memento app.", "gavel");
 
+// ---------- Free tools (Bangla, for people in Bangladesh) ----------
+// Everything runs in the visitor's browser: no uploads, no server.
+SEO_TITLES["tools/index"] = "ফ্রি টুলস: ছবি রিসাইজ, PDF ও আরও | Memento";
+SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resize | ছবি ও স্বাক্ষর রিসাইজ";
+
+function memoBand() {
+  return `<section><div class="band glass spot reveal">
+      <div><h2>সার্টিফিকেট, NID, রশিদ: সব <em>এক জায়গায়।</em></h2><p>পরের আবেদনের সময় আর কাগজ খুঁজতে হবে না। Memento-তে ডকুমেন্টের ছবি তুলে রাখুন, Memento নিজেই দরকারি তথ্যগুলো লিখে রাখে আর এক সার্চে খুঁজে দেয়।</p></div>
+      <div class="cta">${btn("/", "Memento দেখুন", "primary", "rocket_launch")}</div>
+    </div></section>`;
+}
+
+const TOOLS = [
+  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "ছবি ও স্বাক্ষর রিসাইজ", text: "চাকরির আবেদনের ছবি 300×300 আর স্বাক্ষর 300×80, ঠিক KB-এর মধ্যে।" },
+  { icon: "picture_as_pdf", color: C.coral, title: "ছবি থেকে PDF ও PDF ছোট করা", text: "কয়েকটা ছবি এক PDF-এ, আর PDF-কে নির্দিষ্ট KB-এর নিচে।" },
+  { icon: "cake", color: C.amber, title: "বয়স ক্যালকুলেটর", text: "সার্কুলারের তারিখে আপনার বয়স কত বছর, মাস, দিন।" },
+  { icon: "translate", color: C.sky, title: "বিজয় ↔ ইউনিকোড", text: "পুরনো বিজয়ের লেখা ইউনিকোডে, আর ইউনিকোড থেকে বিজয়ে।" },
+  { icon: "payments", color: C.violet, title: "টাকা কথায়", text: "যেকোনো অঙ্ক বাংলা ও ইংরেজি কথায়, চেক বা ভাউচারের জন্য।" },
+];
+
+page("tools/index", "Free tools",
+  "চাকরির আবেদন আর কাগজপত্রের কাজের জন্য ফ্রি অনলাইন টুল। ছবি ও স্বাক্ষর রিসাইজসহ সব টুল আপনার ব্রাউজারেই চলে, কোনো ফাইল আপলোড হয় না।",
+  `    ${pageHero({ eyebrow: "ফ্রি টুলস", eyebrowIcon: "handyman", title: "কাগজপত্রের ঝামেলা, <em>এক মিনিটে শেষ।</em>", lead: "আবেদন ফর্ম, ছবি, PDF: ছোট ছোট কাজের জন্য ফ্রি টুল। সব কাজ আপনার ফোন বা কম্পিউটারেই হয়, কোনো ফাইল কোথাও আপলোড হয় না।" })}
+
+    <section style="padding-top:32px">
+      <div class="grid">
+        ${TOOLS.map((t) => t.slug
+          ? card({ icon: t.icon, color: t.color, title: t.title, text: t.text, href: `/tools/${t.slug}` })
+          : `<article class="card glass spot reveal soon"><div class="icon" style="--c:${t.color}">${icon(t.icon)}</div><h3>${t.title}</h3><p>${t.text}</p><span class="badge-soon">${icon("schedule")} শীঘ্রই আসছে</span></article>`).join("\n        ")}
+      </div>
+    </section>
+${memoBand()}`, { lang: "bn" });
+
+const RESIZER_FAQS = [];
+const rfaq = faqInto(RESIZER_FAQS);
+page("tools/photo-signature-resizer", "ছবি ও স্বাক্ষর রিসাইজ",
+  "চাকরির আবেদনের ছবি 300×300 (100 KB) ও স্বাক্ষর 300×80 (60 KB) এক মিনিটে ঠিক মাপে করুন। ফ্রি, কোনো আপলোড নেই: সব কাজ আপনার ফোনেই হয়।",
+  `    ${pageHero({ eyebrow: "ফ্রি টুল", eyebrowIcon: "photo_size_select_large", title: "আবেদনের ছবি ও স্বাক্ষর, <em>ঠিক মাপে।</em>", lead: "ছবি দিন, ফ্রেমে ঠিক করে বসান, ডাউনলোড করুন। মাপ আর KB-এর হিসাব এই টুল নিজেই করে দেয়।" })}
+
+    <section class="tool-section">
+      <div class="tool glass" id="resizer">
+        <div class="modes" role="tablist" aria-label="কী বানাবেন">
+          <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}ছবি <small>300×300</small></button>
+          <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}স্বাক্ষর <small>300×80</small></button>
+          <button type="button" role="tab" data-mode="custom" aria-selected="false">${icon("tune")}নিজের মাপ</button>
+        </div>
+        <div class="custom" hidden>
+          <label>প্রস্থ (px)<input id="cw" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+          <label>উচ্চতা (px)<input id="ch" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+          <label>সর্বোচ্চ KB<input id="ckb" type="number" inputmode="numeric" min="5" max="10000" value="100" placeholder="সীমা নেই"></label>
+        </div>
+
+        <div class="tool-grid">
+          <div class="stage">
+            <label class="drop" id="drop">
+              ${icon("add_photo_alternate")}
+              <strong data-drop-title>ছবি বেছে নিন</strong>
+              <span class="sub">অথবা এখানে টেনে আনুন / পেস্ট করুন। JPG, PNG বা WebP।</span>
+              <input id="file" type="file" accept="image/*">
+            </label>
+            <div class="editor" hidden>
+              <div class="frame"><canvas id="view" aria-label="ছবিটি টেনে সরান, জুম করে ফ্রেমে বসান"></canvas></div>
+              <p class="hint-line">${icon("pan_tool")} টেনে সরান, জুম করে ফ্রেমে বসান। সবুজ দাগগুলো শুধু সাহায্যের জন্য, ছবিতে আসবে না।</p>
+              <div class="controls">
+                <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="জুম">${icon("zoom_in")}</label>
+                <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}ঘোরান</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}অন্য ছবি</button>
+              </div>
+              <div class="controls">
+                <label class="check"><input id="clean" type="checkbox">কাগজ সাদা ও লেখা গাঢ় করুন</label>
+                <label class="zoom strength" hidden>হালকা<input id="strength" type="range" min="0" max="100" value="60" aria-label="কতটা পরিষ্কার">বেশি</label>
+              </div>
+            </div>
+            <p class="err" id="err" role="alert" hidden></p>
+          </div>
+
+          <div class="result" aria-live="polite">
+            <h3>${icon("task_alt")} ফলাফল</h3>
+            <div class="out"><img id="out" alt="রিসাইজ করা ছবির প্রিভিউ" hidden><span class="empty">ছবি দিলে এখানে দেখা যাবে</span></div>
+            <ul class="facts">
+              <li><span>মাপ</span><b id="f-dim">—</b></li>
+              <li><span>ফাইল সাইজ</span><b id="f-size">—</b></li>
+              <li><span>ফরম্যাট</span><b>JPG</b></li>
+            </ul>
+            <a class="btn btn-primary" id="dl" href="#" aria-disabled="true">${icon("download")}ডাউনলোড</a>
+          </div>
+        </div>
+        <p class="privacy-note">${icon("lock")} আপনার ছবি কোথাও আপলোড হয় না। পুরো কাজটা আপনার ব্রাউজারের ভেতরেই হয়।</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head reveal"><h2>কীভাবে ব্যবহার করবেন</h2></div>
+      <div class="steps">
+        <div class="step glass spot reveal">${icon("touch_app", "step-icon")}<h3>ধরন বেছে নিন</h3><p>ছবি (300×300), স্বাক্ষর (300×80), অথবা সার্কুলারে অন্য মাপ চাইলে "নিজের মাপ"।</p></div>
+        <div class="step glass spot reveal">${icon("crop", "step-icon")}<h3>ফ্রেমে বসান</h3><p>ছবি দিন, টেনে আর জুম করে মুখ বা স্বাক্ষরটা ফ্রেমের মাঝে আনুন।</p></div>
+        <div class="step glass spot reveal">${icon("download", "step-icon")}<h3>ডাউনলোড করুন</h3><p>মাপ আর KB ঠিক আছে কিনা দেখে নিন, তারপর ডাউনলোড করে আবেদনে আপলোড করুন।</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head reveal"><h2>ভালো ফলের জন্য</h2><p>পরিষ্কার ছবি দিলে রিসাইজের পরেও ছবি পরিষ্কার থাকে।</p></div>
+      <div class="grid">
+        ${card({ icon: "light_mode", color: C.amber, title: "আলোতে তুলুন", text: "দিনের আলোয় বা উজ্জ্বল ঘরে, মুখে যেন ছায়া না পড়ে।" })}
+        ${card({ icon: "wallpaper", color: C.sky, title: "হালকা ব্যাকগ্রাউন্ড", text: "সাদা বা হালকা রঙের দেয়ালের সামনে দাঁড়ান। সার্কুলারে আলাদা কিছু চাইলে সেটাই মানুন।" })}
+        ${card({ icon: "face", color: C.mint, title: "মুখ মাঝখানে", text: "মাথার ওপরে আর কাঁধ পর্যন্ত একটু জায়গা রাখুন, মুখ সোজা ক্যামেরার দিকে।" })}
+        ${card({ icon: "edit", color: C.violet, title: "সাদা কাগজে স্বাক্ষর", text: "কালো বা নীল কলমে সাদা কাগজে স্বাক্ষর করে সোজা ওপর থেকে ছবি তুলুন।" })}
+        ${card({ icon: "auto_fix_high", color: C.green, title: "কাগজ সাদা করুন", text: "স্বাক্ষরের কাগজ ধূসর দেখালে \"কাগজ সাদা ও লেখা গাঢ় করুন\" চালু করুন।" })}
+        ${card({ icon: "fact_check", color: C.coral, title: "সার্কুলার মিলিয়ে নিন", text: "প্রতিটি আবেদনের মাপ আলাদা হতে পারে। আপলোডের আগে সার্কুলারের মাপ দেখে নিন।" })}
+      </div>
+    </section>
+
+    <section class="faq" style="padding-top:24px">
+      <div class="faq-group"><h2 class="reveal">সাধারণ প্রশ্ন</h2>
+        ${rfaq("চাকরির আবেদনে ছবি ও স্বাক্ষরের মাপ কত লাগে?", "Teletalk-এর মাধ্যমে হওয়া বেশিরভাগ সরকারি চাকরির আবেদনে ছবি 300×300 পিক্সেল (সর্বোচ্চ 100 KB) আর স্বাক্ষর 300×80 পিক্সেল (সর্বোচ্চ 60 KB) চাওয়া হয়। তবে প্রতিটি সার্কুলারে মাপ আলাদা হতে পারে, তাই আবেদনের আগে সার্কুলার দেখে নিন। অন্য মাপ লাগলে \"নিজের মাপ\" ব্যবহার করুন।")}
+        ${rfaq("আমার ছবি কি কোথাও আপলোড হয়?", "না। ছবি রিসাইজের পুরো কাজটা আপনার ব্রাউজারের ভেতরেই হয়। ছবি আমাদের বা অন্য কারও সার্ভারে যায় না।")}
+        ${rfaq("মোবাইল থেকে ব্যবহার করা যাবে?", "হ্যাঁ। ফোনের ব্রাউজারে খুলে গ্যালারি থেকে ছবি দিন বা নতুন ছবি তুলুন। দুই আঙুলে জুম করা যায়।")}
+        ${rfaq("ডাউনলোড করা ফাইল কোথায় পাব?", "সাধারণত ফোন বা কম্পিউটারের Downloads ফোল্ডারে। ফাইলের নাম হবে photo-300x300.jpg বা signature-300x80.jpg।")}
+        ${rfaq("রিসাইজের পর ছবি ঝাপসা লাগছে কেন?", "মূল ছবি ঝাপসা বা খুব ছোট হলে রিসাইজের পরেও ঝাপসা দেখায়। ভালো আলোতে তোলা পরিষ্কার ছবি ব্যবহার করুন।")}
+        ${rfaq("এটা কি সত্যিই ফ্রি?", "হ্যাঁ, পুরোপুরি ফ্রি। কোনো অ্যাকাউন্ট বা সাইন-ইন লাগে না।")}
+      </div>
+    </section>
+${memoBand()}`, {
+  lang: "bn",
+  scripts: ["resizer.js"],
+  faqs: RESIZER_FAQS,
+  schema: [{ "@type": "WebApplication", name: "ছবি ও স্বাক্ষর রিসাইজ", url: urlOf("tools/photo-signature-resizer"), inLanguage: "bn",
+    applicationCategory: "MultimediaApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript",
+    description: "চাকরির আবেদনের ছবি 300×300 ও স্বাক্ষর 300×80 পিক্সেলে, নির্দিষ্ট KB-এর মধ্যে রিসাইজ করার ফ্রি টুল।",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "BDT" }, publisher: { "@id": `${SITE}/#org` } }],
+});
+
 // 404
 page("404", "Page not found", "This page doesn't exist.",
   `    <div class="notfound">
@@ -581,6 +726,7 @@ for (const p of rendered) for (const m of p.html.matchAll(/<span class="ms[^"]*"
 const iconUrl = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&amp;icon_names=${[...names].sort().join(",")}&amp;display=block`;
 
 for (const p of rendered) {
+  fs.mkdirSync(path.dirname(path.join(__dirname, p.slug)), { recursive: true });
   fs.writeFileSync(path.join(__dirname, `${p.slug}.html`), p.html.replace("__ICON_FONT__", iconUrl));
 }
 
@@ -588,9 +734,9 @@ for (const p of rendered) {
 const listed = rendered.filter((p) => p.slug !== "404");
 fs.writeFileSync(path.join(__dirname, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-  listed.map((p) => `  <url><loc>${p.slug === "index" ? SITE + "/" : `${SITE}/${p.slug}`}</loc><lastmod>${TODAY}</lastmod></url>`).join("\n") +
+  listed.map((p) => `  <url><loc>${urlOf(p.slug)}</loc><lastmod>${TODAY}</lastmod></url>`).join("\n") +
   `\n</urlset>\n`);
 fs.writeFileSync(path.join(__dirname, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
 
-console.log(`Built ${rendered.length} pages: ${rendered.map((p) => (p.slug === "index" ? "/" : "/" + p.slug)).join(" ")}`);
+console.log(`Built ${rendered.length} pages: ${rendered.map((p) => urlOf(p.slug).slice(SITE.length)).join(" ")}`);
 console.log(`Legal: privacy ${nPrivacy} sections, terms ${nTerms} sections. Icons: ${names.size}`);
