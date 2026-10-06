@@ -413,3 +413,17 @@ html[lang="bn"] h1, html[lang="bn"] h2, html[lang="bn"] h3 { font-family: "Outfi
 .result .btn[aria-disabled="true"] { opacity: .4; pointer-events: none; box-shadow: none; }
 .privacy-note { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14.5px; margin: 18px 2px 0; }
 .privacy-note .ms { color: var(--green); font-size: 20px; }
+.bg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px; }
+.bg-label { display: inline-flex; align-items: center; gap: 8px; color: var(--soft); font-weight: 600; font-size: 15px; }
+.bg-label .ms { font-size: 20px; color: var(--muted); }
+.swatches { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sw, .sw-text { cursor: pointer; font: inherit; border: 2px solid var(--border); transition: border-color .2s, transform .15s; }
+.sw { width: 34px; height: 34px; border-radius: 50%; background: var(--sw); padding: 0; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .35); }
+.sw-pick { display: grid; place-items: center; background: conic-gradient(#ff5d5d, #ffd25d, #5dff8a, #5dc8ff, #b45dff, #ff5d5d); color: #000; }
+.sw-pick .ms { font-size: 18px; }
+.sw-text { height: 34px; padding: 0 14px; border-radius: 999px; background: var(--surface-strong); color: var(--soft); font-weight: 700; font-size: 14px; }
+.sw:hover, .sw-text:hover { transform: scale(1.06); }
+.sw[aria-pressed="true"], .sw-text[aria-pressed="true"] { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31, 224, 90, .25); }
+.sw-text[aria-pressed="true"] { color: var(--green); }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; right: 0; bottom: 0; }
+.bg-status { flex-basis: 100%; color: var(--green); font-size: 14px; font-weight: 600; }

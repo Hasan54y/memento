@@ -1,14 +1,16 @@
 // Photo & signature resizer (/tools/photo-signature-resizer). Everything happens in the browser:
 // the picture is decoded, framed and re-encoded as a JPG locally and never leaves the device.
+// Background replacement uses MediaPipe's selfie segmenter, also on the device; the library is
+// only downloaded the first time someone picks a background colour.
 (() => {
   const root = document.getElementById("resizer");
   if (!root) return;
   const $ = (s) => root.querySelector(s);
 
   const PRESETS = {
-    photo: { w: 300, h: 300, kb: 100, file: "photo", clean: false, drop: "Choose a photo" },
-    sign: { w: 300, h: 80, kb: 60, file: "signature", clean: true, drop: "Choose a signature picture" },
-    custom: { file: "image", clean: false, drop: "Choose a picture" },
+    photo: { w: 300, h: 300, kb: 100, file: "photo", clean: false, bg: true, drop: "Choose a photo" },
+    sign: { w: 300, h: 80, kb: 60, file: "signature", clean: true, bg: false, drop: "Choose a signature picture" },
+    custom: { file: "image", clean: false, bg: true, drop: "Choose a picture" },
   };
   const MAX_SRC = 2400; // longest side kept from the original; plenty for any form photo
   const MIN_ZOOM = 0.5, MAX_ZOOM = 4;
@@ -20,6 +22,7 @@
   const zoom = $("#zoom"), clean = $("#clean"), strength = $("#strength"), strengthRow = $(".strength");
   const err = $("#err"), out = $("#out"), empty = $(".out .empty"), dl = $("#dl");
   const fDim = $("#f-dim"), fSize = $("#f-size");
+  const bgRow = $(".bg-row"), swatches = [...root.querySelectorAll("[data-bg]")], bgColor = $("#bgc"), bgStatus = $("#bg-status");
 
   let mode = "photo";
   const states = {}; // one picture per mode, so switching tabs keeps the photo and the signature
@@ -65,7 +68,7 @@
     octx.drawImage(pic, 0, 0, orig.width, orig.height);
     if (pic.close) pic.close();
 
-    const s = { orig, rot: 0, zoom: 1, clean: PRESETS[mode].clean, strength: 0.6, paper: paperLevel(orig) };
+    const s = { orig, rot: 0, zoom: 1, clean: PRESETS[mode].clean, strength: 0.6, paper: paperLevel(orig), bg: "" };
     setSource(s, orig);
     states[mode] = s;
     showMode();
@@ -91,24 +94,26 @@
   function setSource(s, src) {
     s.src = src;
     s.mips = [src];
+    s.cut = null; // person cut-out, rebuilt for the new source when a background is chosen
+    s.cutMips = null;
     s.cx = src.width / 2;
     s.cy = src.height / 2;
   }
-  function mipFor(s, k) {
+  function mipFor(mips, k) {
     let i = 0;
     while (k <= 0.5 / 2 ** i) {
-      if (!s.mips[i + 1]) {
-        const prev = s.mips[i];
+      if (!mips[i + 1]) {
+        const prev = mips[i];
         if (prev.width < 4 || prev.height < 4) break;
         const c = canvas(Math.round(prev.width / 2), Math.round(prev.height / 2));
         const x = c.getContext("2d");
         x.imageSmoothingQuality = "high";
         x.drawImage(prev, 0, 0, c.width, c.height);
-        s.mips[i + 1] = c;
+        mips[i + 1] = c;
       }
       i++;
     }
-    return s.mips[i];
+    return mips[i];
   }
 
   function rotate(s) {
@@ -137,11 +142,12 @@
 
   function draw(ctx, W, H, s) {
     const k = scaleFor(s, W, H);
-    ctx.fillStyle = "#fff";
+    const swap = !!(s.bg && s.cut);
+    ctx.fillStyle = swap ? s.bg : "#fff";
     ctx.fillRect(0, 0, W, H);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(mipFor(s, k), W / 2 - s.cx * k, H / 2 - s.cy * k, s.src.width * k, s.src.height * k);
+    ctx.drawImage(mipFor(swap ? s.cutMips : s.mips, k), W / 2 - s.cx * k, H / 2 - s.cy * k, s.src.width * k, s.src.height * k);
     if (s.clean) cleanUp(ctx, W, H, s);
   }
 
@@ -196,6 +202,171 @@
     vctx.stroke();
     vctx.restore();
   }
+
+  // ---------- Background replacement ----------
+  const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.0";
+  const MODEL = "/assets/models/selfie_segmenter.tflite";
+  let segmenter = null;
+  function getSegmenter() {
+    if (!segmenter) segmenter = (async () => {
+      const { FilesetResolver, ImageSegmenter } = await import(`${MP}/vision_bundle.mjs`);
+      const files = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
+      return ImageSegmenter.createFromOptions(files, {
+        baseOptions: { modelAssetPath: MODEL, delegate: "CPU" },
+        runningMode: "IMAGE", outputConfidenceMasks: true, outputCategoryMask: false,
+      });
+    })().catch((e) => { segmenter = null; throw e; });
+    return segmenter;
+  }
+
+  const shrink = (src, max) => {
+    const k = Math.min(1, max / Math.max(src.width, src.height));
+    const c = canvas(Math.max(1, Math.round(src.width * k)), Math.max(1, Math.round(src.height * k)));
+    const x = c.getContext("2d");
+    x.imageSmoothingQuality = "high";
+    x.drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  };
+
+  // Probability (0..1) that each pixel belongs to the person
+  function personMask(seg, img) {
+    const r = seg.segment(img);
+    const masks = r.confidenceMasks, labels = seg.getLabels() || [];
+    const w = masks[0].width, h = masks[0].height;
+    const pi = labels.findIndex((l) => /person|foreground/i.test(l));
+    let data;
+    if (pi >= 0 && masks[pi]) data = masks[pi].getAsFloat32Array().slice();
+    else if (masks.length === 1) data = masks[0].getAsFloat32Array().slice();
+    else data = masks[Math.max(0, labels.findIndex((l) => /background/i.test(l)))].getAsFloat32Array().map((v) => 1 - v);
+    r.close();
+    return { data, w, h };
+  }
+
+  // The model sometimes marks stray patches of background (a lamp, a shadow) as "person". Keep only
+  // the biggest connected shape (and any other shape at least a quarter of its size), plus a few
+  // pixels around it so the soft edge survives.
+  function mainBlob({ data, w, h }) {
+    const label = new Int32Array(w * h), sizes = [0], stack = [];
+    for (let i = 0; i < w * h; i++) {
+      if (label[i] || data[i] <= 0.5) continue;
+      const id = sizes.length;
+      let n = 0;
+      label[i] = id;
+      stack.push(i);
+      while (stack.length) {
+        const p = stack.pop(), x = p % w, y = (p - x) / w;
+        n++;
+        for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, y > 0 ? p - w : -1, y < h - 1 ? p + w : -1]) {
+          if (q >= 0 && !label[q] && data[q] > 0.5) { label[q] = id; stack.push(q); }
+        }
+      }
+      sizes.push(n);
+    }
+    const biggest = Math.max(0, ...sizes);
+    let keep = new Uint8Array(w * h);
+    for (let i = 0; i < w * h; i++) if (label[i] && sizes[label[i]] >= biggest / 4) keep[i] = 1;
+    for (let r = 0; r < 4; r++) { // grow by 4 px
+      const next = keep.slice();
+      for (let i = 0; i < w * h; i++) {
+        if (keep[i]) continue;
+        const x = i % w;
+        if ((x > 0 && keep[i - 1]) || (x < w - 1 && keep[i + 1]) || (i >= w && keep[i - w]) || (i < w * h - w && keep[i + w])) next[i] = 1;
+      }
+      keep = next;
+    }
+    return keep;
+  }
+
+  // Cut the person out of s.src: a first pass finds them, a second pass on just that area gives
+  // sharper edges (the model only sees 256×256 pixels).
+  async function buildCut(s) {
+    const seg = await getSegmenter();
+    const src = s.src;
+    const small = shrink(src, 512);
+    const m1 = personMask(seg, small);
+    const keep1 = mainBlob(m1);
+    let x0 = m1.w, y0 = m1.h, x1 = -1, y1 = -1;
+    for (let y = 0; y < m1.h; y++) for (let x = 0; x < m1.w; x++) {
+      if (keep1[y * m1.w + x] && m1.data[y * m1.w + x] > 0.5) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0 || (x1 - x0) * (y1 - y0) < m1.w * m1.h * 0.01) throw new Error("noperson");
+    const f = src.width / m1.w, padX = (x1 - x0) * 0.12 * f, padY = (y1 - y0) * 0.12 * f;
+    const rx = Math.max(0, x0 * f - padX), ry = Math.max(0, y0 * f - padY);
+    const rw = Math.min(src.width, (x1 + 1) * f + padX) - rx, rh = Math.min(src.height, (y1 + 1) * f + padY) - ry;
+    const crop = canvas(1, 1);
+    const ck = Math.min(1, 640 / Math.max(rw, rh));
+    crop.width = Math.max(1, Math.round(rw * ck)); crop.height = Math.max(1, Math.round(rh * ck));
+    const cx = crop.getContext("2d");
+    cx.imageSmoothingQuality = "high";
+    cx.drawImage(src, rx, ry, rw, rh, 0, 0, crop.width, crop.height);
+    const m2 = personMask(seg, crop);
+    const keep = mainBlob(m2);
+
+    // Mask as an alpha channel, with the soft edge tightened a little to reduce halos
+    const mc = canvas(m2.w, m2.h), mx = mc.getContext("2d"), id = mx.createImageData(m2.w, m2.h);
+    for (let i = 0; i < m2.data.length; i++) {
+      if (!keep[i]) continue;
+      let t = (m2.data[i] - 0.35) / 0.4;
+      t = t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+      id.data[i * 4 + 3] = t * 255;
+    }
+    mx.putImageData(id, 0, 0);
+    const cut = canvas(src.width, src.height), cc = cut.getContext("2d");
+    cc.imageSmoothingQuality = "high";
+    cc.drawImage(mc, rx, ry, rw, rh);
+    cc.globalCompositeOperation = "source-in";
+    cc.drawImage(src, 0, 0);
+    if (s.src !== src) return; // rotated meanwhile; that rotation starts its own cut
+    s.cut = cut;
+    s.cutMips = [cut];
+  }
+
+  function setStatus(msg) { bgStatus.textContent = msg; bgStatus.hidden = !msg; }
+
+  let cutJob = null;
+  async function ensureCut(s) {
+    if (!s.bg || s.cut) { setStatus(""); return; }
+    const job = (cutJob = {});
+    setStatus(segmenter ? "Finding you in the photo…" : "Loading the background tool (first time only, about 4 MB)…");
+    try {
+      await getSegmenter();
+      if (cutJob !== job) return;
+      setStatus("Finding you in the photo…");
+      await new Promise((r) => setTimeout(r, 30)); // let the status paint
+      await buildCut(s);
+      if (cutJob !== job) return;
+      setStatus("");
+    } catch (e) {
+      if (cutJob !== job) return;
+      setStatus("");
+      s.bg = "";
+      syncSwatches(s);
+      showError(e && e.message === "noperson"
+        ? "Couldn't find a person in this photo. Use a clear photo with your head and shoulders visible."
+        : "The background tool couldn't load. Check your internet connection and try again.");
+    }
+    if (states[mode] === s) changed();
+  }
+
+  function syncSwatches(s) {
+    const presets = swatches.map((b) => b.dataset.bg).filter((v) => v !== "custom");
+    swatches.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.bg === "custom" ? !!s.bg && !presets.includes(s.bg) : b.dataset.bg === s.bg)));
+  }
+
+  function pickBackground(color) {
+    const s = states[mode];
+    if (!s) return;
+    showError("");
+    s.bg = color;
+    syncSwatches(s);
+    changed();
+    ensureCut(s);
+  }
+  swatches.forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.bg === "custom") { try { bgColor.showPicker(); } catch { bgColor.click(); } return; }
+    pickBackground(b.dataset.bg);
+  }));
+  bgColor.addEventListener("input", () => pickBackground(bgColor.value));
 
   // ---------- Output ----------
   let exportTimer = 0, exportSeq = 0, outUrl = "";
@@ -270,6 +441,10 @@
     clean.checked = s.clean;
     strength.value = Math.round(s.strength * 100);
     strengthRow.hidden = !s.clean;
+    bgRow.hidden = !PRESETS[mode].bg;
+    syncSwatches(s);
+    setStatus("");
+    if (s.bg && !s.cut) ensureCut(s);
     sizeView();
     render();
     scheduleExport();
@@ -315,7 +490,7 @@
   };
 
   zoom.addEventListener("input", () => { setZoom(zoom.value / 100); changed(); });
-  $("#rotate").addEventListener("click", () => { rotate(states[mode]); zoom.value = 100; changed(); });
+  $("#rotate").addEventListener("click", () => { const s = states[mode]; rotate(s); zoom.value = 100; changed(); ensureCut(s); });
   clean.addEventListener("change", () => { states[mode].clean = clean.checked; strengthRow.hidden = !clean.checked; changed(); });
   strength.addEventListener("input", () => { states[mode].strength = strength.value / 100; changed(); });
 

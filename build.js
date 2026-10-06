@@ -589,7 +589,7 @@ function memoBand() {
 }
 
 const TOOLS = [
-  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer", text: "Job application photo at 300×300 and signature at 300×80, under the KB limit." },
+  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer", text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue." },
   { icon: "picture_as_pdf", color: C.coral, title: "Image to PDF & PDF compressor", text: "Combine photos into one PDF, and shrink a PDF under a set size." },
   { icon: "cake", color: C.amber, title: "Age calculator", text: "Your exact age in years, months and days on a circular's cut-off date." },
   { icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter", text: "Convert old Bijoy Bangla text to Unicode, and back." },
@@ -612,8 +612,8 @@ ${memoBand()}`);
 const RESIZER_FAQS = [];
 const rfaq = faqInto(RESIZER_FAQS);
 page("tools/photo-signature-resizer", "Photo & signature resizer",
-  "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB) in a minute. Free, and nothing is uploaded: it all happens on your device.",
-  `    ${pageHero({ eyebrow: "Free tool", eyebrowIcon: "photo_size_select_large", title: "Application photo & signature, <em>the right size.</em>", lead: "Add a picture, frame it, download. The tool takes care of the pixels and the KB limit for you." })}
+  "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB), and change the photo background to white or blue. Free, and nothing is uploaded.",
+  `    ${pageHero({ eyebrow: "Free tool", eyebrowIcon: "photo_size_select_large", title: "Application photo & signature, <em>the right size.</em>", lead: "Add a picture, frame it, switch the background to white or blue if you like, and download. The tool takes care of the pixels and the KB limit for you." })}
 
     <section class="tool-section">
       <div class="tool glass" id="resizer">
@@ -643,6 +643,19 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
                 <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
                 <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
                 <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New picture</button>
+              </div>
+              <div class="bg-row">
+                <span class="bg-label">${icon("wallpaper")}Background</span>
+                <div class="swatches" role="group" aria-label="Background">
+                  <button type="button" class="sw-text" data-bg="" aria-pressed="true">Original</button>
+                  <button type="button" class="sw" data-bg="#ffffff" style="--sw:#ffffff" title="White" aria-label="White"></button>
+                  <button type="button" class="sw" data-bg="#dcebf7" style="--sw:#dcebf7" title="Light blue" aria-label="Light blue"></button>
+                  <button type="button" class="sw" data-bg="#2f6fd0" style="--sw:#2f6fd0" title="Blue" aria-label="Blue"></button>
+                  <button type="button" class="sw" data-bg="#e6e6e6" style="--sw:#e6e6e6" title="Light grey" aria-label="Light grey"></button>
+                  <button type="button" class="sw sw-pick" data-bg="custom" title="Any colour" aria-label="Any colour">${icon("palette")}</button>
+                  <input id="bgc" class="vh" type="color" value="#c8102e" tabindex="-1" aria-hidden="true">
+                </div>
+                <span class="bg-status" id="bg-status" hidden></span>
               </div>
               <div class="controls">
                 <label class="check"><input id="clean" type="checkbox">Whiten paper, darken ink</label>
@@ -680,7 +693,7 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
       <div class="section-head reveal"><h2>For the best result</h2><p>A clear original stays clear after resizing.</p></div>
       <div class="grid">
         ${card({ icon: "light_mode", color: C.amber, title: "Good light", text: "Daylight or a bright room, with no shadows on your face." })}
-        ${card({ icon: "wallpaper", color: C.sky, title: "Plain, light background", text: "Stand in front of a white or light wall. If the circular asks for something else, follow it." })}
+        ${card({ icon: "wallpaper", color: C.sky, title: "Plain background helps", text: "A plain wall behind you gives the cleanest edges, even when you switch the background to white or blue here." })}
         ${card({ icon: "face", color: C.mint, title: "Face in the middle", text: "Leave a little room above your head and down to your shoulders, looking straight at the camera." })}
         ${card({ icon: "edit", color: C.violet, title: "Sign on white paper", text: "Sign with a black or blue pen on white paper, and take the photo straight from above." })}
         ${card({ icon: "auto_fix_high", color: C.green, title: "Whiten the paper", text: "If the paper looks grey, turn on \"Whiten paper, darken ink\"." })}
@@ -691,6 +704,7 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
     <section class="faq" style="padding-top:24px">
       <div class="faq-group"><h2 class="reveal">Questions</h2>
         ${rfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
+        ${rfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. Hair edges are usually good but not always perfect, so check the result before you upload it.")}
         ${rfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
         ${rfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
         ${rfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}
@@ -703,7 +717,7 @@ ${memoBand()}`, {
   faqs: RESIZER_FAQS,
   schema: [{ "@type": "WebApplication", name: "Photo & signature resizer", url: urlOf("tools/photo-signature-resizer"), inLanguage: "en",
     applicationCategory: "MultimediaApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript",
-    description: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels, under a set KB limit.",
+    description: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels under a set KB limit, and change the photo background.",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }, publisher: { "@id": `${SITE}/#org` } }],
 });
 
