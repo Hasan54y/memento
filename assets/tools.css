@@ -379,3 +379,19 @@ a.t-mini:hover { color: var(--brand-ink); }
 }
 .q-row input { width: 100%; accent-color: var(--brand-ink); }
 .t-row { display: grid; gap: 8px; }
+
+/* Passport photo */
+.spec-info { font-size: 13.5px; color: var(--muted); margin: 0 0 12px; }
+.custom-mm { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pp-checks { list-style: none; padding: 0; margin: 14px 0 6px; display: grid; gap: 6px; font-size: 14px; }
+.pp-checks li { display: flex; gap: 8px; align-items: flex-start; }
+.pp-checks li::before { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; }
+.pp-checks li.ok::before { content: "✓"; background: var(--brand-ink); }
+.pp-checks li.bad::before { content: "✗"; background: var(--danger); }
+.pp-checks li.warn::before { content: "!"; background: #c27c00; }
+.pp-checks li:empty { display: none; }
+.sheet-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.sheet-btns .btn { width: 100%; }
+.sheet-btns .btn:disabled { opacity: .45; cursor: default; }
+#passport .result .note { margin-top: 12px; }
+#passport .out img { max-height: 280px; }

@@ -612,6 +612,7 @@ SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Mement
 SEO_TITLES["tools/photo-signature-resizer"] = "Resize Photo & Signature for Online Forms (px & KB) | Memento Tools";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
+SEO_TITLES["tools/passport-photo"] = "Passport & Visa Photo Maker: 2×2 in, 35×45 mm, Free | Memento Tools";
 SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
@@ -627,6 +628,9 @@ const TOOLS = [
   { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
     text: "Get a photo or signature to the exact pixels and KB an online form asks for. Change the background to white or blue.",
     keywords: "photo signature resize compress kb pixels online form application exam visa passport background white blue remove" },
+  { slug: "passport-photo", cat: "photo", icon: "badge", color: C.sky, title: "Passport & visa photo",
+    text: "Make a passport or visa photo for the US, UK, Schengen, Canada and more: white background, right head size, print sheet.",
+    keywords: "passport visa photo picture maker id 2x2 35x45 us uk schengen canada australia india china white background print 4x6" },
   { slug: "compress-image", cat: "photo", icon: "photo_size_select_small", color: C.mint, title: "Compress Image",
     text: "Make JPG, PNG and WebP images smaller, or under a target like 100 KB. Resize and convert too, many at once.",
     keywords: "compress image photo picture jpg jpeg png webp reduce size kb mb resize convert optimize shrink" },
@@ -928,7 +932,7 @@ toolPage(tool("photo-signature-resizer"), {
     ["Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light."],
     ["Is it really free?", "Yes, completely free. No account or sign-in needed."],
   ],
-  scripts: ["resizer.js"],
+  scripts: ["matte.js", "resizer.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to resize photos and signatures to exact pixel sizes under a KB limit for online forms, and change the photo background.",
 });
@@ -1162,6 +1166,100 @@ toolPage(tool("pdf-to-image"), {
   scripts: ["pdf-lite.js", "pdf2img.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to convert PDF pages to JPG or PNG images, with page selection, resolution up to 300 DPI, a KB limit per image and ZIP download.",
+});
+
+// Passport & visa photo
+toolPage(tool("passport-photo"), {
+  h1: "Passport &amp; Visa Photo Maker",
+  lead: "Turn a phone photo into a passport or visa photo: the background becomes plain white, your head is sized to the country's rules, and you get a digital photo plus a sheet to print.",
+  description: "Make passport and visa photos for free: US 2×2 in, UK, Schengen, Canada, Australia and more. Automatic white background and head sizing, digital photo and 4×6 or A4 print sheet. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="passport">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("add_a_photo")}
+            <strong>Choose a photo of your face</strong>
+            <span class="sub">Face the camera, eyes open, even light. Any plain-ish background works; it's replaced.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select photo</span>
+            <input id="file" type="file" accept="image/*">
+          </label>
+          <div class="editor" hidden>
+            <div class="frame"><canvas id="view" aria-label="Drag and zoom to line up your head"></canvas></div>
+            <p class="hint-line">${icon("straighten")} Top of your head on the upper line, chin inside the green band, face on the centre line. Drag or zoom to adjust.</p>
+            <div class="controls">
+              <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="60" max="160" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
+              <button type="button" class="btn btn-ghost btn-sm" id="autofit">${icon("center_focus_strong")}Auto-fit</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New photo</button>
+            </div>
+            <div class="bg-row">
+              <span class="bg-label">${icon("wallpaper")}Background</span>
+              <div class="swatches" role="group" aria-label="Background">
+                <button type="button" class="sw" data-bg="#ffffff" style="--sw:#ffffff" title="White" aria-label="White"></button>
+                <button type="button" class="sw" data-bg="#f3f1ea" style="--sw:#f3f1ea" title="Cream" aria-label="Cream"></button>
+                <button type="button" class="sw" data-bg="#e8e8e8" style="--sw:#e8e8e8" title="Light grey" aria-label="Light grey"></button>
+                <button type="button" class="sw" data-bg="#dcebf7" style="--sw:#dcebf7" title="Light blue" aria-label="Light blue"></button>
+                <button type="button" class="sw-text" data-bg="" aria-pressed="false">Original</button>
+              </div>
+            </div>
+          </div>
+          <p class="bg-status" id="status" hidden></p>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("badge")} Document</h3>
+          <div class="fields">
+            <label class="field wide">Country / document<select id="spec"><option value="us" selected>United States: passport & visa (2 × 2 in)</option><option value="uk">United Kingdom: passport</option><option value="schengen">Schengen visa & EU passports</option><option value="canada">Canada: passport</option><option value="australia">Australia: passport</option><option value="india">India: visa (2 × 2 in)</option><option value="china">China: visa</option><option value="std">Other: standard 35 × 45 mm</option><option value="custom">Custom size</option></select></label>
+            <div class="custom-mm wide" hidden>
+              <label class="field">Width (mm)<input id="cmw" type="number" inputmode="decimal" min="15" max="120" value="35"></label>
+              <label class="field">Height (mm)<input id="cmh" type="number" inputmode="decimal" min="15" max="160" value="45"></label>
+            </div>
+          </div>
+          <p class="spec-info" id="spec-info"></p>
+          <div class="out"><img id="out" alt="Your passport photo" hidden><span class="empty">Your photo will appear here</span></div>
+          <ul class="pp-checks">
+            <li id="c-head" class="warn"></li>
+            <li id="c-bg" class="warn"></li>
+            <li id="c-center" class="warn"></li>
+          </ul>
+          <ul class="facts">
+            <li><span>Digital size</span><b id="f-px">—</b></li>
+            <li><span>File size</span><b id="f-size">—</b></li>
+          </ul>
+          <a class="btn btn-primary" id="dl-photo" href="#" aria-disabled="true">${icon("download")}Download photo</a>
+          <div class="sheet-btns">
+            <button type="button" class="btn btn-ghost btn-sm" id="dl-46" disabled>${icon("print")}4×6 in sheet</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="dl-a4" disabled>${icon("print")}A4 sheet</button>
+          </div>
+          <p class="note">${icon("info")} Rules change and offices can be strict. Check the official photo requirements before you print or upload.</p>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your photo is never uploaded. Everything happens inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Take or choose a photo.", "Face the camera straight on with a neutral expression, eyes open, in even light. Ask someone else to take it from about 1–1.5 m away."],
+    ["Pick the country or document.", "The tool sets the photo size and the head size that document needs, and makes the background plain."],
+    ["Check the guides.", "Top of your head on the upper line, chin inside the green band, face on the centre line. Drag or zoom if needed; the checks turn green."],
+    ["Download and print.", "Download the digital photo for online forms, or a 4 × 6 in or A4 sheet to print at 100% (actual size) and cut out."],
+  ],
+  tips: [
+    ["light_mode", "Even light on your face.", "Face a window. Avoid shadows on your face or behind you."],
+    ["sentiment_neutral", "Neutral expression.", "Mouth closed, eyes open and looking at the camera."],
+    ["visibility_off", "No glasses, no hat.", "Many countries no longer accept glasses; religious head coverings are usually allowed if your face is fully visible."],
+    ["print", "Printing at a shop.", "Ask for a 4 × 6 in (10 × 15 cm) photo print of the sheet at actual size, then cut along the grey lines."],
+  ],
+  faqs: [
+    ["What size is a US passport photo?", "2 × 2 inches (51 × 51 mm), with the head 1 to 1⅜ inches (25–35 mm) from chin to the top of the head, on a white or off-white background. For online visa forms the digital photo is 600 × 600 pixels, up to 240 KB. Choose \"United States\" and the tool sets all of this."],
+    ["What size is a UK, Schengen or Australian passport photo?", "35 × 45 mm. The head (chin to top of head) should be about 29–34 mm for the UK and 32–36 mm for Schengen visas and Australian passports. Check the exact rules for your application."],
+    ["Can I really change the background to white?", "Yes. The tool finds you in the photo and replaces everything behind you with a plain colour, right on your device. Choose white, cream, light grey or light blue to match the rules."],
+    ["How do I print passport photos?", "Download the 4 × 6 in sheet and print it as a normal 4 × 6 (10 × 15 cm) photo at a print shop or at home, at actual size (100%), not \"fit to page\". Then cut along the grey lines."],
+    ["Will the photo be accepted?", "The tool gets the size, head height and background right, but offices also check things a tool can't, like expression, lighting and glasses. Follow the official rules for your country, and check the photo carefully before you submit it."],
+    ["Is my photo uploaded anywhere?", "No. Face detection, background removal and the photo itself are all made inside your browser. The first time, the tools download about 20 MB, which your browser then keeps."],
+    ["Is it really free?", "Yes. No account, no watermark."],
+  ],
+  scripts: ["matte.js", "passport.js"],
+  appCategory: "MultimediaApplication",
+  schemaDesc: "Free passport and visa photo maker with country presets (US 2×2 in, UK, Schengen, Canada, Australia, India, China), automatic white background and head sizing, digital photo and print sheets.",
 });
 
 // Compress Image
