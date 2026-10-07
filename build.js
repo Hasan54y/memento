@@ -108,7 +108,7 @@ function jsonLd(slug, title, url, faqs = [], extra = []) {
 }
 
 // <head> shared by the main site and the tools section
-function headTags({ slug, title, description, lang = "en", faqs, schema }, { themeColor, css, scripts }) {
+function headTags({ slug, title, description, lang = "en", faqs, schema }, { themeColor, css, scripts, adsense = false }) {
   const url = urlOf(slug);
   const bn = lang === "bn";
   const fullTitle = SEO_TITLES[slug] || (slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`);
@@ -135,6 +135,8 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   <meta name="twitter:image" content="${SITE}/assets/og.png">
   ${slug === "404" ? '<meta name="robots" content="noindex">' : ""}
   ${jsonLd(slug, title, url, faqs, schema)}
+  <meta name="google-adsense-account" content="${ADSENSE.client}">${adsense ? `
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.client}" crossorigin="anonymous"></script>` : ""}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -636,6 +638,13 @@ const TOOLS = [
     keywords: "age calculator date of birth circular job eligibility limit cut off years months days" },
 ];
 
+// ---------- Ads: Google AdSense, on tools pages only ----------
+// Every page carries the account meta tag (AdSense verifies the whole domain); the AdSense
+// loader itself is only added to tools pages. Ad units are made after approval: put their slot
+// IDs here and the placements (below the tool, top of the sidebar, after the FAQ) start showing.
+const ADSENSE = { client: "ca-pub-9066794566087802", slots: { leader: "", box: "", article: "" } };
+const adSlot = (kind) => `<div class="ad" data-ad="${kind}" data-slot="${ADSENSE.slots[kind] || ""}" hidden><span class="ad-label">Advertisement</span><div class="ad-box"></div></div>`;
+
 function toolTile(t) {
   const inner = `<span class="t-ico" style="--c:${t.color}">${icon(t.icon)}</span>
           <h3>${t.title}</h3><p>${t.text}</p>`;
@@ -651,7 +660,7 @@ function toolsLayout(p) {
   const live = TOOLS.filter((t) => t.slug);
   return `<!doctype html>
 <html lang="en">
-${headTags(p, { themeColor: "#ffffff", css: "tools.css", scripts: ["tools.js", ...scripts] })}
+${headTags(p, { themeColor: "#ffffff", css: "tools.css", scripts: ["tools.js", ...scripts], adsense: true })}
 <body>
   <header class="t-head">
     <div class="t-wrap t-bar">
@@ -674,7 +683,7 @@ ${body}
       </div>
       <div><h4>Tools</h4>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a></div>
       <div><h4>Memento</h4><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
-      <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a></div>
+      <div><h4>Legal</h4><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
     <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> HM Dev Studio</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
   </footer>
@@ -711,6 +720,7 @@ page("tools/index", "Free tools",
         ${TOOLS.map(toolTile).join("\n        ")}
       </div>
       <p class="t-empty" data-empty hidden>${icon("search_off")} No tools match your search yet. <a href="/contact">Tell us what you need</a>.</p>
+      ${adSlot("leader")}
     </section>
 
     <section class="t-section">
@@ -721,7 +731,29 @@ page("tools/index", "Free tools",
         </div>
         <a class="btn btn-primary" href="/">${icon("rocket_launch")}Meet Memento</a>
       </div>
+      ${adSlot("article")}
     </section>`, { shell: "tools" });
+
+// Privacy for the tools section (the app has its own policy at /privacy)
+page("tools/privacy", "Tools privacy & ads",
+  "How Memento Tools handles your files (they never leave your device) and how ads on the tools pages work.",
+  `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<span>Privacy &amp; ads</span></nav>
+    <div class="t-title"><span class="t-ico big" style="--c:${C.green}">${icon("policy")}</span><div><h1>Privacy &amp; ads</h1><p>For the free tools at mementoapp.online/tools. The Memento app has its own <a href="/privacy">privacy policy</a>.</p></div></div>
+    <article class="t-article t-legal">
+      <h2>Your files stay on your device</h2>
+      <p>Every tool works inside your browser. Photos, PDFs and the details you type are processed on your phone or computer and are never uploaded to us or anyone else. We don't keep copies, and we can't see them.</p>
+      <h2>No accounts, no tracking by us</h2>
+      <p>The tools don't need an account. We don't run analytics on the tools pages. Your browser may keep the background-removal model in its cache so it doesn't download again; you can clear it with your browser data.</p>
+      <h2>Ads and cookies</h2>
+      <p>To keep the tools free, the tools pages show ads served by Google AdSense. The Memento app and the rest of mementoapp.online don't show ads.</p>
+      <p>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to you based on your visits to this site and/or other sites on the Internet.</p>
+      <p>You may opt out of personalised advertising by visiting Google's <a href="https://adssettings.google.com/" rel="noopener" target="_blank">Ads Settings</a>, or opt out of some third-party vendors' use of cookies for personalised advertising at <a href="https://www.aboutads.info/choices/" rel="noopener" target="_blank">www.aboutads.info</a>. Learn more in <a href="https://policies.google.com/technologies/ads" rel="noopener" target="_blank">how Google uses information from sites that use its services</a>.</p>
+      <p>Ads and cookies never get your files: what you open in a tool is processed on your device and isn't sent to us, to Google or to anyone else.</p>
+      <h2>Your choice</h2>
+      <p>Visitors in the European Economic Area, the UK and Switzerland are asked for consent through Google's consent message before personalised ads are shown. Ad blockers also work on these pages; the tools keep working either way.</p>
+      <h2>Contact</h2>
+      <p>Questions? Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+    </article>`, { shell: "tools", cat: "" });
 
 // One tool page: breadcrumbs, title, the tool itself, then how-to, tips, FAQ and a sidebar.
 function toolPage(t, { h1, lead, description, workspace, steps, tips, faqs, scripts, appCategory = "UtilitiesApplication", schemaDesc }) {
@@ -744,6 +776,8 @@ function toolPage(t, { h1, lead, description, workspace, steps, tips, faqs, scri
 
 ${workspace}
 
+    ${adSlot("leader")}
+
     <div class="t-cols">
       <article class="t-article">
         <h2>How to use it</h2>
@@ -760,9 +794,11 @@ ${workspace}
         <div class="t-faq">
           ${faqHtml}
         </div>
+        ${adSlot("article")}
       </article>
 
       <div class="t-side">
+        ${adSlot("box")}
         ${memoPromo()}
         <div class="t-more">
           <h3>More tools</h3>
@@ -1361,6 +1397,8 @@ fs.writeFileSync(path.join(__dirname, "sitemap.xml"),
   listed.map((p) => `  <url><loc>${urlOf(p.slug)}</loc><lastmod>${TODAY}</lastmod></url>`).join("\n") +
   `\n</urlset>\n`);
 fs.writeFileSync(path.join(__dirname, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
+// Authorised ad sellers (AdSense checks it; without it earnings can be held back)
+fs.writeFileSync(path.join(__dirname, "ads.txt"), `google.com, ${ADSENSE.client.replace("ca-", "")}, DIRECT, f08c47fec0942fa0\n`);
 
 console.log(`Built ${rendered.length} pages: ${rendered.map((p) => urlOf(p.slug).slice(SITE.length)).join(" ")}`);
 console.log(`Legal: privacy ${nPrivacy} sections, terms ${nTerms} sections. Icons: ${names.size}`);

@@ -1,7 +1,24 @@
-// Memento Tools: search and category filter on /tools/, plus the shared header.
+// Memento Tools: search and category filter on /tools/, the shared header, and ads.
 (() => {
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
+
+  // ---------- Ads (Google AdSense) ----------
+  // A placement only shows once it has an ad unit (data-slot); AdSense handles consent in Europe.
+  document.querySelectorAll("[data-ad]").forEach((slot) => {
+    const id = slot.dataset.slot;
+    if (!id) return;
+    const ins = document.createElement("ins");
+    ins.className = "adsbygoogle";
+    ins.style.display = "block";
+    ins.dataset.adClient = "ca-pub-9066794566087802";
+    ins.dataset.adSlot = id;
+    ins.dataset.adFormat = slot.dataset.ad === "box" ? "rectangle" : "auto";
+    ins.dataset.fullWidthResponsive = "true";
+    slot.querySelector(".ad-box").appendChild(ins);
+    slot.hidden = false;
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* blocked: the tools still work */ }
+  });
 
   const grid = document.querySelector("[data-tool-grid]");
   if (!grid) return; // tool pages: the search form simply submits to /tools/?q=
