@@ -600,6 +600,8 @@ const nTerms = legal("terms", "Terms of Service", sections("TermsSections"), "Th
 // Everything runs in the visitor's browser: no uploads, no server.
 SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Memento Tools";
 SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
+SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
+SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
 
 const TOOL_CATS = [
   ["photo", "Photo", "image"],
@@ -610,14 +612,18 @@ const TOOL_CATS = [
 const TOOLS = [
   { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
     text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue.",
-    keywords: "teletalk passport resize compress kb signature background white blue job application" },
-  { cat: "pdf", icon: "picture_as_pdf", color: C.coral, title: "Image to PDF & PDF compressor",
-    text: "Combine photos into one PDF, and shrink a PDF under a set size.", keywords: "jpg pdf merge compress reduce size kb" },
+    keywords: "teletalk passport resize compress kb signature background white blue remove job application" },
+  { slug: "image-to-pdf", cat: "pdf", icon: "picture_as_pdf", color: C.coral, title: "Image to PDF",
+    text: "Turn photos of certificates, NID or marksheets into one PDF, under the KB limit you need.",
+    keywords: "jpg png photo images to pdf convert merge combine certificate scan kb size" },
+  { slug: "compress-pdf", cat: "pdf", icon: "compress", color: C.violet, title: "Compress PDF",
+    text: "Shrink a PDF to 100 KB, 200 KB, 500 KB or 1 MB for online applications.",
+    keywords: "compress reduce shrink pdf size kb mb smaller" },
   { cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
     text: "Your exact age in years, months and days on a circular's cut-off date.", keywords: "age date birth circular job" },
   { cat: "bangla", icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter",
     text: "Convert old Bijoy Bangla text to Unicode, and back.", keywords: "bangla bengali bijoy unicode font converter" },
-  { cat: "calc", icon: "payments", color: C.violet, title: "Amount in words",
+  { cat: "calc", icon: "payments", color: C.mint, title: "Amount in words",
     text: "Write any amount in English and Bangla words, for cheques and invoices.", keywords: "taka number words cheque invoice bangla english" },
 ];
 
@@ -678,7 +684,7 @@ function memoPromo() {
 }
 
 page("tools/index", "Free tools",
-  "Free online tools for job applications and paperwork: resize photos and signatures, change photo backgrounds, and more. Everything runs in your browser; no files are uploaded.",
+  "Free online tools for job applications and paperwork: resize photos and signatures, change photo backgrounds, turn images into PDF and compress PDFs. Everything runs in your browser; no files are uploaded.",
   `    <section class="t-hero">
       <h1>Free online tools for everyday paperwork</h1>
       <p>Resize application photos, make PDFs, convert Bangla text and more. Free, no sign-up, and your files never leave your device.</p>
@@ -708,21 +714,71 @@ page("tools/index", "Free tools",
       </div>
     </section>`, { shell: "tools" });
 
-const RESIZER_FAQS = [];
-const tfaq = (q, a) => (RESIZER_FAQS.push([q, a]), `<details><summary>${q}</summary><p>${a}</p></details>`);
-const resizer = TOOLS[0];
-page("tools/photo-signature-resizer", "Photo & signature resizer",
-  "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB), and change the photo background to white or blue. Free, and nothing is uploaded.",
-  `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<a href="/tools/#photo">Photo</a>${icon("chevron_right")}<span>Photo &amp; signature resizer</span></nav>
+// One tool page: breadcrumbs, title, the tool itself, then how-to, tips, FAQ and a sidebar.
+function toolPage(t, { h1, lead, description, workspace, steps, tips, faqs, scripts, appCategory = "UtilitiesApplication", schemaDesc }) {
+  const faqData = [];
+  const faqHtml = faqs.map(([q, a]) => (faqData.push([q, a]), `<details><summary>${q}</summary><p>${a}</p></details>`)).join("\n          ");
+  const [, catLabel] = TOOL_CATS.find(([id]) => id === t.cat);
+  const others = TOOLS.filter((o) => o !== t).sort((x, y) => (y.slug ? 1 : 0) - (x.slug ? 1 : 0));
+  const mini = (o) => o.slug
+    ? `<a class="t-mini" href="/tools/${o.slug}"><span class="t-ico sm" style="--c:${o.color}">${icon(o.icon)}</span><span>${o.title}<small>Open tool</small></span></a>`
+    : `<div class="t-mini"><span class="t-ico sm" style="--c:${o.color}">${icon(o.icon)}</span><span>${o.title}<small>Coming soon</small></span></div>`;
+  page(`tools/${t.slug}`, t.title, description,
+    `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<a href="/tools/#${t.cat}">${catLabel}</a>${icon("chevron_right")}<span>${esc(t.title)}</span></nav>
     <div class="t-title">
-      <span class="t-ico big" style="--c:${resizer.color}">${icon(resizer.icon)}</span>
+      <span class="t-ico big" style="--c:${t.color}">${icon(t.icon)}</span>
       <div>
-        <h1>Photo &amp; Signature Resizer</h1>
-        <p>Job application photo 300×300 and signature 300×80, under the KB limit, with a white or blue background if you need it.</p>
+        <h1>${h1}</h1>
+        <p>${lead}</p>
       </div>
     </div>
 
-    <div class="tool" id="resizer">
+${workspace}
+
+    <div class="t-cols">
+      <article class="t-article">
+        <h2>How to use it</h2>
+        <ol class="t-steps">
+          ${steps.map(([b, text]) => `<li><b>${b}</b> ${text}</li>`).join("\n          ")}
+        </ol>
+
+        <h2>For the best result</h2>
+        <ul class="t-tips">
+          ${tips.map(([ic, b, text]) => `<li>${icon(ic)}<span><b>${b}</b> ${text}</span></li>`).join("\n          ")}
+        </ul>
+
+        <h2>Questions</h2>
+        <div class="t-faq">
+          ${faqHtml}
+        </div>
+      </article>
+
+      <div class="t-side">
+        ${memoPromo()}
+        <div class="t-more">
+          <h3>More tools</h3>
+          ${others.map(mini).join("\n          ")}
+        </div>
+      </div>
+    </div>`, {
+    shell: "tools",
+    cat: t.cat,
+    scripts,
+    faqs: faqData,
+    schema: [{ "@type": "WebApplication", name: t.title, url: urlOf(`tools/${t.slug}`), inLanguage: "en",
+      applicationCategory: appCategory, operatingSystem: "Any", browserRequirements: "Requires JavaScript",
+      description: schemaDesc, offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }, publisher: { "@id": `${SITE}/#org` } }],
+  });
+}
+const tool = (slug) => TOOLS.find((t) => t.slug === slug);
+const kbChips = (list) => `<div class="chips">${list.map(([v, l]) => `<button type="button" data-kb="${v}">${l}</button>`).join("")}</div>`;
+
+// Photo & signature resizer
+toolPage(tool("photo-signature-resizer"), {
+  h1: "Photo &amp; Signature Resizer",
+  lead: "Job application photo 300×300 and signature 300×80, under the KB limit, with a white or blue background if you need it.",
+  description: "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB), and change the photo background to white or blue. Free, and nothing is uploaded.",
+  workspace: `    <div class="tool" id="resizer">
       <div class="modes" role="tablist" aria-label="What are you making?">
         <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}Photo <small>300×300</small></button>
         <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}Signature <small>300×80</small></button>
@@ -792,55 +848,182 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
         </div>
       </div>
       <p class="privacy-note">${icon("lock")} Your picture is never uploaded. All the work happens inside your browser.</p>
-    </div>
+    </div>`,
+  steps: [
+    ["Pick a type.", "Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else."],
+    ["Add and frame your picture.", "Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one, and touch up any spot with Fix edges."],
+    ["Download.", "Check the size and KB, then upload the file to your application."],
+  ],
+  tips: [
+    ["light_mode", "Good light.", "Daylight or a bright room, with no shadows on your face."],
+    ["wallpaper", "Plain background helps.", "A plain wall gives the cleanest edges, even when you switch the background here."],
+    ["face", "Face in the middle.", "Leave a little room above your head and down to your shoulders."],
+    ["edit", "Sign on white paper.", "Black or blue pen, photo taken straight from above."],
+    ["auto_fix_high", "Whiten the paper.", "If the paper looks grey, turn on \"Whiten paper, darken ink\"."],
+    ["fact_check", "Check the circular.", "Every application can ask for different sizes."],
+  ],
+  faqs: [
+    ["What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else."],
+    ["Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. If a spot is missed, use Fix edges: Erase removes leftover background and Restore brings back anything that was cut off. The first time, the background tool downloads about 16 MB; after that it is saved in your browser."],
+    ["Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's."],
+    ["Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom."],
+    ["Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg."],
+    ["Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light."],
+    ["Is it really free?", "Yes, completely free. No account or sign-in needed."],
+  ],
+  scripts: ["resizer.js"],
+  appCategory: "MultimediaApplication",
+  schemaDesc: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels under a set KB limit, and change the photo background.",
+});
 
-    <div class="t-cols">
-      <article class="t-article">
-        <h2>How to use it</h2>
-        <ol class="t-steps">
-          <li><b>Pick a type.</b> Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else.</li>
-          <li><b>Add and frame your picture.</b> Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one, and touch up any spot with Fix edges.</li>
-          <li><b>Download.</b> Check the size and KB, then upload the file to your application.</li>
-        </ol>
-
-        <h2>For the best result</h2>
-        <ul class="t-tips">
-          <li>${icon("light_mode")}<span><b>Good light.</b> Daylight or a bright room, with no shadows on your face.</span></li>
-          <li>${icon("wallpaper")}<span><b>Plain background helps.</b> A plain wall gives the cleanest edges, even when you switch the background here.</span></li>
-          <li>${icon("face")}<span><b>Face in the middle.</b> Leave a little room above your head and down to your shoulders.</span></li>
-          <li>${icon("edit")}<span><b>Sign on white paper.</b> Black or blue pen, photo taken straight from above.</span></li>
-          <li>${icon("auto_fix_high")}<span><b>Whiten the paper.</b> If the paper looks grey, turn on "Whiten paper, darken ink".</span></li>
-          <li>${icon("fact_check")}<span><b>Check the circular.</b> Every application can ask for different sizes.</span></li>
-        </ul>
-
-        <h2>Questions</h2>
-        <div class="t-faq">
-          ${tfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
-          ${tfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. If a spot is missed, use Fix edges: Erase removes leftover background and Restore brings back anything that was cut off. The first time, the background tool downloads about 16 MB; after that it is saved in your browser.")}
-          ${tfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
-          ${tfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
-          ${tfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}
-          ${tfaq("Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light.")}
-          ${tfaq("Is it really free?", "Yes, completely free. No account or sign-in needed.")}
+// Image to PDF
+toolPage(tool("image-to-pdf"), {
+  h1: "Image to PDF",
+  lead: "Turn photos of certificates, NID, marksheets or any document into one PDF. Set a size limit like 200 KB or 1 MB, and the tool keeps it under.",
+  description: "Convert JPG, PNG and phone photos to one PDF for free. Reorder and rotate pages, choose A4, and keep the PDF under 200 KB, 500 KB or 1 MB. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="img2pdf">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("add_photo_alternate")}
+            <strong>Add photos or scans</strong>
+            <span class="sub">Pick several at once, drag them here, or paste. JPG, PNG or WebP.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select images</span>
+            <input id="file" type="file" accept="image/*" multiple>
+          </label>
+          <div class="pages" hidden>
+            <div class="pages-head">
+              <b id="p-count">0 pages</b>
+              <span class="sub">Drag or use the arrows to reorder</span>
+              <span class="pages-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="add-more">${icon("add")}Add more</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="clear">${icon("delete")}Remove all</button>
+              </span>
+            </div>
+            <ol class="thumbs" id="thumbs"></ol>
+          </div>
+          <template>${icon("chevron_left")}${icon("chevron_right")}${icon("rotate_right")}</template>
+          <p class="err" id="err" role="alert" hidden></p>
         </div>
-      </article>
 
-      <div class="t-side">
-        ${memoPromo()}
-        <div class="t-more">
-          <h3>More tools</h3>
-          ${TOOLS.slice(1).map((t) => `<div class="t-mini"><span class="t-ico sm" style="--c:${t.color}">${icon(t.icon)}</span><span>${t.title}<small>Coming soon</small></span></div>`).join("\n          ")}
+        <div class="result">
+          <h3>${icon("tune")} Settings</h3>
+          <div class="fields">
+            <label class="field">Page size<select id="psize"><option value="a4">A4</option><option value="letter">Letter</option><option value="legal">Legal</option><option value="fit">Same as photo</option></select></label>
+            <label class="field">Orientation<select id="orient"><option value="auto">Auto</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+            <label class="field">Margin<select id="margin"><option value="none">None</option><option value="small" selected>Small</option><option value="normal">Normal</option></select></label>
+            <label class="field">File name<input id="fname" type="text" placeholder="document" maxlength="80"></label>
+            <label class="field wide">Max file size (KB)<input id="maxkb" type="number" inputmode="numeric" min="20" placeholder="No limit"></label>
+            ${kbChips([[200, "200 KB"], [500, "500 KB"], [1000, "1 MB"], [2000, "2 MB"]])}
+            <label class="check wide"><input id="scan" type="checkbox">Scanned look for documents (whiten paper)</label>
+          </div>
+          <ul class="facts">
+            <li><span>Pages</span><b id="f-pages">—</b></li>
+            <li><span>File size</span><b id="f-size">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="make" disabled>${icon("picture_as_pdf")}Create PDF</button>
+          <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download PDF</a>
         </div>
       </div>
-    </div>`, {
-  shell: "tools",
-  cat: "photo",
-  scripts: ["resizer.js"],
-  faqs: RESIZER_FAQS,
-  schema: [{ "@type": "WebApplication", name: "Photo & signature resizer", url: urlOf("tools/photo-signature-resizer"), inLanguage: "en",
-    applicationCategory: "MultimediaApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript",
-    description: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels under a set KB limit, and change the photo background.",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }, publisher: { "@id": `${SITE}/#org` } }],
+      <p class="privacy-note">${icon("lock")} Your images are never uploaded. The PDF is made inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Add your photos.", "Pick all the pages at once from your gallery or computer, or take photos with your phone."],
+    ["Arrange them.", "Drag pages (or use the arrows) into the right order, and rotate any that are sideways."],
+    ["Set a size limit if you need one.", "Type the KB limit from the application form, or tap 200 KB, 500 KB, 1 MB or 2 MB."],
+    ["Create and download.", "Tap Create PDF, check the size, then Download PDF."],
+  ],
+  tips: [
+    ["crop_free", "Whole page in frame.", "Keep all four corners of the paper in the photo."],
+    ["light_mode", "Even light.", "Avoid shadows from your phone or hand across the page."],
+    ["auto_fix_high", "Scanned look.", "Turn it on to make grey paper white and text darker, like a scanner. Photos of people or places are left as they are."],
+    ["straighten", "Shoot from above.", "Hold the phone flat over the page so the text isn't slanted."],
+    ["compress", "Big limit, better pages.", "Use the largest KB limit the form allows; smaller limits mean blurrier pages."],
+    ["picture_as_pdf", "Already have a PDF?", "Use Compress PDF to make an existing PDF smaller."],
+  ],
+  faqs: [
+    ["How do I convert multiple images into one PDF?", "Select all the images at once (or add more later). Each image becomes one page, in the order shown. Drag pages or use the arrows to change the order, then tap Create PDF."],
+    ["How do I make a PDF under 200 KB or 1 MB?", "Type the limit in Max file size, or tap one of the quick sizes. The tool lowers image quality and resolution only as much as needed to fit. If the pages would become unreadable it tells you, so you can remove a page or use a bigger limit."],
+    ["Are my documents uploaded anywhere?", "No. The PDF is made inside your browser. Your certificates and IDs never reach our servers or anyone else's."],
+    ["Does it work on a phone?", "Yes. Open it in your phone's browser, pick photos from your gallery, and download the PDF. It's saved to your Downloads folder."],
+    ["What page size should I use?", "A4 is the standard in Bangladesh and most countries. Choose Same as photo if you want each page to match the photo's shape with no white borders."],
+    ["Can I add more pages later?", "Yes. Tap Add more to add pages to the same PDF, then Create PDF again."],
+    ["Is it really free?", "Yes, completely free. No account, no watermark."],
+  ],
+  scripts: ["pdf-lite.js", "img2pdf.js"],
+  schemaDesc: "Free tool to convert JPG, PNG and phone photos into a single PDF, with page reordering, rotation, A4/Letter pages and a maximum file size.",
+});
+
+// Compress PDF
+toolPage(tool("compress-pdf"), {
+  h1: "Compress PDF",
+  lead: "Make a PDF small enough to upload: 100 KB, 200 KB, 500 KB or 1 MB. Pick how much to shrink it, or type the limit from the form.",
+  description: "Compress a PDF to 100 KB, 200 KB, 500 KB or 1 MB for free, right in your browser. Choose the size limit, optional black & white, and download. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="pdfcomp">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("upload_file")}
+            <strong>Choose a PDF</strong>
+            <span class="sub">or drag it here.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select PDF</span>
+            <input id="file" type="file" accept="application/pdf,.pdf">
+          </label>
+          <div class="pdf-info" hidden>
+            <span class="t-ico" style="--c:${C.coral}">${icon("picture_as_pdf")}</span>
+            <div><b id="pdf-name"></b><span id="pdf-meta"></span></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("swap_horiz")}Change</button>
+          </div>
+          <p class="note">${icon("info")} Pages are saved as images, so text in the compressed PDF can't be selected or searched. That's fine for application uploads; keep your original too.</p>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Compression</h3>
+          <div class="levels" role="radiogroup" aria-label="Compression level">
+            <label class="lvl"><input type="radio" name="level" value="small"><span><b>Smallest</b><small>Tiny file, less detail</small></span></label>
+            <label class="lvl"><input type="radio" name="level" value="balanced" checked><span><b>Balanced</b><small>Clear text, small file</small></span></label>
+            <label class="lvl"><input type="radio" name="level" value="sharp"><span><b>Sharp</b><small>For small print</small></span></label>
+          </div>
+          <div class="fields">
+            <label class="field wide">Max file size (KB)<input id="maxkb" type="number" inputmode="numeric" min="20" placeholder="No limit"></label>
+            ${kbChips([[100, "100 KB"], [200, "200 KB"], [500, "500 KB"], [1000, "1 MB"]])}
+            <label class="check wide"><input id="gray" type="checkbox">Black &amp; white (smaller)</label>
+          </div>
+          <ul class="facts">
+            <li><span>Original</span><b id="f-orig">—</b></li>
+            <li><span>Compressed</span><b id="f-new">—</b></li>
+            <li><span>Saved</span><b id="f-saved">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="make" disabled>${icon("compress")}Compress PDF</button>
+          <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download PDF</a>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your PDF is never uploaded. It's compressed inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Choose your PDF.", "Pick it from your phone or computer, or drag it onto the box."],
+    ["Pick a level or a limit.", "Balanced suits most forms. If the form says \"max 200 KB\", type 200 or tap the 200 KB button."],
+    ["Compress and download.", "Tap Compress PDF, check the new size, then Download PDF."],
+  ],
+  tips: [
+    ["format_size", "Use the biggest limit allowed.", "A 500 KB PDF looks better than a 100 KB one, so don't shrink more than the form needs."],
+    ["contrast", "Black & white saves a lot.", "For text documents and certificates, it can halve the size."],
+    ["zoom_in", "Check the result.", "Open the compressed PDF and make sure every page is readable before uploading."],
+    ["photo_library", "Starting from photos?", "Use Image to PDF instead; it makes the PDF and sets the size in one go."],
+  ],
+  faqs: [
+    ["How do I compress a PDF to 200 KB?", "Choose your PDF, type 200 in Max file size (or tap 200 KB), then tap Compress PDF. The tool lowers resolution and quality just enough to fit. For long PDFs with many pages, turning on Black & white helps reach small limits."],
+    ["Will the text still be readable?", "Balanced and Sharp keep normal text readable. Smallest and very small limits can make tiny print blurry, so always open the result and check before uploading."],
+    ["Why can't I select text in the compressed PDF?", "To make the file small, each page is saved as an image. That's fine for uploading to applications, but keep your original PDF if you need to copy text from it."],
+    ["Is my PDF uploaded anywhere?", "No. Everything happens inside your browser. Your PDF never reaches our servers or anyone else's."],
+    ["What if my PDF has a password?", "Remove the password first (open it and save or print it as a new PDF), then compress the new file."],
+    ["Is it really free?", "Yes, completely free. No account, no watermark, no page limit."],
+  ],
+  scripts: ["pdf-lite.js", "compress-pdf.js"],
+  schemaDesc: "Free tool to compress PDF files to a target size such as 100 KB, 200 KB, 500 KB or 1 MB, with optional black and white.",
 });
 
 // 404
