@@ -309,3 +309,23 @@ a.t-mini:hover { color: var(--brand-ink); }
 .thumb-bar .thumb-label { align-self: center; font-size: 12.5px; font-weight: 700; color: var(--muted); padding-left: 4px; }
 .kb-row { display: grid; gap: 8px; }
 .drop.compact + .pdf-info { margin-top: 0; }
+
+/* Age calculator */
+.age-fields { grid-template-columns: 1fr 1fr; }
+@media (max-width: 480px) { .age-fields { grid-template-columns: 1fr; } }
+.chips button .ms { font-size: 16px; vertical-align: -3px; margin-right: 4px; }
+.age-limit { margin-top: 16px; padding: 16px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); }
+.age-limit h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 15px; }
+.age-limit h4 .ms { color: var(--brand-ink); font-size: 20px; }
+.age-limit h4 small { color: var(--muted); font-weight: 500; }
+.age-big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.age-big span { display: grid; justify-items: center; padding: 12px 4px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--muted); font-size: 13px; font-weight: 600; }
+.age-big b { font-family: "Outfit", sans-serif; font-size: 30px; line-height: 1.1; color: var(--text); }
+.eligible { display: flex; gap: 8px; margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; font-size: 14px; }
+.eligible .ms { font-size: 22px; }
+.eligible.ok { background: var(--brand-soft); color: #0b5a2a; }
+.eligible.ok .ms { color: var(--brand-ink); }
+.eligible.bad { background: #fef1f0; color: #8f1d14; }
+.eligible.bad .ms { color: var(--danger); }
+#agecalc .tool-grid { grid-template-columns: minmax(0, 1fr) 340px; }
+@media (max-width: 860px) { #agecalc .tool-grid { grid-template-columns: minmax(0, 1fr); } }

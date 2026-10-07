@@ -602,6 +602,7 @@ SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Mement
 SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
+SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on a Job Circular's Date | Memento Tools";
 SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Images, Free | Memento Tools";
 
 const TOOL_CATS = [
@@ -623,8 +624,9 @@ const TOOLS = [
   { slug: "pdf-to-image", cat: "pdf", icon: "photo_library", color: C.sky, title: "PDF to Image",
     text: "Turn PDF pages into JPG or PNG images, one page or all of them, with an optional KB limit.",
     keywords: "pdf to jpg png image picture convert pages extract save" },
-  { cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
-    text: "Your exact age in years, months and days on a circular's cut-off date.", keywords: "age date birth circular job" },
+  { slug: "age-calculator", cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
+    text: "Your exact age in years, months and days on a circular's cut-off date, and whether you're within the age limit.",
+    keywords: "age calculator date of birth circular job eligibility limit cut off years months days" },
   { cat: "bangla", icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter",
     text: "Convert old Bijoy Bangla text to Unicode, and back.", keywords: "bangla bengali bijoy unicode font converter" },
   { cat: "calc", icon: "payments", color: C.mint, title: "Amount in words",
@@ -1109,6 +1111,73 @@ toolPage(tool("pdf-to-image"), {
   scripts: ["pdf-lite.js", "pdf2img.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to convert PDF pages to JPG or PNG images, with page selection, resolution up to 300 DPI, a KB limit per image and ZIP download.",
+});
+
+// Age calculator
+toolPage(tool("age-calculator"), {
+  h1: "Age Calculator",
+  lead: "Your exact age in years, months and days on any date, such as a job circular's cut-off date. Add the age limit to see if you're eligible.",
+  description: "Calculate your exact age in years, months and days on any date, like a job circular's cut-off date, and check it against the minimum and maximum age limit. Free.",
+  workspace: `    <div class="tool" id="agecalc">
+      <div class="tool-grid">
+        <div class="stage">
+          <div class="fields age-fields">
+            <label class="field">Date of birth<input id="dob" type="date" min="1900-01-01" required></label>
+            <label class="field">Age on (cut-off date)<input id="on" type="date" min="1900-01-01"></label>
+            <div class="chips wide"><button type="button" data-on="today">${icon("today")}Today</button></div>
+          </div>
+          <div class="age-limit">
+            <h4>${icon("rule")} Age limit from the circular <small>(optional)</small></h4>
+            <div class="fields">
+              <label class="field">Minimum age<input id="minage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 18"></label>
+              <label class="field">Maximum age<input id="maxage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 30"></label>
+              <div class="chips wide"><button type="button" data-range="18-30">18–30</button><button type="button" data-range="18-32">18–32</button><button type="button" data-range="18-35">18–35</button><button type="button" data-range="-">Clear</button></div>
+            </div>
+          </div>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result age-result" aria-live="polite">
+          <h3>${icon("cake")} Age</h3>
+          <div class="age-big">
+            <span><b id="a-y">—</b>years</span>
+            <span><b id="a-m">—</b>months</span>
+            <span><b id="a-d">—</b>days</span>
+          </div>
+          <p class="eligible" id="elig" hidden></p>
+          <template>${icon("check_circle")}${icon("cancel")}</template>
+          <ul class="facts">
+            <li><span>Total months</span><b id="f-months">—</b></li>
+            <li><span>Total weeks</span><b id="f-weeks">—</b></li>
+            <li><span>Total days</span><b id="f-days">—</b></li>
+            <li><span>Born on a</span><b id="f-born">—</b></li>
+            <li><span>Next birthday</span><b id="f-next">—</b></li>
+          </ul>
+          <button type="button" class="btn btn-ghost" id="copy" disabled>${icon("content_copy")}Copy result</button>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Nothing you enter leaves your device.</p>
+    </div>`,
+  steps: [
+    ["Enter your date of birth.", "Use the date on your SSC certificate or NID, the one the application asks for."],
+    ["Set the \"age on\" date.", "It starts at today. For a job, change it to the cut-off date written in the circular."],
+    ["Add the age limit (optional).", "Type the minimum and maximum age from the circular to see whether you're eligible, and the range of birth dates that qualify."],
+  ],
+  tips: [
+    ["event", "Use the circular's date.", "Age limits are counted on a fixed date in the circular, not on the day you apply."],
+    ["badge", "Match your documents.", "Use the same date of birth that's on the certificate you'll upload."],
+    ["content_copy", "Keep a note.", "Copy result gives you a short summary to save or share."],
+    ["photo_size_select_large", "Applying now?", "The photo & signature resizer gets your 300×300 photo and 300×80 signature ready."],
+  ],
+  faqs: [
+    ["How do I check my age for a job circular?", "Enter your date of birth, set \"Age on\" to the cut-off date from the circular, and type the minimum and maximum age. The tool shows your exact age on that date and whether you're within the limit."],
+    ["What does \"maximum age 30\" mean here?", "This calculator reads it strictly: on the cut-off date you can be at most exactly 30 years, 0 months and 0 days. If you're even a day older, it shows how much you're over. Some circulars word their limits differently, so always follow the circular's own wording."],
+    ["How is the age counted?", "In whole calendar years and months, then the remaining days, the way it's done on official forms. For example, from 15 March 2000 to 1 January 2026 is 25 years, 9 months and 17 days."],
+    ["What if I was born on 29 February?", "In years without 29 February, your birthday is counted as 28 February."],
+    ["Is my date of birth saved or sent anywhere?", "No. The calculation happens on your device, and nothing is stored or sent."],
+  ],
+  scripts: ["agecalc.js"],
+  schemaDesc: "Free calculator for exact age in years, months and days on any date, with a check against a job circular's minimum and maximum age.",
 });
 
 // 404
