@@ -602,6 +602,7 @@ SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Mement
 SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
+SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Images, Free | Memento Tools";
 
 const TOOL_CATS = [
   ["photo", "Photo", "image"],
@@ -619,6 +620,9 @@ const TOOLS = [
   { slug: "compress-pdf", cat: "pdf", icon: "compress", color: C.violet, title: "Compress PDF",
     text: "Shrink a PDF to 100 KB, 200 KB, 500 KB or 1 MB for online applications.",
     keywords: "compress reduce shrink pdf size kb mb smaller" },
+  { slug: "pdf-to-image", cat: "pdf", icon: "photo_library", color: C.sky, title: "PDF to Image",
+    text: "Turn PDF pages into JPG or PNG images, one page or all of them, with an optional KB limit.",
+    keywords: "pdf to jpg png image picture convert pages extract save" },
   { cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
     text: "Your exact age in years, months and days on a circular's cut-off date.", keywords: "age date birth circular job" },
   { cat: "bangla", icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter",
@@ -1024,6 +1028,87 @@ toolPage(tool("compress-pdf"), {
   ],
   scripts: ["pdf-lite.js", "compress-pdf.js"],
   schemaDesc: "Free tool to compress PDF files to a target size such as 100 KB, 200 KB, 500 KB or 1 MB, with optional black and white.",
+});
+
+// PDF to Image
+toolPage(tool("pdf-to-image"), {
+  h1: "PDF to Image",
+  lead: "Turn PDF pages into JPG or PNG images. Pick the pages you need, set the resolution, and download one image or all of them in a ZIP.",
+  description: "Convert PDF pages to JPG or PNG images for free. Choose pages and resolution (up to 300 DPI), keep each JPG under a KB limit, and download one image or a ZIP. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="pdf2img">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("upload_file")}
+            <strong>Choose a PDF</strong>
+            <span class="sub">or drag it here.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select PDF</span>
+            <input id="file" type="file" accept="application/pdf,.pdf">
+          </label>
+          <div class="pdf-info" hidden>
+            <span class="t-ico" style="--c:${C.sky}">${icon("picture_as_pdf")}</span>
+            <div><b id="pdf-name"></b><span id="pdf-meta"></span></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("swap_horiz")}Change</button>
+          </div>
+          <div class="pages" hidden>
+            <div class="pages-head">
+              <b id="sel-count">0 pages selected</b>
+              <span class="sub">Tap a page to include or skip it</span>
+              <span class="pages-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="all">${icon("select_all")}All</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="none">${icon("deselect")}None</button>
+              </span>
+            </div>
+            <ol class="thumbs" id="thumbs"></ol>
+          </div>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Settings</h3>
+          <div class="fields">
+            <label class="field">Format<select id="format"><option value="jpg">JPG</option><option value="png">PNG</option></select></label>
+            <label class="field">Resolution<select id="dpi"><option value="96">96 DPI</option><option value="150" selected>150 DPI</option><option value="200">200 DPI</option><option value="300">300 DPI</option></select></label>
+            <div class="kb-row wide">
+              <label class="field">Max KB per image (JPG)<input id="maxkb" type="number" inputmode="numeric" min="10" placeholder="No limit"></label>
+              ${kbChips([[100, "100 KB"], [200, "200 KB"], [300, "300 KB"], [500, "500 KB"]])}
+            </div>
+          </div>
+          <ul class="facts">
+            <li><span>Pages</span><b id="f-sel">—</b></li>
+            <li><span>Image size</span><b id="f-px">—</b></li>
+            <li><span>File size</span><b id="f-size">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="make" disabled>${icon("photo_library")}Convert pages</button>
+          <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download</a>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your PDF is never uploaded. The images are made inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Choose your PDF.", "Pick it from your phone or computer, or drag it onto the box. Every page shows up as a preview."],
+    ["Pick the pages.", "All pages are selected; tap any page to skip it. Or use the download button under a page to save just that one."],
+    ["Choose format and resolution.", "JPG makes small files, PNG keeps text crispest. 150 DPI suits most uses; add a KB limit if a form asks for one."],
+    ["Convert and download.", "One page downloads as an image; several come together in a ZIP file."],
+  ],
+  tips: [
+    ["description", "Certificate for a form?", "Use JPG at 150 DPI with the KB limit from the form, for example 200 KB."],
+    ["text_fields", "Lots of small text?", "PNG or 200–300 DPI keeps letters sharp."],
+    ["folder_zip", "Opening the ZIP.", "On Android, tap the ZIP in Files and choose Extract. On a computer, double-click it."],
+    ["picture_as_pdf", "Need it the other way?", "Image to PDF turns photos back into one PDF."],
+  ],
+  faqs: [
+    ["How do I convert a PDF to JPG?", "Choose your PDF, keep JPG as the format, pick the pages you want and tap Convert. One page downloads as a JPG; several pages download together as a ZIP of JPGs."],
+    ["Can I save just one page?", "Yes. Tap the download button under that page's preview, or select only that page and tap Convert."],
+    ["How do I keep each image under 100 KB or 200 KB?", "Choose JPG and type the limit in Max KB per image (or tap a quick size). Each page is made as clear as possible while staying under the limit."],
+    ["JPG or PNG, which is better?", "JPG files are much smaller and accepted almost everywhere. PNG keeps text perfectly sharp but files are larger. For online forms, JPG is usually the right choice."],
+    ["Is my PDF uploaded anywhere?", "No. The pages are turned into images inside your browser. Your PDF never reaches our servers or anyone else's."],
+    ["Is it really free?", "Yes, completely free. No account, no watermark, no page limit."],
+  ],
+  scripts: ["pdf-lite.js", "pdf2img.js"],
+  appCategory: "MultimediaApplication",
+  schemaDesc: "Free tool to convert PDF pages to JPG or PNG images, with page selection, resolution up to 300 DPI, a KB limit per image and ZIP download.",
 });
 
 // 404

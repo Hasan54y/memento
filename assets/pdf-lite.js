@@ -105,5 +105,72 @@
   // Page sizes in PDF points (1/72 inch)
   const SIZES = { a4: [595.28, 841.89], letter: [612, 792], legal: [612, 1008] };
 
-  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES };
+  // ---------- Reading PDFs (pdf.js, self-hosted: its worker has to be same-origin) ----------
+  const PDFJS = "/assets/vendor/pdfjs/";
+  const PDFJS_CDN = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/";
+  let pdfjs = null;
+  async function openPdf(file) {
+    if (!pdfjs) {
+      pdfjs = await import(`${PDFJS}pdf.min.mjs`);
+      pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
+    }
+    return pdfjs.getDocument({
+      data: new Uint8Array(await file.arrayBuffer()),
+      cMapUrl: `${PDFJS_CDN}cmaps/`, cMapPacked: true, standardFontDataUrl: `${PDFJS_CDN}standard_fonts/`,
+      wasmUrl: `${PDFJS_CDN}wasm/`, iccUrl: `${PDFJS_CDN}iccs/`,
+    }).promise;
+  }
+
+  // One page onto a white canvas at `scale` (1 = 72 DPI)
+  async function renderPage(doc, n, scale) {
+    const page = await doc.getPage(n);
+    const vp = page.getViewport({ scale });
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.floor(vp.width));
+    c.height = Math.max(1, Math.floor(vp.height));
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: ctx, canvas: c, viewport: vp, background: "#ffffff" }).promise;
+    const size = page.getViewport({ scale: 1 });
+    page.cleanup();
+    return { canvas: c, pageW: size.width, pageH: size.height };
+  }
+
+  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES, openPdf, renderPage };
+
+  // ---------- MiniZip: a "stored" ZIP (JPG/PNG are already compressed) ----------
+  const CRC = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; CRC[i] = c >>> 0; }
+  const crc32 = (d) => { let c = 0xffffffff; for (let i = 0; i < d.length; i++) c = CRC[(c ^ d[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+
+  // files: [{ name, data: Uint8Array }]
+  function zip(files) {
+    const now = new Date();
+    const time = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    const date = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    const parts = [], central = [];
+    let offset = 0;
+    for (const f of files) {
+      const name = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+      h.setUint16(10, time, true); h.setUint16(12, date, true); h.setUint32(14, crc, true);
+      h.setUint32(18, size, true); h.setUint32(22, size, true); h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+      parts.push(new Uint8Array(h.buffer), name, f.data);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+      c.setUint16(10, 0, true); c.setUint16(12, time, true); c.setUint16(14, date, true); c.setUint32(16, crc, true);
+      c.setUint32(20, size, true); c.setUint32(24, size, true); c.setUint16(28, name.length, true);
+      c.setUint32(42, offset, true);
+      central.push(new Uint8Array(c.buffer), name);
+      offset += 30 + name.length + size;
+    }
+    const cdSize = central.reduce((n, p) => n + p.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+    return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: "application/zip" });
+  }
+  window.MiniZip = { zip };
 })();

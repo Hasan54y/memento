@@ -295,3 +295,17 @@ a.t-tile:hover .t-go .ms { transform: translateX(3px); }
 .note .ms { color: var(--brand-ink); font-size: 18px; }
 a.t-mini { text-decoration: none; color: var(--text); }
 a.t-mini:hover { color: var(--brand-ink); }
+
+/* PDF to Image: selectable page previews */
+#pdf2img .drop.compact { display: none; }
+#pdf2img .pdf-info + .pages { margin-top: 14px; }
+.thumb.pick { cursor: default; }
+.thumb.pick .thumb-img { position: relative; cursor: pointer; }
+.thumb.pick .thumb-img input { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; margin: 0; accent-color: var(--brand-ink); z-index: 1; }
+.thumb.pick.off .thumb-img img { opacity: .35; filter: grayscale(1); }
+.thumb.pick:not(.off) { border-color: #9fdcb6; }
+.thumb-wait { width: 60%; height: 70%; border-radius: 4px; background: linear-gradient(90deg, #eef1ef, #f8faf9, #eef1ef); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.thumb-bar .thumb-label { align-self: center; font-size: 12.5px; font-weight: 700; color: var(--muted); padding-left: 4px; }
+.kb-row { display: grid; gap: 8px; }
+.drop.compact + .pdf-info { margin-top: 0; }
