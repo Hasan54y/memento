@@ -137,7 +137,37 @@
     return { canvas: c, pageW: size.width, pageH: size.height };
   }
 
-  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES, openPdf, renderPage };
+  // ---------- Editing PDFs without re-drawing them (pdf-lib, MIT, self-hosted) ----------
+  let pdfLib = null;
+  function loadPdfLib() {
+    if (!pdfLib) pdfLib = new Promise((resolve, reject) => {
+      if (window.PDFLib) return resolve(window.PDFLib);
+      const s = Object.assign(document.createElement("script"), { src: "/assets/vendor/pdf-lib/pdf-lib.min.js" });
+      s.onload = () => resolve(window.PDFLib);
+      s.onerror = () => { pdfLib = null; reject(new Error("pdf-lib")); };
+      document.head.appendChild(s);
+    });
+    return pdfLib;
+  }
+
+  // "1-3, 5, 8-end" -> [[0,1,2],[4],[7,8,...]] (0-based), or { error }
+  function parseRanges(text, count) {
+    const groups = [];
+    for (const raw of String(text).split(/[,;]+/)) {
+      const part = raw.trim().toLowerCase();
+      if (!part) continue;
+      const m = /^(\d+)\s*(?:(?:-|–|to)\s*(\d+|end)?)?$/.exec(part);
+      if (!m) return { error: `"${raw.trim()}" isn't a page or range. Use numbers like 1-3, 5, 8-end.` };
+      const a = Number(m[1]), b = m[2] === undefined ? (part.includes("-") || part.includes("–") || part.includes("to") ? count : a) : m[2] === "end" ? count : Number(m[2]);
+      if (a < 1 || b < 1 || a > count || b > count) return { error: `This PDF has ${count} page${count === 1 ? "" : "s"}; "${raw.trim()}" is outside that.` };
+      const g = [];
+      for (let i = Math.min(a, b); i <= Math.max(a, b); i++) g.push(i - 1);
+      groups.push(g);
+    }
+    return groups.length ? { groups } : { error: "Type the pages to split out, like 1-3, 5, 8-end." };
+  }
+
+  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES, openPdf, renderPage, loadPdfLib, parseRanges };
 
   // ---------- MiniZip: a "stored" ZIP (JPG/PNG are already compressed) ----------
   const CRC = new Uint32Array(256);

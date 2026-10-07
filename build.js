@@ -602,19 +602,26 @@ SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Mement
 SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
+SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
+SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
 SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on a Job Circular's Date | Memento Tools";
 SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Images, Free | Memento Tools";
 
 const TOOL_CATS = [
   ["photo", "Photo", "image"],
   ["pdf", "PDF", "picture_as_pdf"],
-  ["bangla", "Bangla", "translate"],
   ["calc", "Calculators", "calculate"],
 ];
 const TOOLS = [
   { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
     text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue.",
     keywords: "teletalk passport resize compress kb signature background white blue remove job application" },
+  { slug: "merge-pdf", cat: "pdf", icon: "merge", color: C.coral, title: "Merge PDF",
+    text: "Combine PDFs and images into one PDF, in any order. Text stays sharp and selectable.",
+    keywords: "merge combine join pdf files together append add images jpg" },
+  { slug: "split-pdf", cat: "pdf", icon: "call_split", color: C.sky, title: "Split PDF",
+    text: "Extract pages, split every page, or split by ranges like 1-3, 5, 8-end.",
+    keywords: "split separate extract pages pdf range remove delete" },
   { slug: "image-to-pdf", cat: "pdf", icon: "picture_as_pdf", color: C.coral, title: "Image to PDF",
     text: "Turn photos of certificates, NID or marksheets into one PDF, under the KB limit you need.",
     keywords: "jpg png photo images to pdf convert merge combine certificate scan kb size" },
@@ -627,10 +634,6 @@ const TOOLS = [
   { slug: "age-calculator", cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
     text: "Your exact age in years, months and days on a circular's cut-off date, and whether you're within the age limit.",
     keywords: "age calculator date of birth circular job eligibility limit cut off years months days" },
-  { cat: "bangla", icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter",
-    text: "Convert old Bijoy Bangla text to Unicode, and back.", keywords: "bangla bengali bijoy unicode font converter" },
-  { cat: "calc", icon: "payments", color: C.mint, title: "Amount in words",
-    text: "Write any amount in English and Bangla words, for cheques and invoices.", keywords: "taka number words cheque invoice bangla english" },
 ];
 
 function toolTile(t) {
@@ -690,10 +693,10 @@ function memoPromo() {
 }
 
 page("tools/index", "Free tools",
-  "Free online tools for job applications and paperwork: resize photos and signatures, change photo backgrounds, turn images into PDF and compress PDFs. Everything runs in your browser; no files are uploaded.",
+  "Free online tools for everyday paperwork: merge, split and compress PDFs, convert images to PDF and back, resize photos and change backgrounds. Everything runs in your browser; no files are uploaded.",
   `    <section class="t-hero">
       <h1>Free online tools for everyday paperwork</h1>
-      <p>Resize application photos, make PDFs, convert Bangla text and more. Free, no sign-up, and your files never leave your device.</p>
+      <p>Merge, split and compress PDFs, turn photos into PDFs, resize photos for forms and more. Free, no sign-up, and your files never leave your device.</p>
       <ul class="t-perks">
         <li>${icon("lock")} No uploads</li>
         <li>${icon("bolt")} No sign-up</li>
@@ -1111,6 +1114,155 @@ toolPage(tool("pdf-to-image"), {
   scripts: ["pdf-lite.js", "pdf2img.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to convert PDF pages to JPG or PNG images, with page selection, resolution up to 300 DPI, a KB limit per image and ZIP download.",
+});
+
+// Merge PDF
+toolPage(tool("merge-pdf"), {
+  h1: "Merge PDF",
+  lead: "Combine several PDFs, and photos too, into one PDF. Put them in any order; pages are copied exactly, so text stays sharp and selectable.",
+  description: "Merge PDF files into one, free and private. Add PDFs and images, drag them into order, and download a single PDF. Pages aren't re-compressed, and nothing is uploaded.",
+  workspace: `    <div class="tool" id="mergepdf">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("note_add")}
+            <strong>Add PDFs to merge</strong>
+            <span class="sub">Pick several at once, or drag them here. Images (JPG, PNG) work too.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select files</span>
+            <input id="file" type="file" accept="application/pdf,.pdf,image/*" multiple>
+          </label>
+          <div class="pages" hidden>
+            <div class="pages-head">
+              <b id="p-count">0 files</b>
+              <span class="sub">Drag or use the arrows to set the order</span>
+              <span class="pages-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="add-more">${icon("add")}Add more</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="clear">${icon("delete")}Remove all</button>
+              </span>
+            </div>
+            <ol class="thumbs" id="thumbs"></ol>
+          </div>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Merge</h3>
+          <div class="fields">
+            <label class="field wide">File name<input id="fname" type="text" placeholder="merged" maxlength="80"></label>
+          </div>
+          <ul class="facts">
+            <li><span>Files</span><b id="f-files">—</b></li>
+            <li><span>Pages</span><b id="f-pages">—</b></li>
+            <li><span>File size</span><b id="f-size">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="make" disabled>${icon("merge")}Merge PDF</button>
+          <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download PDF</a>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your files are never uploaded. They're merged inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Add your files.", "Select all the PDFs at once, or drag them in. You can mix in JPG or PNG images; each becomes a page."],
+    ["Put them in order.", "Drag the files, or use the arrows. The merged PDF follows the order shown, left to right."],
+    ["Merge and download.", "Name the file if you like, tap Merge PDF, then Download PDF."],
+  ],
+  tips: [
+    ["text_fields", "Text stays text.", "Pages are copied as they are, so text remains searchable and nothing gets blurrier."],
+    ["photo_library", "Mix in photos.", "Add a photo of a receipt or ID and it becomes an A4 page in the right spot."],
+    ["compress", "Too big to email?", "Run the merged file through Compress PDF to shrink it."],
+    ["call_split", "Need only some pages?", "Split PDF pulls out just the pages you want first."],
+  ],
+  faqs: [
+    ["How do I merge PDF files into one?", "Add the PDFs (select several at once or drag them in), put them in order, and tap Merge PDF. Your merged file downloads as a single PDF."],
+    ["Will the quality change?", "No. Pages are copied exactly as they are, without re-compressing, so text stays sharp and selectable and images keep their quality."],
+    ["Can I merge images with PDFs?", "Yes. JPG and PNG images (and WebP) are added as A4 pages, sized to fit, in the position you put them."],
+    ["Is there a limit on files or size?", "There's no set limit. Everything happens in your browser, so very large files depend on your device's memory; most phones handle dozens of normal PDFs easily."],
+    ["Are my files uploaded anywhere?", "No. Merging happens inside your browser. Your files never reach our servers or anyone else's."],
+    ["Can I merge password-protected PDFs?", "Not yet. Open the protected PDF, remove the password (or print it to a new PDF), then add that copy."],
+    ["Is it really free?", "Yes. No account, no watermark, no limits."],
+  ],
+  scripts: ["pdf-lite.js", "merge-pdf.js"],
+  schemaDesc: "Free private tool to merge PDF files and images into one PDF in the browser, keeping pages unchanged.",
+});
+
+// Split PDF
+toolPage(tool("split-pdf"), {
+  h1: "Split PDF",
+  lead: "Take pages out of a PDF: pick the pages you need, split every page into its own PDF, or split by ranges like 1-3, 5, 8-end.",
+  description: "Split a PDF for free: extract selected pages, save every page as a separate PDF, or split by page ranges. Pages are copied exactly, and nothing is uploaded.",
+  workspace: `    <div class="tool" id="splitpdf">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("upload_file")}
+            <strong>Choose a PDF</strong>
+            <span class="sub">or drag it here.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select PDF</span>
+            <input id="file" type="file" accept="application/pdf,.pdf">
+          </label>
+          <div class="pdf-info" hidden>
+            <span class="t-ico" style="--c:${C.sky}">${icon("picture_as_pdf")}</span>
+            <div><b id="pdf-name"></b><span id="pdf-meta"></span></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("swap_horiz")}Change</button>
+          </div>
+          <div class="pages" hidden>
+            <div class="pages-head">
+              <b id="sel-count"></b>
+              <span class="pages-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="all">${icon("select_all")}All</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="none">${icon("deselect")}None</button>
+              </span>
+            </div>
+            <ol class="thumbs" id="thumbs"></ol>
+          </div>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Split</h3>
+          <div class="levels" role="radiogroup" aria-label="How to split">
+            <label class="lvl"><input type="radio" name="mode" value="select" checked><span><b>Pick pages</b><small>Tap pages; they become one PDF</small></span></label>
+            <label class="lvl"><input type="radio" name="mode" value="each"><span><b>Every page</b><small>One PDF per page</small></span></label>
+            <label class="lvl"><input type="radio" name="mode" value="ranges"><span><b>Custom ranges</b><small>One PDF per range</small></span></label>
+            <label class="lvl"><input type="radio" name="mode" value="every"><span><b>Every N pages</b><small>Equal-size parts</small></span></label>
+          </div>
+          <div class="fields">
+            <label class="field wide mode-extra" hidden>Ranges<input id="ranges" type="text" placeholder="1-3, 5, 8-end" autocomplete="off"></label>
+            <label class="field wide mode-extra" hidden>Pages per PDF<input id="every" type="number" inputmode="numeric" min="1" value="2"></label>
+          </div>
+          <ul class="facts">
+            <li><span>Output</span><b id="f-out">—</b></li>
+            <li><span>Size</span><b id="f-size">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="make" disabled>${icon("call_split")}Make PDF</button>
+          <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download</a>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your PDF is never uploaded. It's split inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Choose your PDF.", "Every page shows up as a preview."],
+    ["Choose how to split.", "Pick pages (tap the ones you want), Every page, Custom ranges such as 1-3, 5, 8-end, or Every N pages."],
+    ["Download.", "One result downloads as a PDF; several come together in a ZIP."],
+  ],
+  tips: [
+    ["touch_app", "Remove pages.", "Pick pages, select All, then tap the pages you don't want. The result is your PDF without them."],
+    ["format_list_numbered", "Ranges.", "Separate with commas: 1-3 is pages 1 to 3, 5 is just page 5, 8-end runs to the last page."],
+    ["merge", "Rearranging?", "Split out the parts, then put them back together in a new order with Merge PDF."],
+    ["folder_zip", "Opening the ZIP.", "On Android, tap the ZIP in Files and choose Extract. On a computer, double-click it."],
+  ],
+  faqs: [
+    ["How do I extract pages from a PDF?", "Choose your PDF, keep Pick pages selected, tap the pages you want, and tap Make PDF. You get a new PDF with only those pages."],
+    ["How do I split a PDF into separate pages?", "Choose Every page. Each page becomes its own PDF, and they download together in a ZIP."],
+    ["How do I split by page ranges?", "Choose Custom ranges and type them separated by commas, for example 1-3, 4-6, 7-end. Each range becomes a separate PDF."],
+    ["How do I delete pages from a PDF?", "Choose Pick pages, tap All, then tap the pages you want to remove so they're unselected. Make PDF gives you the PDF without them."],
+    ["Does splitting lower the quality?", "No. Pages are copied exactly, so text stays sharp and selectable."],
+    ["Are my files uploaded anywhere?", "No. Splitting happens inside your browser. Your PDF never reaches our servers or anyone else's."],
+  ],
+  scripts: ["pdf-lite.js", "split-pdf.js"],
+  schemaDesc: "Free private tool to split PDF files: extract selected pages, split every page, by page ranges or every N pages.",
 });
 
 // Age calculator
