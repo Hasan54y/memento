@@ -395,3 +395,18 @@ a.t-mini:hover { color: var(--brand-ink); }
 .sheet-btns .btn:disabled { opacity: .45; cursor: default; }
 #passport .result .note { margin-top: 12px; }
 #passport .out img { max-height: 280px; }
+
+/* ID Copy Maker */
+#idcopy .modes { margin-bottom: 14px; }
+#idcopy .modes button.has::after { content: "✓"; margin-left: 4px; color: var(--brand-ink); font-weight: 800; }
+.step-label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 10px; font-weight: 700; font-size: 15px; }
+.step-label > b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--brand); color: #04140a; font-size: 13px; }
+.step-actions { display: flex; gap: 8px; margin-left: auto; }
+.editor .step-label:not(:first-child) { margin-top: 18px; }
+.crop-frame canvas { cursor: crosshair; }
+.card-frame canvas { cursor: default; }
+.card-frame canvas.drawing { cursor: crosshair; }
+.page-preview { margin: 4px 0 14px; padding: 10px; border-radius: 12px; background: repeating-conic-gradient(#eceff0 0 25%, #f8f9f9 0 50%) 0 0 / 16px 16px; }
+.page-preview canvas { display: block; width: 100%; box-shadow: 0 2px 10px rgba(15, 23, 19, .18); background: #fff; }
+.result .dl-jpg { margin-top: 8px; }
+#idcopy .result .note { margin-top: 12px; }

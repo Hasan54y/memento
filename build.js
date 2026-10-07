@@ -614,6 +614,7 @@ SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free 
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
 SEO_TITLES["tools/passport-photo"] = "Passport & Visa Photo Maker: 2×2 in, 35×45 mm, Free | Memento Tools";
 SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools";
+SEO_TITLES["tools/id-copy"] = "ID Card Copy: Front & Back on One Page, Real Size | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
 SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on Any Date & Age Limit Check | Memento Tools";
@@ -634,6 +635,9 @@ const TOOLS = [
   { slug: "compress-image", cat: "photo", icon: "photo_size_select_small", color: C.mint, title: "Compress Image",
     text: "Make JPG, PNG and WebP images smaller, or under a target like 100 KB. Resize and convert too, many at once.",
     keywords: "compress image photo picture jpg jpeg png webp reduce size kb mb resize convert optimize shrink" },
+  { slug: "id-copy", cat: "pdf", icon: "id_card", color: C.amber, title: "ID Copy Maker",
+    text: "Front and back of an ID card on one page at real size, straightened, with a safe-copy watermark.",
+    keywords: "id card copy front back one page photocopy driving licence license national id residence permit passport copy watermark a4 print real size" },
   { slug: "merge-pdf", cat: "pdf", icon: "merge", color: C.coral, title: "Merge PDF",
     text: "Combine PDFs and images into one PDF, in any order. Text stays sharp and selectable.",
     keywords: "merge combine join pdf files together append add images jpg" },
@@ -1343,6 +1347,92 @@ toolPage(tool("compress-image"), {
   scripts: ["pdf-lite.js", "compress-image.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to compress JPG, PNG and WebP images by quality or to a target size such as 100 KB, with resizing, format conversion and ZIP download.",
+});
+
+// ID Copy Maker
+toolPage(tool("id-copy"), {
+  h1: "ID Copy Maker",
+  lead: "Photograph the front and back of an ID card or driving licence. The tool straightens them and puts both on one page at real size, ready to print or send, with an optional safe-copy watermark.",
+  description: "Make a copy of an ID card, driving licence or passport page: front and back on one A4 or Letter page at real size, straightened from a phone photo, with a safe-copy watermark. Free, nothing is uploaded.",
+  workspace: `    <div class="tool" id="idcopy">
+      <div class="tool-grid">
+        <div class="stage">
+          <div class="modes" role="tablist" aria-label="Side of the card">
+            <button type="button" role="tab" data-side="front" aria-selected="true">${icon("badge")}Front</button>
+            <button type="button" role="tab" data-side="back" aria-selected="false">${icon("flip")}Back</button>
+          </div>
+          <label class="drop" id="drop">
+            ${icon("add_a_photo")}
+            <strong data-drop-title>Add a photo of the front</strong>
+            <span class="sub">Put the card on a plain surface that contrasts with it, and take the photo from above.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select photo</span>
+            <input id="file" type="file" accept="image/*">
+          </label>
+          <div class="editor" hidden>
+            <p class="step-label"><b>1</b> Drag the four corners onto the card's corners</p>
+            <div class="frame crop-frame"><canvas id="crop" aria-label="Card corners"></canvas></div>
+            <div class="controls">
+              <button type="button" class="btn btn-ghost btn-sm" id="detect">${icon("auto_fix_high")}Find edges</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New photo</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="remove">${icon("delete")}Remove</button>
+            </div>
+            <p class="step-label"><b>2</b> Check the straightened card
+              <span class="step-actions">
+                <button type="button" class="sw-text brush-btn" id="redact" aria-pressed="false">${icon("format_color_fill")}Hide parts</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="undo-box" disabled>${icon("undo")}Undo</button>
+              </span>
+            </p>
+            <div class="frame card-frame"><canvas id="card" aria-label="Straightened card"></canvas></div>
+            <p class="hint-line redact-hint" hidden>${icon("format_color_fill")} Drag over a number or detail to black it out.</p>
+          </div>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Copy</h3>
+          <div class="fields">
+            <label class="field wide">Document<select id="doc"><option value="id">ID card / driving licence (85.6 × 54 mm)</option><option value="passport">Passport photo page (125 × 88 mm)</option><option value="custom">Custom size</option></select></label>
+            <div class="custom-mm wide" hidden>
+              <label class="field">Width (mm)<input id="cmw" type="number" inputmode="decimal" min="20" max="300" value="85.6"></label>
+              <label class="field">Height (mm)<input id="cmh" type="number" inputmode="decimal" min="20" max="300" value="54"></label>
+            </div>
+            <label class="field">Paper<select id="paper"><option value="a4">A4</option><option value="letter">Letter</option></select></label>
+            <label class="field">Colour<select id="color"><option value="color">Colour</option><option value="gray">Greyscale</option><option value="bw">Black &amp; white</option></select></label>
+            <label class="field wide">Safe-copy watermark<input id="wm" type="text" maxlength="60" placeholder="e.g. For bank account opening only"></label>
+            <label class="check wide"><input id="wm-date" type="checkbox" checked>Add today's date</label>
+          </div>
+          <div class="page-preview"><canvas id="page" aria-label="Page preview"></canvas></div>
+          <p class="bg-status" id="status" hidden></p>
+          <button type="button" class="btn btn-primary" id="dl-pdf" disabled>${icon("picture_as_pdf")}Download PDF</button>
+          <button type="button" class="btn btn-ghost btn-sm dl-jpg" id="dl-jpg" disabled>${icon("image")}Download as JPG</button>
+          <p class="note">${icon("print")} Print at 100% (actual size), not "fit to page", and the card prints at its real size.</p>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your ID never leaves your device. Everything happens inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Photograph the front.", "Lay the card on a plain surface that contrasts with it (a dark table for a light card) and shoot from straight above, with no glare."],
+    ["Line up the corners.", "The tool finds the card's edges; if a corner is off, drag it onto the card's corner. The straightened card appears below."],
+    ["Add the back.", "Switch to Back and do the same. Skip it if you only need the front."],
+    ["Protect and download.", "Add a watermark saying what the copy is for, black out anything the other side doesn't need, then download the PDF and print at 100%."],
+  ],
+  tips: [
+    ["verified_user", "Always watermark copies.", "\"For rental application only, 7 Oct 2026\" makes a copy hard to reuse for anything else."],
+    ["format_color_fill", "Share only what's needed.", "Hide parts you don't have to show, such as a card number, when the receiver doesn't need it."],
+    ["wb_sunny", "Avoid glare.", "Tilt the card away from lamps and windows so the shine doesn't hide details."],
+    ["straighten", "Real size means real size.", "ID cards and driving licences are 85.6 × 54 mm; printing at 100% keeps them that size."],
+  ],
+  faqs: [
+    ["How do I copy both sides of an ID card on one page?", "Take a photo of the front and the back, add them here, and download the PDF. Both sides are straightened and placed on one A4 or Letter page at real size, ready to print or attach to an application."],
+    ["Will it print at the card's real size?", "Yes, if you print at 100% (\"actual size\"). ID cards and driving licences use the standard 85.6 × 54 mm size; passport photo pages are 125 × 88 mm, and you can enter any other size."],
+    ["Why add a watermark to an ID copy?", "A copy that says what it's for and the date (\"For bank account opening only, 7 Oct 2026\") is much harder to misuse for something else, such as identity fraud."],
+    ["Can I hide my ID number or other details?", "Yes. Tap Hide parts and drag over anything you want to black out. Only hide what the receiver doesn't need; some organisations require the full copy."],
+    ["What if the edges aren't found?", "Drag the four corner dots onto the card's corners by hand. Photographing the card on a surface that contrasts with it helps automatic detection."],
+    ["Is my ID uploaded anywhere?", "No. Everything happens inside your browser. Your ID never reaches our servers or anyone else's."],
+  ],
+  scripts: ["pdf-lite.js", "idcopy.js"],
+  schemaDesc: "Free tool to copy the front and back of an ID card, driving licence or passport page onto one page at real size, straightened from a photo, with a safe-copy watermark.",
 });
 
 // Merge PDF
