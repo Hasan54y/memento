@@ -68,7 +68,7 @@ const NAV = [
   ["backup", "Backup", "add_to_drive"],
   ["reviews", "Reviews", "rate_review"],
   ["faq", "FAQ", "help"],
-  ["tools/", "Tools", "handyman"],
+  ["tools/", "Tools", "handyman", "Free"],
   ["contact", "Contact", "mail"],
 ];
 const MOBILE_EXTRA = [["about", "About", "info"], ["download", "Get the app", "rocket_launch"]];
@@ -107,22 +107,18 @@ function jsonLd(slug, title, url, faqs = [], extra = []) {
   return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph })}</script>`;
 }
 
-function layout({ slug, title, description, body, lang = "en", scripts = [], faqs, schema }) {
+// <head> shared by the main site and the tools section
+function headTags({ slug, title, description, lang = "en", faqs, schema }, { themeColor, css, scripts }) {
   const url = urlOf(slug);
   const bn = lang === "bn";
   const fullTitle = SEO_TITLES[slug] || (slug === "index" ? "Memento — More than a notepad. Your paperwork, remembered." : `${title} — Memento`);
-  const isActive = (s) => s === slug || (s.endsWith("/") && slug.startsWith(s));
-  const link = ([s, label, ic], mobile) =>
-    `<a href="/${s}"${isActive(s) ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}</a>`;
-  return `<!doctype html>
-<html lang="${lang}">
-<head>
+  return `<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${fullTitle}</title>
   <meta name="description" content="${description}">
   <link rel="canonical" href="${url}">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="${themeColor}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Memento">
   <meta property="og:title" content="${fullTitle}">
@@ -144,11 +140,19 @@ function layout({ slug, title, description, body, lang = "en", scripts = [], faq
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700${bn ? "&family=Hind+Siliguri:wght@400;500;600;700" : ""}&display=swap" rel="stylesheet">
   <link href="__ICON_FONT__" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/site.css">
-  <script src="/assets/site.js" defer></script>${scripts.map((s) => `
-  <script src="/assets/${s}" defer></script>`).join("")}
-  <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-</head>
+  <link rel="stylesheet" href="/assets/${css}">${scripts.map((s) => `
+  <script src="${s.startsWith("http") ? s : "/assets/" + s}" ${s.startsWith("http") ? "async" : "defer"}></script>`).join("")}
+</head>`;
+}
+
+function layout(p) {
+  const { slug, body, lang = "en", scripts = [] } = p;
+  const isActive = (s) => s === slug || (s.endsWith("/") && slug.startsWith(s));
+  const link = ([s, label, ic, pill], mobile) =>
+    `<a href="/${s}"${isActive(s) ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}${pill ? `<span class="nav-pill">${pill}</span>` : ""}</a>`;
+  return `<!doctype html>
+<html lang="${lang}">
+${headTags(p, { themeColor: "#000000", css: "site.css", scripts: ["site.js", ...scripts, "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"] })}
 <body>
   <div class="progress" aria-hidden="true"></div>
   <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -230,6 +234,22 @@ page("index", "Home",
         ${card({ icon: "search", color: C.sky, title: "Find anything", text: "Search every title, detail and note, and filter by category in a tap.", href: "/features#search" })}
         ${card({ icon: "add_to_drive", color: C.violet, title: "Private Drive backup", text: "Back up to your own Google Drive and restore everything on a new phone.", href: "/backup" })}
         ${card({ icon: "file_save", color: C.coral, title: "Save as PDF, Excel, TXT", text: "Export any document as a PDF, spreadsheet, text file, or images to your gallery.", href: "/features#export" })}
+      </div>
+    </section>
+
+    <section>
+      <div class="tools-spot glass spot reveal">
+        <div>
+          <span class="eyebrow">${icon("handyman")} New · Free tools</span>
+          <h2>Job application photo? <em>Ready in a minute.</em></h2>
+          <p>Resize your photo to 300×300 and signature to 300×80, keep them under the KB limit, and switch the background to white or blue. Free, no sign-in, and nothing is uploaded.</p>
+          <div class="cta">${btn("/tools/photo-signature-resizer", "Try the photo resizer", "primary", "photo_size_select_large")}${btn("/tools/", "All free tools", "ghost")}</div>
+        </div>
+        <div class="spot-preview" aria-hidden="true">
+          <div class="pv pv-photo">${icon("person", "fill")}<b>300 × 300</b></div>
+          <div class="pv pv-sign">${icon("signature")}<b>300 × 80</b></div>
+          <div class="pv-swatches"><span style="--sw:#ffffff"></span><span style="--sw:#dcebf7"></span><span style="--sw:#2f6fd0"></span><small>Background</small></div>
+        </div>
       </div>
     </section>
 
@@ -576,143 +596,237 @@ ${list.map((s) => `      <section class="glass reveal"><h2>${esc(s.heading)}</h2
 const nPrivacy = legal("privacy", "Privacy Policy", sections("PrivacySections"), "How Memento handles your account, documents, AI processing and backups.", "policy");
 const nTerms = legal("terms", "Terms of Service", sections("TermsSections"), "The terms for using the Memento app.", "gavel");
 
-// ---------- Free tools ----------
+// ---------- Free tools: "Memento Tools", its own utility-style section ----------
 // Everything runs in the visitor's browser: no uploads, no server.
-SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Memento";
+SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Memento Tools";
 SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
 
-function memoBand() {
-  return `<section><div class="band glass spot reveal">
-      <div><h2>Certificates, IDs, receipts: <em>all in one place.</em></h2><p>Never dig through drawers before the next application. Snap your documents into Memento, and it fills in the details and finds any of them in one search.</p></div>
-      <div class="cta">${btn("/", "Meet Memento", "primary", "rocket_launch")}</div>
-    </div></section>`;
-}
-
+const TOOL_CATS = [
+  ["photo", "Photo", "image"],
+  ["pdf", "PDF", "picture_as_pdf"],
+  ["bangla", "Bangla", "translate"],
+  ["calc", "Calculators", "calculate"],
+];
 const TOOLS = [
-  { slug: "photo-signature-resizer", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer", text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue." },
-  { icon: "picture_as_pdf", color: C.coral, title: "Image to PDF & PDF compressor", text: "Combine photos into one PDF, and shrink a PDF under a set size." },
-  { icon: "cake", color: C.amber, title: "Age calculator", text: "Your exact age in years, months and days on a circular's cut-off date." },
-  { icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter", text: "Convert old Bijoy Bangla text to Unicode, and back." },
-  { icon: "payments", color: C.violet, title: "Amount in words", text: "Write any amount in English and Bangla words, for cheques and invoices." },
+  { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
+    text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue.",
+    keywords: "teletalk passport resize compress kb signature background white blue job application" },
+  { cat: "pdf", icon: "picture_as_pdf", color: C.coral, title: "Image to PDF & PDF compressor",
+    text: "Combine photos into one PDF, and shrink a PDF under a set size.", keywords: "jpg pdf merge compress reduce size kb" },
+  { cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
+    text: "Your exact age in years, months and days on a circular's cut-off date.", keywords: "age date birth circular job" },
+  { cat: "bangla", icon: "translate", color: C.sky, title: "Bijoy ↔ Unicode converter",
+    text: "Convert old Bijoy Bangla text to Unicode, and back.", keywords: "bangla bengali bijoy unicode font converter" },
+  { cat: "calc", icon: "payments", color: C.violet, title: "Amount in words",
+    text: "Write any amount in English and Bangla words, for cheques and invoices.", keywords: "taka number words cheque invoice bangla english" },
 ];
 
-page("tools/index", "Free tools",
-  "Free online tools for job applications and paperwork: resize photos and signatures, and more. Everything runs in your browser; no files are uploaded.",
-  `    ${pageHero({ eyebrow: "Free tools", eyebrowIcon: "handyman", title: "Paperwork chores, <em>done in a minute.</em>", lead: "Application forms, photos, PDFs: free tools for the small jobs. Everything happens on your phone or computer, and no file is ever uploaded." })}
+function toolTile(t) {
+  const inner = `<span class="t-ico" style="--c:${t.color}">${icon(t.icon)}</span>
+          <h3>${t.title}</h3><p>${t.text}</p>`;
+  const data = `data-cat="${t.cat}" data-name="${esc(`${t.title} ${t.text} ${t.keywords || ""}`.toLowerCase())}"`;
+  return t.slug
+    ? `<a class="t-tile" href="/tools/${t.slug}" ${data}>${inner}<span class="t-go">Open tool ${icon("arrow_forward")}</span></a>`
+    : `<div class="t-tile soon" ${data}>${inner}<span class="t-soon">${icon("schedule")} Coming soon</span></div>`;
+}
 
-    <section style="padding-top:32px">
-      <div class="grid">
-        ${TOOLS.map((t) => t.slug
-          ? card({ icon: t.icon, color: t.color, title: t.title, text: t.text, href: `/tools/${t.slug}` })
-          : `<article class="card glass spot reveal soon"><div class="icon" style="--c:${t.color}">${icon(t.icon)}</div><h3>${t.title}</h3><p>${t.text}</p><span class="badge-soon">${icon("schedule")} Coming soon</span></article>`).join("\n        ")}
+function toolsLayout(p) {
+  const { slug, body, scripts = [], cat } = p;
+  const catLink = ([id, label, ic]) => `<a href="/tools/#${id}" data-cat="${id}" data-label="${label}"${cat === id ? ' class="on"' : ""}>${icon(ic)}${label}</a>`;
+  const live = TOOLS.filter((t) => t.slug);
+  return `<!doctype html>
+<html lang="en">
+${headTags(p, { themeColor: "#ffffff", css: "tools.css", scripts: ["tools.js", ...scripts] })}
+<body>
+  <header class="t-head">
+    <div class="t-wrap t-bar">
+      <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
+      <form class="t-search" action="/tools/" method="get" role="search">${icon("search")}<input name="q" type="search" placeholder="Search tools…" aria-label="Search tools" autocomplete="off"></form>
+      <a class="t-app" href="/">${icon("smartphone")}<span>Memento app</span></a>
+    </div>
+    <nav class="t-wrap t-cats" aria-label="Tool categories">
+      <a href="/tools/" data-cat="all" data-label="All tools"${slug === "tools/index" ? ' class="on"' : ""}>${icon("apps")}All tools</a>${TOOL_CATS.map(catLink).join("")}
+    </nav>
+  </header>
+  <main class="t-wrap">
+${body}
+  </main>
+  <footer class="t-foot">
+    <div class="t-wrap t-foot-cols">
+      <div>
+        <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
+        <p>Free tools for everyday paperwork, by HM Dev Studio. Everything runs in your browser, so your files never leave your device.</p>
       </div>
+      <div><h4>Tools</h4>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a></div>
+      <div><h4>Memento</h4><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
+      <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a></div>
+    </div>
+    <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> HM Dev Studio</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
+  </footer>
+</body>
+</html>
+`;
+}
+
+function memoPromo() {
+  return `<aside class="t-promo">
+        <img src="/assets/logo.svg" alt="" width="40" height="42">
+        <h3>Keep every document in one place</h3>
+        <p>Certificates, IDs, receipts: snap them into Memento, and it fills in the details and finds any of them in one search.</p>
+        <a class="btn btn-primary btn-sm" href="/">${icon("rocket_launch")}Meet Memento</a>
+      </aside>`;
+}
+
+page("tools/index", "Free tools",
+  "Free online tools for job applications and paperwork: resize photos and signatures, change photo backgrounds, and more. Everything runs in your browser; no files are uploaded.",
+  `    <section class="t-hero">
+      <h1>Free online tools for everyday paperwork</h1>
+      <p>Resize application photos, make PDFs, convert Bangla text and more. Free, no sign-up, and your files never leave your device.</p>
+      <ul class="t-perks">
+        <li>${icon("lock")} No uploads</li>
+        <li>${icon("bolt")} No sign-up</li>
+        <li>${icon("smartphone")} Works on phones</li>
+        <li>${icon("money_off")} 100% free</li>
+      </ul>
     </section>
-${memoBand()}`);
+
+    <section class="t-section">
+      <div class="t-section-head"><h2 data-grid-title>All tools</h2><span class="t-count" data-count></span></div>
+      <div class="t-grid" data-tool-grid>
+        ${TOOLS.map(toolTile).join("\n        ")}
+      </div>
+      <p class="t-empty" data-empty hidden>${icon("search_off")} No tools match your search yet. <a href="/contact">Tell us what you need</a>.</p>
+    </section>
+
+    <section class="t-section">
+      <div class="t-banner">
+        <div>
+          <h2>Tired of hunting for documents before every application?</h2>
+          <p>Memento keeps your certificates, IDs and receipts organized on your phone, with reminders before important dates.</p>
+        </div>
+        <a class="btn btn-primary" href="/">${icon("rocket_launch")}Meet Memento</a>
+      </div>
+    </section>`, { shell: "tools" });
 
 const RESIZER_FAQS = [];
-const rfaq = faqInto(RESIZER_FAQS);
+const tfaq = (q, a) => (RESIZER_FAQS.push([q, a]), `<details><summary>${q}</summary><p>${a}</p></details>`);
+const resizer = TOOLS[0];
 page("tools/photo-signature-resizer", "Photo & signature resizer",
   "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB), and change the photo background to white or blue. Free, and nothing is uploaded.",
-  `    ${pageHero({ eyebrow: "Free tool", eyebrowIcon: "photo_size_select_large", title: "Application photo & signature, <em>the right size.</em>", lead: "Add a picture, frame it, switch the background to white or blue if you like, and download. The tool takes care of the pixels and the KB limit for you." })}
+  `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<a href="/tools/#photo">Photo</a>${icon("chevron_right")}<span>Photo &amp; signature resizer</span></nav>
+    <div class="t-title">
+      <span class="t-ico big" style="--c:${resizer.color}">${icon(resizer.icon)}</span>
+      <div>
+        <h1>Photo &amp; Signature Resizer</h1>
+        <p>Job application photo 300×300 and signature 300×80, under the KB limit, with a white or blue background if you need it.</p>
+      </div>
+    </div>
 
-    <section class="tool-section">
-      <div class="tool glass" id="resizer">
-        <div class="modes" role="tablist" aria-label="What are you making?">
-          <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}Photo <small>300×300</small></button>
-          <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}Signature <small>300×80</small></button>
-          <button type="button" role="tab" data-mode="custom" aria-selected="false">${icon("tune")}Custom size</button>
-        </div>
-        <div class="custom" hidden>
-          <label>Width (px)<input id="cw" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
-          <label>Height (px)<input id="ch" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
-          <label>Max KB<input id="ckb" type="number" inputmode="numeric" min="5" max="10000" value="100" placeholder="No limit"></label>
-        </div>
+    <div class="tool" id="resizer">
+      <div class="modes" role="tablist" aria-label="What are you making?">
+        <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}Photo <small>300×300</small></button>
+        <button type="button" role="tab" data-mode="sign" aria-selected="false">${icon("draw")}Signature <small>300×80</small></button>
+        <button type="button" role="tab" data-mode="custom" aria-selected="false">${icon("tune")}Custom size</button>
+      </div>
+      <div class="custom" hidden>
+        <label>Width (px)<input id="cw" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+        <label>Height (px)<input id="ch" type="number" inputmode="numeric" min="20" max="5000" value="300"></label>
+        <label>Max KB<input id="ckb" type="number" inputmode="numeric" min="5" max="10000" value="100" placeholder="No limit"></label>
+      </div>
 
-        <div class="tool-grid">
-          <div class="stage">
-            <label class="drop" id="drop">
-              ${icon("add_photo_alternate")}
-              <strong data-drop-title>Choose a photo</strong>
-              <span class="sub">or drag it here, or paste it. JPG, PNG or WebP.</span>
-              <input id="file" type="file" accept="image/*">
-            </label>
-            <div class="editor" hidden>
-              <div class="frame"><canvas id="view" aria-label="Drag and zoom to frame the picture"></canvas></div>
-              <p class="hint-line">${icon("pan_tool")} Drag to move, zoom to fit. The green guides are only here to help; they won't appear in the file.</p>
-              <div class="controls">
-                <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
-                <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
-                <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New picture</button>
-              </div>
-              <div class="bg-row">
-                <span class="bg-label">${icon("wallpaper")}Background</span>
-                <div class="swatches" role="group" aria-label="Background">
-                  <button type="button" class="sw-text" data-bg="" aria-pressed="true">Original</button>
-                  <button type="button" class="sw" data-bg="#ffffff" style="--sw:#ffffff" title="White" aria-label="White"></button>
-                  <button type="button" class="sw" data-bg="#dcebf7" style="--sw:#dcebf7" title="Light blue" aria-label="Light blue"></button>
-                  <button type="button" class="sw" data-bg="#2f6fd0" style="--sw:#2f6fd0" title="Blue" aria-label="Blue"></button>
-                  <button type="button" class="sw" data-bg="#e6e6e6" style="--sw:#e6e6e6" title="Light grey" aria-label="Light grey"></button>
-                  <button type="button" class="sw sw-pick" data-bg="custom" title="Any colour" aria-label="Any colour">${icon("palette")}</button>
-                  <input id="bgc" class="vh" type="color" value="#c8102e" tabindex="-1" aria-hidden="true">
-                </div>
-                <span class="bg-status" id="bg-status" hidden></span>
-              </div>
-              <div class="controls">
-                <label class="check"><input id="clean" type="checkbox">Whiten paper, darken ink</label>
-                <label class="zoom strength" hidden>Light<input id="strength" type="range" min="0" max="100" value="60" aria-label="Cleanup strength">Strong</label>
-              </div>
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("add_photo_alternate")}
+            <strong data-drop-title>Choose a photo</strong>
+            <span class="sub">or drag it here, or paste it. JPG, PNG or WebP.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select file</span>
+            <input id="file" type="file" accept="image/*">
+          </label>
+          <div class="editor" hidden>
+            <div class="frame"><canvas id="view" aria-label="Drag and zoom to frame the picture"></canvas></div>
+            <p class="hint-line">${icon("pan_tool")} Drag to move, zoom to fit. The green guides won't appear in the file.</p>
+            <div class="controls">
+              <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
+              <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("image")}New picture</button>
             </div>
-            <p class="err" id="err" role="alert" hidden></p>
+            <div class="bg-row">
+              <span class="bg-label">${icon("wallpaper")}Background</span>
+              <div class="swatches" role="group" aria-label="Background">
+                <button type="button" class="sw-text" data-bg="" aria-pressed="true">Original</button>
+                <button type="button" class="sw" data-bg="#ffffff" style="--sw:#ffffff" title="White" aria-label="White"></button>
+                <button type="button" class="sw" data-bg="#dcebf7" style="--sw:#dcebf7" title="Light blue" aria-label="Light blue"></button>
+                <button type="button" class="sw" data-bg="#2f6fd0" style="--sw:#2f6fd0" title="Blue" aria-label="Blue"></button>
+                <button type="button" class="sw" data-bg="#e6e6e6" style="--sw:#e6e6e6" title="Light grey" aria-label="Light grey"></button>
+                <button type="button" class="sw sw-pick" data-bg="custom" title="Any colour" aria-label="Any colour">${icon("palette")}</button>
+                <input id="bgc" class="vh" type="color" value="#c8102e" tabindex="-1" aria-hidden="true">
+              </div>
+              <span class="bg-status" id="bg-status" hidden></span>
+            </div>
+            <div class="controls">
+              <label class="check"><input id="clean" type="checkbox">Whiten paper, darken ink</label>
+              <label class="zoom strength" hidden>Light<input id="strength" type="range" min="0" max="100" value="60" aria-label="Cleanup strength">Strong</label>
+            </div>
           </div>
-
-          <div class="result" aria-live="polite">
-            <h3>${icon("task_alt")} Result</h3>
-            <div class="out"><img id="out" alt="Preview of the resized picture" hidden><span class="empty">Your result will appear here</span></div>
-            <ul class="facts">
-              <li><span>Size</span><b id="f-dim">—</b></li>
-              <li><span>File size</span><b id="f-size">—</b></li>
-              <li><span>Format</span><b>JPG</b></li>
-            </ul>
-            <a class="btn btn-primary" id="dl" href="#" aria-disabled="true">${icon("download")}Download</a>
-          </div>
+          <p class="err" id="err" role="alert" hidden></p>
         </div>
-        <p class="privacy-note">${icon("lock")} Your picture is never uploaded. All the work happens inside your browser.</p>
-      </div>
-    </section>
 
-    <section>
-      <div class="section-head reveal"><h2>How to use it</h2></div>
-      <div class="steps">
-        <div class="step glass spot reveal">${icon("touch_app", "step-icon")}<h3>Pick a type</h3><p>Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else.</p></div>
-        <div class="step glass spot reveal">${icon("crop", "step-icon")}<h3>Frame it</h3><p>Add your picture, then drag and zoom until your face or signature sits in the middle.</p></div>
-        <div class="step glass spot reveal">${icon("download", "step-icon")}<h3>Download</h3><p>Check the size and KB, download, and upload the file to your application.</p></div>
+        <div class="result" aria-live="polite">
+          <h3>${icon("task_alt")} Result</h3>
+          <div class="out"><img id="out" alt="Preview of the resized picture" hidden><span class="empty">Your result will appear here</span></div>
+          <ul class="facts">
+            <li><span>Size</span><b id="f-dim">—</b></li>
+            <li><span>File size</span><b id="f-size">—</b></li>
+            <li><span>Format</span><b>JPG</b></li>
+          </ul>
+          <a class="btn btn-primary" id="dl" href="#" aria-disabled="true">${icon("download")}Download</a>
+        </div>
       </div>
-    </section>
+      <p class="privacy-note">${icon("lock")} Your picture is never uploaded. All the work happens inside your browser.</p>
+    </div>
 
-    <section>
-      <div class="section-head reveal"><h2>For the best result</h2><p>A clear original stays clear after resizing.</p></div>
-      <div class="grid">
-        ${card({ icon: "light_mode", color: C.amber, title: "Good light", text: "Daylight or a bright room, with no shadows on your face." })}
-        ${card({ icon: "wallpaper", color: C.sky, title: "Plain background helps", text: "A plain wall behind you gives the cleanest edges, even when you switch the background to white or blue here." })}
-        ${card({ icon: "face", color: C.mint, title: "Face in the middle", text: "Leave a little room above your head and down to your shoulders, looking straight at the camera." })}
-        ${card({ icon: "edit", color: C.violet, title: "Sign on white paper", text: "Sign with a black or blue pen on white paper, and take the photo straight from above." })}
-        ${card({ icon: "auto_fix_high", color: C.green, title: "Whiten the paper", text: "If the paper looks grey, turn on \"Whiten paper, darken ink\"." })}
-        ${card({ icon: "fact_check", color: C.coral, title: "Check the circular", text: "Every application can ask for different sizes. Check the circular before you upload." })}
-      </div>
-    </section>
+    <div class="t-cols">
+      <article class="t-article">
+        <h2>How to use it</h2>
+        <ol class="t-steps">
+          <li><b>Pick a type.</b> Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else.</li>
+          <li><b>Add and frame your picture.</b> Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one.</li>
+          <li><b>Download.</b> Check the size and KB, then upload the file to your application.</li>
+        </ol>
 
-    <section class="faq" style="padding-top:24px">
-      <div class="faq-group"><h2 class="reveal">Questions</h2>
-        ${rfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
-        ${rfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. Hair edges are usually good but not always perfect, so check the result before you upload it.")}
-        ${rfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
-        ${rfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
-        ${rfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}
-        ${rfaq("Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light.")}
-        ${rfaq("Is it really free?", "Yes, completely free. No account or sign-in needed.")}
+        <h2>For the best result</h2>
+        <ul class="t-tips">
+          <li>${icon("light_mode")}<span><b>Good light.</b> Daylight or a bright room, with no shadows on your face.</span></li>
+          <li>${icon("wallpaper")}<span><b>Plain background helps.</b> A plain wall gives the cleanest edges, even when you switch the background here.</span></li>
+          <li>${icon("face")}<span><b>Face in the middle.</b> Leave a little room above your head and down to your shoulders.</span></li>
+          <li>${icon("edit")}<span><b>Sign on white paper.</b> Black or blue pen, photo taken straight from above.</span></li>
+          <li>${icon("auto_fix_high")}<span><b>Whiten the paper.</b> If the paper looks grey, turn on "Whiten paper, darken ink".</span></li>
+          <li>${icon("fact_check")}<span><b>Check the circular.</b> Every application can ask for different sizes.</span></li>
+        </ul>
+
+        <h2>Questions</h2>
+        <div class="t-faq">
+          ${tfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
+          ${tfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. Hair edges are usually good but not always perfect, so check the result before you upload it.")}
+          ${tfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
+          ${tfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
+          ${tfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}
+          ${tfaq("Why does my photo look blurry after resizing?", "If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light.")}
+          ${tfaq("Is it really free?", "Yes, completely free. No account or sign-in needed.")}
+        </div>
+      </article>
+
+      <div class="t-side">
+        ${memoPromo()}
+        <div class="t-more">
+          <h3>More tools</h3>
+          ${TOOLS.slice(1).map((t) => `<div class="t-mini"><span class="t-ico sm" style="--c:${t.color}">${icon(t.icon)}</span><span>${t.title}<small>Coming soon</small></span></div>`).join("\n          ")}
+        </div>
       </div>
-    </section>
-${memoBand()}`, {
+    </div>`, {
+  shell: "tools",
+  cat: "photo",
   scripts: ["resizer.js"],
   faqs: RESIZER_FAQS,
   schema: [{ "@type": "WebApplication", name: "Photo & signature resizer", url: urlOf("tools/photo-signature-resizer"), inLanguage: "en",
@@ -731,7 +845,7 @@ page("404", "Page not found", "This page doesn't exist.",
     </div>`);
 
 // ---------- Render ----------
-const rendered = pages.map((p) => ({ ...p, html: layout(p) }));
+const rendered = pages.map((p) => ({ ...p, html: p.shell === "tools" ? toolsLayout(p) : layout(p) }));
 
 // Load only the icons the site uses (Google Fonts needs the list sorted)
 const names = new Set();
