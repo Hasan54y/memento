@@ -107,6 +107,14 @@ function jsonLd(slug, title, url, faqs = [], extra = []) {
   return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph })}</script>`;
 }
 
+// Share (Open Graph) images: assets/og/<page>.jpg, made by `node build.js --og`
+const ogName = (slug) => (slug === "index" ? "home" : slug === "tools/index" ? "tools" : slug.replace(/\//g, "-"));
+function ogImage(slug) {
+  const file = path.join(__dirname, "assets", "og", `${ogName(slug)}.jpg`);
+  if (!fs.existsSync(file)) return `${SITE}/assets/og.png`;
+  return `${SITE}/assets/og/${ogName(slug)}.jpg?v=${Math.floor(fs.statSync(file).mtimeMs / 1000).toString(36)}`;
+}
+
 // <head> shared by the main site and the tools section
 function headTags({ slug, title, description, lang = "en", faqs, schema }, { themeColor, css, scripts, adsense = false }) {
   const url = urlOf(slug);
@@ -124,15 +132,15 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   <meta property="og:title" content="${fullTitle}">
   <meta property="og:description" content="${description}">
   <meta property="og:url" content="${url}">
-  <meta property="og:image" content="${SITE}/assets/og.png">
+  <meta property="og:image" content="${ogImage(slug)}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Memento app: your paperwork, remembered">
+  <meta property="og:image:alt" content="${fullTitle}">
   <meta property="og:locale" content="${bn ? "bn_BD" : "en_US"}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${fullTitle}">
   <meta name="twitter:description" content="${description}">
-  <meta name="twitter:image" content="${SITE}/assets/og.png">
+  <meta name="twitter:image" content="${ogImage(slug)}">
   ${slug === "404" ? '<meta name="robots" content="noindex">' : ""}
   ${jsonLd(slug, title, url, faqs, schema)}
   <meta name="google-adsense-account" content="${ADSENSE.client}">${adsense ? `
@@ -243,8 +251,8 @@ page("index", "Home",
       <div class="tools-spot glass spot reveal">
         <div>
           <span class="eyebrow">${icon("handyman")} New · Free tools</span>
-          <h2>Job application photo? <em>Ready in a minute.</em></h2>
-          <p>Resize your photo to 300×300 and signature to 300×80, keep them under the KB limit, and switch the background to white or blue. Free, no sign-in, and nothing is uploaded.</p>
+          <h2>Photos, signatures and PDFs, <em>ready for any form.</em></h2>
+          <p>Resize a photo to the exact pixels and KB a form asks for, swap the background to white, and merge, split or compress PDFs. Free, no sign-in, and nothing is uploaded.</p>
           <div class="cta">${btn("/tools/photo-signature-resizer", "Try the photo resizer", "primary", "photo_size_select_large")}${btn("/tools/", "All free tools", "ghost")}</div>
         </div>
         <div class="spot-preview" aria-hidden="true">
@@ -601,12 +609,12 @@ const nTerms = legal("terms", "Terms of Service", sections("TermsSections"), "Th
 // ---------- Free tools: "Memento Tools", its own utility-style section ----------
 // Everything runs in the visitor's browser: no uploads, no server.
 SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Memento Tools";
-SEO_TITLES["tools/photo-signature-resizer"] = "Photo 300×300 & Signature 300×80 Resizer (Teletalk) | Memento";
+SEO_TITLES["tools/photo-signature-resizer"] = "Resize Photo & Signature for Online Forms (px & KB) | Memento Tools";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
-SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on a Job Circular's Date | Memento Tools";
+SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on Any Date & Age Limit Check | Memento Tools";
 SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Images, Free | Memento Tools";
 
 const TOOL_CATS = [
@@ -616,8 +624,8 @@ const TOOL_CATS = [
 ];
 const TOOLS = [
   { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
-    text: "Job application photo at 300×300 and signature at 300×80, under the KB limit. Change the background to white or blue.",
-    keywords: "teletalk passport resize compress kb signature background white blue remove job application" },
+    text: "Get a photo or signature to the exact pixels and KB an online form asks for. Change the background to white or blue.",
+    keywords: "photo signature resize compress kb pixels online form application exam visa passport background white blue remove" },
   { slug: "merge-pdf", cat: "pdf", icon: "merge", color: C.coral, title: "Merge PDF",
     text: "Combine PDFs and images into one PDF, in any order. Text stays sharp and selectable.",
     keywords: "merge combine join pdf files together append add images jpg" },
@@ -625,7 +633,7 @@ const TOOLS = [
     text: "Extract pages, split every page, or split by ranges like 1-3, 5, 8-end.",
     keywords: "split separate extract pages pdf range remove delete" },
   { slug: "image-to-pdf", cat: "pdf", icon: "picture_as_pdf", color: C.coral, title: "Image to PDF",
-    text: "Turn photos of certificates, NID or marksheets into one PDF, under the KB limit you need.",
+    text: "Turn photos of certificates, IDs, receipts or any document into one PDF, under the KB limit you need.",
     keywords: "jpg png photo images to pdf convert merge combine certificate scan kb size" },
   { slug: "compress-pdf", cat: "pdf", icon: "compress", color: C.violet, title: "Compress PDF",
     text: "Shrink a PDF to 100 KB, 200 KB, 500 KB or 1 MB for online applications.",
@@ -634,8 +642,8 @@ const TOOLS = [
     text: "Turn PDF pages into JPG or PNG images, one page or all of them, with an optional KB limit.",
     keywords: "pdf to jpg png image picture convert pages extract save" },
   { slug: "age-calculator", cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
-    text: "Your exact age in years, months and days on a circular's cut-off date, and whether you're within the age limit.",
-    keywords: "age calculator date of birth circular job eligibility limit cut off years months days" },
+    text: "Your exact age in years, months and days on any date, and whether you're within an age limit.",
+    keywords: "age calculator date of birth exact age eligibility limit cut off date years months days" },
 ];
 
 // ---------- Ads: Google AdSense, on tools pages only ----------
@@ -821,8 +829,8 @@ const kbChips = (list) => `<div class="chips">${list.map(([v, l]) => `<button ty
 // Photo & signature resizer
 toolPage(tool("photo-signature-resizer"), {
   h1: "Photo &amp; Signature Resizer",
-  lead: "Job application photo 300×300 and signature 300×80, under the KB limit, with a white or blue background if you need it.",
-  description: "Resize your job application photo to 300×300 (100 KB) and signature to 300×80 (60 KB), and change the photo background to white or blue. Free, and nothing is uploaded.",
+  lead: "Get your photo or signature to the exact pixel size and file size an online form asks for, with a white or blue background if you need it.",
+  description: "Resize a photo or signature for online forms: exact pixels under a KB limit, like 300×300 under 100 KB. Change the background to white or blue. Free, and nothing is uploaded.",
   workspace: `    <div class="tool" id="resizer">
       <div class="modes" role="tablist" aria-label="What are you making?">
         <button type="button" role="tab" data-mode="photo" aria-selected="true">${icon("person")}Photo <small>300×300</small></button>
@@ -895,7 +903,7 @@ toolPage(tool("photo-signature-resizer"), {
       <p class="privacy-note">${icon("lock")} Your picture is never uploaded. All the work happens inside your browser.</p>
     </div>`,
   steps: [
-    ["Pick a type.", "Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else."],
+    ["Pick a type.", "Photo (300×300), Signature (300×80), or Custom size for any width, height and KB limit the form asks for."],
     ["Add and frame your picture.", "Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one, and touch up any spot with Fix edges."],
     ["Download.", "Check the size and KB, then upload the file to your application."],
   ],
@@ -905,10 +913,10 @@ toolPage(tool("photo-signature-resizer"), {
     ["face", "Face in the middle.", "Leave a little room above your head and down to your shoulders."],
     ["edit", "Sign on white paper.", "Black or blue pen, photo taken straight from above."],
     ["auto_fix_high", "Whiten the paper.", "If the paper looks grey, turn on \"Whiten paper, darken ink\"."],
-    ["fact_check", "Check the circular.", "Every application can ask for different sizes."],
+    ["fact_check", "Check the requirements.", "Every form can ask for different sizes and file limits; check them before you upload."],
   ],
   faqs: [
-    ["What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else."],
+    ["What photo and signature size do online forms ask for?", "It depends on the form. Many application sites ask for a square photo such as 300×300 pixels under 100 KB and a signature around 300×80 pixels under 60 KB, while others want different sizes. Check the instructions, and use Custom size to set the exact width, height and KB limit."],
     ["Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. If a spot is missed, use Fix edges: Erase removes leftover background and Restore brings back anything that was cut off. The first time, the background tool downloads about 16 MB; after that it is saved in your browser."],
     ["Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's."],
     ["Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom."],
@@ -918,13 +926,13 @@ toolPage(tool("photo-signature-resizer"), {
   ],
   scripts: ["resizer.js"],
   appCategory: "MultimediaApplication",
-  schemaDesc: "Free tool to resize job application photos to 300×300 and signatures to 300×80 pixels under a set KB limit, and change the photo background.",
+  schemaDesc: "Free tool to resize photos and signatures to exact pixel sizes under a KB limit for online forms, and change the photo background.",
 });
 
 // Image to PDF
 toolPage(tool("image-to-pdf"), {
   h1: "Image to PDF",
-  lead: "Turn photos of certificates, NID, marksheets or any document into one PDF. Set a size limit like 200 KB or 1 MB, and the tool keeps it under.",
+  lead: "Turn photos of certificates, IDs, receipts or any document into one PDF. Set a size limit like 200 KB or 1 MB, and the tool keeps it under.",
   description: "Convert JPG, PNG and phone photos to one PDF for free. Reorder and rotate pages, choose A4, and keep the PDF under 200 KB, 500 KB or 1 MB. Nothing is uploaded.",
   workspace: `    <div class="tool" id="img2pdf">
       <div class="tool-grid">
@@ -976,7 +984,7 @@ toolPage(tool("image-to-pdf"), {
   steps: [
     ["Add your photos.", "Pick all the pages at once from your gallery or computer, or take photos with your phone."],
     ["Arrange them.", "Drag pages (or use the arrows) into the right order, and rotate any that are sideways."],
-    ["Set a size limit if you need one.", "Type the KB limit from the application form, or tap 200 KB, 500 KB, 1 MB or 2 MB."],
+    ["Set a size limit if you need one.", "Type the KB limit the website asks for, or tap 200 KB, 500 KB, 1 MB or 2 MB."],
     ["Create and download.", "Tap Create PDF, check the size, then Download PDF."],
   ],
   tips: [
@@ -992,7 +1000,7 @@ toolPage(tool("image-to-pdf"), {
     ["How do I make a PDF under 200 KB or 1 MB?", "Type the limit in Max file size, or tap one of the quick sizes. The tool lowers image quality and resolution only as much as needed to fit. If the pages would become unreadable it tells you, so you can remove a page or use a bigger limit."],
     ["Are my documents uploaded anywhere?", "No. The PDF is made inside your browser. Your certificates and IDs never reach our servers or anyone else's."],
     ["Does it work on a phone?", "Yes. Open it in your phone's browser, pick photos from your gallery, and download the PDF. It's saved to your Downloads folder."],
-    ["What page size should I use?", "A4 is the standard in Bangladesh and most countries. Choose Same as photo if you want each page to match the photo's shape with no white borders."],
+    ["What page size should I use?", "A4 is the standard in most countries; the US and Canada mostly use Letter. Choose Same as photo if you want each page to match the photo's shape with no white borders."],
     ["Can I add more pages later?", "Yes. Tap Add more to add pages to the same PDF, then Create PDF again."],
     ["Is it really free?", "Yes, completely free. No account, no watermark."],
   ],
@@ -1304,8 +1312,8 @@ toolPage(tool("split-pdf"), {
 // Age calculator
 toolPage(tool("age-calculator"), {
   h1: "Age Calculator",
-  lead: "Your exact age in years, months and days on any date, such as a job circular's cut-off date. Add the age limit to see if you're eligible.",
-  description: "Calculate your exact age in years, months and days on any date, like a job circular's cut-off date, and check it against the minimum and maximum age limit. Free.",
+  lead: "Your exact age in years, months and days on any date, such as an application's cut-off date. Add an age limit to see if you're eligible.",
+  description: "Calculate your exact age in years, months and days on any date and check it against a minimum and maximum age limit, for jobs, exams, visas or school admissions. Free.",
   workspace: `    <div class="tool" id="agecalc">
       <div class="tool-grid">
         <div class="stage">
@@ -1315,7 +1323,7 @@ toolPage(tool("age-calculator"), {
             <div class="chips wide"><button type="button" data-on="today">${icon("today")}Today</button></div>
           </div>
           <div class="age-limit">
-            <h4>${icon("rule")} Age limit from the circular <small>(optional)</small></h4>
+            <h4>${icon("rule")} Age limit <small>(optional)</small></h4>
             <div class="fields">
               <label class="field">Minimum age<input id="minage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 18"></label>
               <label class="field">Maximum age<input id="maxage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 30"></label>
@@ -1347,25 +1355,25 @@ toolPage(tool("age-calculator"), {
       <p class="privacy-note">${icon("lock")} Nothing you enter leaves your device.</p>
     </div>`,
   steps: [
-    ["Enter your date of birth.", "Use the date on your SSC certificate or NID, the one the application asks for."],
-    ["Set the \"age on\" date.", "It starts at today. For a job, change it to the cut-off date written in the circular."],
-    ["Add the age limit (optional).", "Type the minimum and maximum age from the circular to see whether you're eligible, and the range of birth dates that qualify."],
+    ["Enter your date of birth.", "Use the date on your birth certificate, passport or ID, the one the application asks for."],
+    ["Set the \"age on\" date.", "It starts at today. To check an application, change it to the cut-off date it gives."],
+    ["Add the age limit (optional).", "Type the minimum and maximum age to see whether you're eligible, and the range of birth dates that qualify."],
   ],
   tips: [
-    ["event", "Use the circular's date.", "Age limits are counted on a fixed date in the circular, not on the day you apply."],
+    ["event", "Use the cut-off date.", "Age limits are usually counted on a fixed date given in the rules, not on the day you apply."],
     ["badge", "Match your documents.", "Use the same date of birth that's on the certificate you'll upload."],
     ["content_copy", "Keep a note.", "Copy result gives you a short summary to save or share."],
-    ["photo_size_select_large", "Applying now?", "The photo & signature resizer gets your 300×300 photo and 300×80 signature ready."],
+    ["photo_size_select_large", "Applying now?", "The photo & signature resizer gets your photo and signature to the exact size the form asks for."],
   ],
   faqs: [
-    ["How do I check my age for a job circular?", "Enter your date of birth, set \"Age on\" to the cut-off date from the circular, and type the minimum and maximum age. The tool shows your exact age on that date and whether you're within the limit."],
-    ["What does \"maximum age 30\" mean here?", "This calculator reads it strictly: on the cut-off date you can be at most exactly 30 years, 0 months and 0 days. If you're even a day older, it shows how much you're over. Some circulars word their limits differently, so always follow the circular's own wording."],
+    ["How do I check if I'm within an age limit?", "Enter your date of birth, set \"Age on\" to the cut-off date, and type the minimum and maximum age. The tool shows your exact age on that date and whether you're within the limit."],
+    ["What does \"maximum age 30\" mean here?", "This calculator reads it strictly: on the cut-off date you can be at most exactly 30 years, 0 months and 0 days. If you're even a day older, it shows how much you're over. Some rules word their limits differently, so always follow the official wording."],
     ["How is the age counted?", "In whole calendar years and months, then the remaining days, the way it's done on official forms. For example, from 15 March 2000 to 1 January 2026 is 25 years, 9 months and 17 days."],
     ["What if I was born on 29 February?", "In years without 29 February, your birthday is counted as 28 February."],
     ["Is my date of birth saved or sent anywhere?", "No. The calculation happens on your device, and nothing is stored or sent."],
   ],
   scripts: ["agecalc.js"],
-  schemaDesc: "Free calculator for exact age in years, months and days on any date, with a check against a job circular's minimum and maximum age.",
+  schemaDesc: "Free calculator for exact age in years, months and days on any date, with a check against a minimum and maximum age limit.",
 });
 
 // 404
@@ -1377,7 +1385,96 @@ page("404", "Page not found", "This page doesn't exist.",
       <div class="cta reveal">${btn("/", "Go home", "primary", "home")}${btn("/features", "See features", "ghost")}</div>
     </div>`);
 
+// ---------- Share images ----------
+// Main-site pages: [headline, line, app screenshot]. Tools pages use their entry in TOOLS.
+const OG = {
+  index: ["Capture anything. Find it forever.", "Memento reads your receipts, warranties and bills, reminds you before dates expire, and backs it all up.", "screen-home.png"],
+  features: ["Everything your paperwork needs.", "Scan, search, reminders, notes, PDF and Excel export, and Google Drive backup.", "screen-ai.png"],
+  "how-it-works": ["From photo to organized in seconds.", "Capture a document and Memento fills in the details for you.", "screen-detail.png"],
+  backup: ["Your documents, safe in your own Drive.", "Back up and restore everything on a new phone in one tap.", "screen-backup.png"],
+  reviews: ["Tell us what you think.", "Honest reviews help other people decide and help us improve Memento.", "screen-profile.png"],
+  faq: ["Questions, answered.", "Pricing, privacy, backups, reminders and more.", "screen-search.png"],
+  download: ["Get Memento.", "More than a notepad. Your paperwork, remembered.", "screen-home.png"],
+  about: ["Never search a drawer again.", "Memento remembers the important paperwork for you.", "screen-light.png"],
+  contact: ["Let's talk.", "Questions, ideas or problems? We'd love to hear from you.", "screen-profile.png"],
+  "delete-account": ["Delete your account.", "How to delete your Memento account and data.", "screen-profile.png"],
+  privacy: ["Privacy Policy", "How Memento handles your account, documents and backups.", "screen-backup.png"],
+  terms: ["Terms of Service", "The terms for using the Memento app.", "screen-home.png"],
+};
+function ogCard(p) {
+  if (p.shell === "tools") {
+    const t = TOOLS.find((x) => `tools/${x.slug}` === p.slug);
+    if (t) return { kind: "tools", title: t.title, sub: t.text, icon: t.icon, color: t.color };
+    if (p.slug === "tools/index") return { kind: "tools", title: "Free online tools for everyday paperwork", sub: "Merge, split and compress PDFs, convert images, resize photos for forms and more.", icon: "handyman", color: C.green };
+    return { kind: "tools", title: p.title, sub: p.description.split(". ")[0] + ".", icon: "policy", color: C.green };
+  }
+  const o = OG[p.slug];
+  return o && { kind: "site", title: o[0], sub: o[1], img: o[2] };
+}
+async function renderOg() {
+  const puppeteer = require(path.join(__dirname, "../store/video/node_modules/puppeteer-core"));
+  const asset = (f, type) => `data:${type};base64,${fs.readFileSync(path.join(__dirname, "assets", f)).toString("base64")}`;
+  const logo = asset("logo.svg", "image/svg+xml"), logoInk = asset("logo-ink.svg", "image/svg+xml");
+  const html = (c) => `<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,500,1,0&display=block" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;width:1200px;height:630px;overflow:hidden;font-family:"Plus Jakarta Sans",sans-serif}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;line-height:1;font-variation-settings:"FILL" 1,"wght" 500,"opsz" 48}
+.card{position:relative;width:1200px;height:630px;padding:64px 72px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:14px;font:600 34px Outfit,sans-serif}.brand img{width:40px;height:42px}
+h1{font:800 64px/1.08 Outfit,sans-serif;letter-spacing:-.02em;margin:0 0 18px;max-width:760px}
+p{font-size:28px;line-height:1.42;margin:0;max-width:700px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.foot{position:relative;z-index:2;margin-top:34px;display:flex;align-items:center;gap:26px;font-size:24px;font-weight:600}
+.foot .url{margin-left:auto;font-weight:700}
+/* tools: light */
+.tools{background:#fff;color:#0f1713}.tools::before{content:"";position:absolute;right:-180px;top:-180px;width:640px;height:640px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 24%,transparent),transparent)}
+.tools .brand b{color:#0a7d36;font-weight:800}.tools .mid{position:relative;z-index:1;margin-top:auto;display:flex;flex-direction:column}
+.tools .ico{width:100px;height:100px;border-radius:28px;display:grid;place-items:center;margin-bottom:26px;color:color-mix(in srgb,var(--c) 62%,#000);background:color-mix(in srgb,var(--c) 18%,#fff)}.tools .ico .ms{font-size:60px}
+.tools .big{position:absolute;z-index:0;right:70px;top:120px;font-size:290px;color:color-mix(in srgb,var(--c) 14%,#fff)}
+.tools p{color:#4d5c55}.tools .foot{color:#34413b}.tools .foot span:not(.url)::before{content:"✓ ";color:#0a7d36}.tools .url{color:#0a7d36}
+/* main site: dark */
+.site{background:#000;color:#f4f7f5}.site::before{content:"";position:absolute;left:-200px;top:-260px;width:820px;height:820px;border-radius:50%;background:radial-gradient(closest-side,rgba(31,224,90,.45),transparent)}
+.site::after{content:"";position:absolute;right:-120px;bottom:-300px;width:700px;height:700px;border-radius:50%;background:radial-gradient(closest-side,rgba(45,212,191,.28),transparent)}
+.site>*{position:relative;z-index:1}.site .mid{margin-top:auto;max-width:640px}.site .foot{max-width:640px}.site h1{max-width:640px;background:linear-gradient(180deg,#fff 30%,#7cef9c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.site p{color:#a9b6af;max-width:600px}.site .url{color:#7cef9c}.site .foot{color:#c9d2cd}
+.phone{position:absolute;right:90px;top:46px;width:236px;padding:9px;border-radius:40px;background:#0b0d0c;border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.6);transform:rotate(4deg);z-index:1}
+.phone img{width:100%;border-radius:32px;display:block}
+</style></head><body>${c.kind === "tools" ? `
+<div class="card tools" style="--c:${c.color}">
+  <div class="brand"><img src="${logoInk}">Memento&nbsp;<b>Tools</b></div>
+  <span class="ms big">${c.icon}</span>
+  <div class="mid"><div class="ico"><span class="ms">${c.icon}</span></div><h1>${c.title}</h1><p>${c.sub}</p></div>
+  <div class="foot"><span>Free</span><span>No sign-up</span><span>Files stay on your device</span><span class="url">mementoapp.online/tools</span></div>
+</div>` : `
+<div class="card site">
+  <div class="brand"><img src="${logo}">Memento</div>
+  <div class="phone"><img src="${asset(c.img, "image/png")}"></div>
+  <div class="mid"><h1>${c.title}</h1><p>${c.sub}</p></div>
+  <div class="foot"><span class="url" style="margin-left:0">mementoapp.online</span></div>
+</div>`}</body></html>`;
+  const out = path.join(__dirname, "assets", "og");
+  fs.mkdirSync(out, { recursive: true });
+  const browser = await puppeteer.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: "new" });
+  const pg = await browser.newPage();
+  await pg.setViewport({ width: 1200, height: 630 });
+  let n = 0;
+  for (const p of pages) {
+    const c = ogCard(p);
+    if (!c) continue;
+    await pg.setContent(html(c), { waitUntil: "load", timeout: 60000 });
+    await pg.evaluate(() => document.fonts.ready);
+    await new Promise((r) => setTimeout(r, 150)); // let the icon font settle
+    await pg.screenshot({ path: path.join(out, `${ogName(p.slug)}.jpg`), type: "jpeg", quality: 88 });
+    n++;
+  }
+  await browser.close();
+  console.log(`Share images: ${n} rendered into assets/og/`);
+}
+
 // ---------- Render ----------
+(async () => {
+if (process.argv.includes("--og")) await renderOg();
 const rendered = pages.map((p) => ({ ...p, html: p.shell === "tools" ? toolsLayout(p) : layout(p) }));
 
 // Load only the icons the site uses (Google Fonts needs the list sorted)
@@ -1402,3 +1499,4 @@ fs.writeFileSync(path.join(__dirname, "ads.txt"), `google.com, ${ADSENSE.client.
 
 console.log(`Built ${rendered.length} pages: ${rendered.map((p) => urlOf(p.slug).slice(SITE.length)).join(" ")}`);
 console.log(`Legal: privacy ${nPrivacy} sections, terms ${nTerms} sections. Icons: ${names.size}`);
+})().catch((e) => { console.error(e); process.exit(1); });

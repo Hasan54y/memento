@@ -1,5 +1,5 @@
 // Age calculator (/tools/age-calculator): exact age on any date, plus a check against a
-// circular's age limits. Pure date arithmetic in the browser; nothing is sent anywhere.
+// minimum/maximum age limit. Pure date arithmetic in the browser; nothing is sent anywhere.
 (() => {
   const root = document.getElementById("agecalc");
   if (!root) return;
@@ -52,7 +52,7 @@
     const until = Math.round((next - t) / DAY);
     fNext.textContent = until === 0 ? "Today! 🎉" : `${plural(until, "day")} (${fmt(next)})`;
 
-    // Eligibility against the circular's limits. "Maximum 30" is read strictly: on the cut-off
+    // Eligibility against the age limits. "Maximum 30" is read strictly: on the cut-off
     // date you may be exactly 30 years 0 months 0 days, but not a day older.
     const lo = minAge.value === "" ? null : Number(minAge.value), hi = maxAge.value === "" ? null : Number(maxAge.value);
     let verdict = "";
