@@ -612,6 +612,7 @@ SEO_TITLES["tools/index"] = "Free Online Tools for Photos, PDFs & Forms | Mement
 SEO_TITLES["tools/photo-signature-resizer"] = "Resize Photo & Signature for Online Forms (px & KB) | Memento Tools";
 SEO_TITLES["tools/image-to-pdf"] = "Image to PDF: JPG to PDF Under 200 KB, Free | Memento Tools";
 SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free | Memento Tools";
+SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
 SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on Any Date & Age Limit Check | Memento Tools";
@@ -626,6 +627,9 @@ const TOOLS = [
   { slug: "photo-signature-resizer", cat: "photo", icon: "photo_size_select_large", color: C.green, title: "Photo & signature resizer",
     text: "Get a photo or signature to the exact pixels and KB an online form asks for. Change the background to white or blue.",
     keywords: "photo signature resize compress kb pixels online form application exam visa passport background white blue remove" },
+  { slug: "compress-image", cat: "photo", icon: "photo_size_select_small", color: C.mint, title: "Compress Image",
+    text: "Make JPG, PNG and WebP images smaller, or under a target like 100 KB. Resize and convert too, many at once.",
+    keywords: "compress image photo picture jpg jpeg png webp reduce size kb mb resize convert optimize shrink" },
   { slug: "merge-pdf", cat: "pdf", icon: "merge", color: C.coral, title: "Merge PDF",
     text: "Combine PDFs and images into one PDF, in any order. Text stays sharp and selectable.",
     keywords: "merge combine join pdf files together append add images jpg" },
@@ -1158,6 +1162,89 @@ toolPage(tool("pdf-to-image"), {
   scripts: ["pdf-lite.js", "pdf2img.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to convert PDF pages to JPG or PNG images, with page selection, resolution up to 300 DPI, a KB limit per image and ZIP download.",
+});
+
+// Compress Image
+toolPage(tool("compress-image"), {
+  h1: "Compress Image",
+  lead: "Make photos smaller for email, websites and upload forms: pick a quality or a target like 100 KB, resize if you need to, and download one or all.",
+  description: "Compress JPG, PNG and WebP images for free: choose quality or a target size like 100 KB, resize, convert format, and download all as a ZIP. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="imgcomp">
+      <div class="tool-grid">
+        <div class="stage">
+          <label class="drop" id="drop">
+            ${icon("add_photo_alternate")}
+            <strong>Add images to compress</strong>
+            <span class="sub">Pick several at once, drag them here, or paste. JPG, PNG or WebP.</span>
+            <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select images</span>
+            <input id="file" type="file" accept="image/*" multiple>
+          </label>
+          <div class="pages" hidden>
+            <div class="pages-head">
+              <b id="p-count">0 images</b>
+              <span class="sub">Changes apply to all images</span>
+              <span class="pages-actions">
+                <button type="button" class="btn btn-ghost btn-sm" id="add-more">${icon("add")}Add more</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="clear">${icon("delete")}Remove all</button>
+              </span>
+            </div>
+            <ol class="ilist" id="ilist"></ol>
+          </div>
+          <template>${icon("close")}${icon("download")}</template>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result">
+          <h3>${icon("tune")} Settings</h3>
+          <div class="levels" role="radiogroup" aria-label="How to compress">
+            <label class="lvl"><input type="radio" name="cmode" value="quality" checked><span><b>Set quality</b><small>Good look, smaller file</small></span></label>
+            <label class="lvl"><input type="radio" name="cmode" value="target"><span><b>Target size</b><small>Each image under a KB limit</small></span></label>
+          </div>
+          <div class="fields">
+            <label class="field wide q-row"><span>Quality: <b id="q-val">80</b></span><input id="quality" type="range" min="10" max="100" value="80"></label>
+            <div class="t-row wide" hidden>
+              <label class="field">Max KB per image<input id="target" type="number" inputmode="numeric" min="5" value="100"></label>
+              ${kbChips([[50, "50 KB"], [100, "100 KB"], [200, "200 KB"], [500, "500 KB"], [1000, "1 MB"]])}
+            </div>
+            <label class="field">Format<select id="format"><option value="jpg">JPG</option><option value="webp">WebP</option><option value="png">PNG</option><option value="keep">Same as original</option></select></label>
+            <label class="field">Max width/height<input id="maxside" type="number" inputmode="numeric" min="16" placeholder="Original"></label>
+            <div class="chips wide side-chips"><button type="button" data-side="">Original</button><button type="button" data-side="1920">1920 px</button><button type="button" data-side="1280">1280 px</button><button type="button" data-side="800">800 px</button></div>
+          </div>
+          <ul class="facts">
+            <li><span>Before</span><b id="f-before">—</b></li>
+            <li><span>After</span><b id="f-after">—</b></li>
+            <li><span>Saved</span><b id="f-saved">—</b></li>
+          </ul>
+          <p class="bg-status" id="status" hidden></p>
+          <a class="btn btn-primary" id="dl-all" href="#" hidden>${icon("folder_zip")}Download all as ZIP</a>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your images are never uploaded. They're compressed inside your browser, and hidden location data is removed.</p>
+    </div>`,
+  steps: [
+    ["Add your images.", "Select several at once, drag them in, or paste a screenshot. Each one is compressed straight away."],
+    ["Choose how small.", "Set quality (80 is a good balance), or switch to Target size and give a limit like 100 KB per image."],
+    ["Resize or convert if you like.", "Set a maximum width/height such as 1920 px, and pick JPG, WebP or PNG."],
+    ["Download.", "Save images one by one, or all of them in a ZIP."],
+  ],
+  tips: [
+    ["tune", "Quality 70–85 is the sweet spot.", "Files shrink a lot while photos still look the same to the eye."],
+    ["aspect_ratio", "Resizing saves the most.", "A 4000 px phone photo shown at 1920 px loses nothing visible and can be several times smaller."],
+    ["image", "WebP is smallest.", "Use it for websites. For forms and email, JPG is accepted everywhere."],
+    ["location_off", "Location removed.", "Phone photos can carry GPS data; the compressed copies don't."],
+  ],
+  faqs: [
+    ["How do I compress an image to 100 KB?", "Add the image, choose Target size and enter 100 (or tap 100 KB). The tool keeps the best quality that fits under 100 KB, and makes the picture smaller in pixels only if it has to."],
+    ["Will compressing make my photo look worse?", "At quality 70–85 most people can't see a difference, while the file is usually 50–80% smaller. Very small targets can make photos look soft or blocky, so use the largest size you're allowed."],
+    ["Can I compress many images at once?", "Yes. Add as many as you like; the same settings apply to all, and you can download them together as a ZIP."],
+    ["Why is my PNG still big?", "PNG is lossless, so it barely shrinks without resizing. Choose JPG or WebP for photos, or set a maximum width/height."],
+    ["Does it remove location data from photos?", "Yes. The compressed images are newly encoded, so camera metadata such as GPS location isn't carried over."],
+    ["Are my images uploaded anywhere?", "No. Compression happens inside your browser. Your images never reach our servers or anyone else's."],
+    ["Is it really free?", "Yes. No account, no watermark, no limits."],
+  ],
+  scripts: ["pdf-lite.js", "compress-image.js"],
+  appCategory: "MultimediaApplication",
+  schemaDesc: "Free tool to compress JPG, PNG and WebP images by quality or to a target size such as 100 KB, with resizing, format conversion and ZIP download.",
 });
 
 // Merge PDF

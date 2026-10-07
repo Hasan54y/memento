@@ -350,3 +350,32 @@ a.t-mini:hover { color: var(--brand-ink); }
 .t-legal { max-width: 760px; padding: 8px 0 24px; }
 .t-legal p { color: var(--soft); }
 .linkish { font: inherit; color: var(--brand-ink); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+
+/* Compress Image */
+#imgcomp .drop.compact { display: none; }
+.ilist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 560px; overflow-y: auto; }
+.ilist li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto 32px; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+.ilist img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; background: #f1f4f2; }
+.i-name { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.i-name small { display: block; color: var(--muted); font-weight: 500; font-size: 12.5px; }
+.i-size { font-size: 13.5px; color: var(--muted); text-align: right; white-space: nowrap; }
+.i-size s { opacity: .7; }
+.i-size b { color: var(--text); }
+.i-size b.bad, .i-size.bad { color: var(--danger); }
+.i-size em { display: block; font-style: normal; font-weight: 700; font-size: 12.5px; }
+.i-size em.ok { color: var(--brand-ink); }
+.i-wait { font-style: italic; }
+.ilist .btn-sm .ms { font-size: 18px; }
+.i-del { width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; }
+.i-del:hover { background: #fef1f0; color: var(--danger); }
+.i-del .ms { font-size: 18px; }
+.ilist li > .i-wait { grid-column: span 2; }
+@media (max-width: 560px) {
+  .ilist li { grid-template-columns: 48px minmax(0, 1fr) 32px; }
+  .ilist img { width: 48px; height: 48px; }
+  .ilist li .i-size { grid-column: 2; text-align: left; }
+  .ilist li .btn-sm { grid-column: 2; justify-self: start; }
+  .ilist li .i-del { grid-column: 3; grid-row: 1; }
+}
+.q-row input { width: 100%; accent-color: var(--brand-ink); }
+.t-row { display: grid; gap: 8px; }
