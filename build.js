@@ -745,7 +745,8 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
           </label>
           <div class="editor" hidden>
             <div class="frame"><canvas id="view" aria-label="Drag and zoom to frame the picture"></canvas></div>
-            <p class="hint-line">${icon("pan_tool")} Drag to move, zoom to fit. The green guides won't appear in the file.</p>
+            <p class="hint-line move-hint">${icon("pan_tool")} Drag to move, zoom to fit. The green guides won't appear in the file.</p>
+            <p class="hint-line brush-hint" hidden>${icon("brush")} Paint over the spots to fix. Tap the brush again to go back to moving the picture.</p>
             <div class="controls">
               <label class="zoom">${icon("zoom_out")}<input id="zoom" type="range" min="50" max="400" value="100" aria-label="Zoom">${icon("zoom_in")}</label>
               <button type="button" class="btn btn-ghost btn-sm" id="rotate">${icon("rotate_right")}Rotate</button>
@@ -763,6 +764,13 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
                 <input id="bgc" class="vh" type="color" value="#c8102e" tabindex="-1" aria-hidden="true">
               </div>
               <span class="bg-status" id="bg-status" hidden></span>
+            </div>
+            <div class="fix-row" hidden>
+              <span class="bg-label">${icon("auto_fix_high")}Fix edges</span>
+              <button type="button" class="sw-text brush-btn erase" data-brush="erase" aria-pressed="false">${icon("ink_eraser")}Erase</button>
+              <button type="button" class="sw-text brush-btn" data-brush="restore" aria-pressed="false">${icon("brush")}Restore</button>
+              <label class="zoom brush-size">Size<input id="bsize" type="range" min="6" max="80" value="26" aria-label="Brush size"></label>
+              <button type="button" class="btn btn-ghost btn-sm" id="undo" disabled>${icon("undo")}Undo</button>
             </div>
             <div class="controls">
               <label class="check"><input id="clean" type="checkbox">Whiten paper, darken ink</label>
@@ -791,7 +799,7 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
         <h2>How to use it</h2>
         <ol class="t-steps">
           <li><b>Pick a type.</b> Photo (300×300), Signature (300×80), or Custom size if the circular asks for something else.</li>
-          <li><b>Add and frame your picture.</b> Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one.</li>
+          <li><b>Add and frame your picture.</b> Drag and zoom until your face or signature sits in the middle. Pick a background colour if you need one, and touch up any spot with Fix edges.</li>
           <li><b>Download.</b> Check the size and KB, then upload the file to your application.</li>
         </ol>
 
@@ -808,7 +816,7 @@ page("tools/photo-signature-resizer", "Photo & signature resizer",
         <h2>Questions</h2>
         <div class="t-faq">
           ${tfaq("What photo and signature size do job applications need?", "Most Bangladesh government job applications made through Teletalk ask for a 300×300 pixel photo (up to 100 KB) and a 300×80 pixel signature (up to 60 KB). Sizes can differ from one circular to another, so check yours before applying, and use Custom size if it asks for something else.")}
-          ${tfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. Hair edges are usually good but not always perfect, so check the result before you upload it.")}
+          ${tfaq("Can I change my photo background to white or blue?", "Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. If a spot is missed, use Fix edges: Erase removes leftover background and Restore brings back anything that was cut off. The first time, the background tool downloads about 16 MB; after that it is saved in your browser.")}
           ${tfaq("Is my picture uploaded anywhere?", "No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's.")}
           ${tfaq("Does it work on a phone?", "Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom.")}
           ${tfaq("Where do I find the downloaded file?", "Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg.")}

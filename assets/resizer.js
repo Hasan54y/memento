@@ -1,7 +1,8 @@
 // Photo & signature resizer (/tools/photo-signature-resizer). Everything happens in the browser:
 // the picture is decoded, framed and re-encoded as a JPG locally and never leaves the device.
-// Background replacement uses MediaPipe's selfie segmenter, also on the device; the library is
-// only downloaded the first time someone picks a background colour.
+// Background replacement uses MODNet (portrait matting, Apache-2.0) through onnxruntime-web, also on
+// the device. The engine and model are only downloaded the first time someone picks a background
+// colour, and the model is kept in Cache Storage so it downloads once.
 (() => {
   const root = document.getElementById("resizer");
   if (!root) return;
@@ -23,6 +24,8 @@
   const err = $("#err"), out = $("#out"), empty = $(".out .empty"), dl = $("#dl");
   const fDim = $("#f-dim"), fSize = $("#f-size");
   const bgRow = $(".bg-row"), swatches = [...root.querySelectorAll("[data-bg]")], bgColor = $("#bgc"), bgStatus = $("#bg-status");
+  const fixRow = $(".fix-row"), brushBtns = [...root.querySelectorAll("[data-brush]")], brushSize = $("#bsize"), undoBtn = $("#undo");
+  const moveHint = $(".move-hint"), brushHint = $(".brush-hint");
 
   let mode = "photo";
   const states = {}; // one picture per mode, so switching tabs keeps the photo and the signature
@@ -96,6 +99,9 @@
     s.mips = [src];
     s.cut = null; // person cut-out, rebuilt for the new source when a background is chosen
     s.cutMips = null;
+    s.fill = null;
+    s.mask = null; // alpha mask of the person (editable with the brush), smaller than the source
+    s.history = [];
     s.cx = src.width / 2;
     s.cy = src.height / 2;
   }
@@ -201,45 +207,83 @@
     }
     vctx.stroke();
     vctx.restore();
+    if (brush && cursor) {
+      const r = view.getBoundingClientRect(), d = W / r.width;
+      vctx.save();
+      vctx.lineWidth = Math.max(1, d * 1.5);
+      vctx.strokeStyle = brush === "erase" ? "rgba(220, 38, 38, .9)" : "rgba(10, 125, 54, .9)";
+      vctx.setLineDash([]);
+      vctx.beginPath();
+      vctx.arc((cursor.x - r.left) * d, (cursor.y - r.top) * d, (Number(brushSize.value) / 2) * d, 0, Math.PI * 2);
+      vctx.stroke();
+      vctx.restore();
+    }
   }
 
   // ---------- Background replacement ----------
-  const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.0";
-  const MODEL = "/assets/models/selfie_segmenter.tflite";
-  let segmenter = null;
-  function getSegmenter() {
-    if (!segmenter) segmenter = (async () => {
-      const { FilesetResolver, ImageSegmenter } = await import(`${MP}/vision_bundle.mjs`);
-      const files = await FilesetResolver.forVisionTasks(`${MP}/wasm`);
-      return ImageSegmenter.createFromOptions(files, {
-        baseOptions: { modelAssetPath: MODEL, delegate: "CPU" },
-        runningMode: "IMAGE", outputConfidenceMasks: true, outputCategoryMask: false,
-      });
-    })().catch((e) => { segmenter = null; throw e; });
-    return segmenter;
+  const ORT = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/";
+  const MODEL_URL = "/assets/models/modnet_fp16.onnx";
+  const MODEL_CACHE = "memento-tools-models-v1";
+  const MASK_MAX = 1400; // longest side of the editable mask
+
+  // The model file, from Cache Storage when we have it, otherwise downloaded with progress
+  async function fetchModel(onProgress) {
+    let cache = null;
+    try {
+      cache = await caches.open(MODEL_CACHE);
+      const hit = await cache.match(MODEL_URL);
+      if (hit) return new Uint8Array(await hit.arrayBuffer());
+    } catch { cache = null; }
+    const res = await fetch(MODEL_URL);
+    if (!res.ok || !res.body) throw new Error("model");
+    const total = Number(res.headers.get("content-length")) || 13e6;
+    const reader = res.body.getReader(), parts = [];
+    let got = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parts.push(value);
+      got += value.length;
+      onProgress(Math.min(0.99, got / total));
+    }
+    const bytes = new Uint8Array(got);
+    let o = 0;
+    for (const p of parts) { bytes.set(p, o); o += p.length; }
+    try { if (cache) await cache.put(MODEL_URL, new Response(bytes, { headers: { "content-type": "application/octet-stream" } })); } catch { /* storage full or blocked: fine */ }
+    return bytes;
   }
 
-  const shrink = (src, max) => {
-    const k = Math.min(1, max / Math.max(src.width, src.height));
-    const c = canvas(Math.max(1, Math.round(src.width * k)), Math.max(1, Math.round(src.height * k)));
-    const x = c.getContext("2d");
-    x.imageSmoothingQuality = "high";
-    x.drawImage(src, 0, 0, c.width, c.height);
-    return c;
-  };
+  let model = null;
+  function getModel() {
+    if (!model) model = (async () => {
+      const ort = await import(`${ORT}ort.wasm.min.mjs`);
+      ort.env.wasm.wasmPaths = ORT;
+      ort.env.wasm.numThreads = self.crossOriginIsolated ? Math.min(4, navigator.hardwareConcurrency || 1) : 1;
+      const bytes = await fetchModel((p) => setStatus(`Downloading the background tool… ${Math.round(p * 100)}% (first time only, about 16 MB)`));
+      setStatus("Starting the background tool…");
+      const session = await ort.InferenceSession.create(bytes, { executionProviders: ["wasm"], graphOptimizationLevel: "all" });
+      return { ort, session };
+    })().catch((e) => { model = null; throw e; });
+    return model;
+  }
 
-  // Probability (0..1) that each pixel belongs to the person
-  function personMask(seg, img) {
-    const r = seg.segment(img);
-    const masks = r.confidenceMasks, labels = seg.getLabels() || [];
-    const w = masks[0].width, h = masks[0].height;
-    const pi = labels.findIndex((l) => /person|foreground/i.test(l));
-    let data;
-    if (pi >= 0 && masks[pi]) data = masks[pi].getAsFloat32Array().slice();
-    else if (masks.length === 1) data = masks[0].getAsFloat32Array().slice();
-    else data = masks[Math.max(0, labels.findIndex((l) => /background/i.test(l)))].getAsFloat32Array().map((v) => 1 - v);
-    r.close();
-    return { data, w, h };
+  // Alpha matte (0..1) of the person in one region of the picture. MODNet wants the shorter side at
+  // 512 px and both sides a multiple of 32.
+  async function matte({ ort, session }, src, rx, ry, rw, rh) {
+    const k = Math.min(512 / Math.min(rw, rh), 1024 / Math.max(rw, rh));
+    const w = Math.max(32, Math.round((rw * k) / 32) * 32), h = Math.max(32, Math.round((rh * k) / 32) * 32);
+    const c = canvas(w, h), x = c.getContext("2d");
+    x.imageSmoothingQuality = "high";
+    x.drawImage(src, rx, ry, rw, rh, 0, 0, w, h);
+    const px = x.getImageData(0, 0, w, h).data, n = w * h, input = new Float32Array(3 * n);
+    for (let i = 0; i < n; i++) {
+      input[i] = px[i * 4] / 127.5 - 1;
+      input[n + i] = px[i * 4 + 1] / 127.5 - 1;
+      input[2 * n + i] = px[i * 4 + 2] / 127.5 - 1;
+    }
+    await new Promise((r) => setTimeout(r, 20)); // let the status message paint first
+    const out = await session.run({ [session.inputNames[0]]: new ort.Tensor("float32", input, [1, 3, h, w]) });
+    return { data: Float32Array.from(out[session.outputNames[0]].data), w, h };
   }
 
   // The model sometimes marks stray patches of background (a lamp, a shadow) as "person". Keep only
@@ -277,48 +321,106 @@
     return keep;
   }
 
-  // Cut the person out of s.src: a first pass finds them, a second pass on just that area gives
-  // sharper edges (the model only sees 256×256 pixels).
-  async function buildCut(s) {
-    const seg = await getSegmenter();
-    const src = s.src;
-    const small = shrink(src, 512);
-    const m1 = personMask(seg, small);
-    const keep1 = mainBlob(m1);
-    let x0 = m1.w, y0 = m1.h, x1 = -1, y1 = -1;
-    for (let y = 0; y < m1.h; y++) for (let x = 0; x < m1.w; x++) {
-      if (keep1[y * m1.w + x] && m1.data[y * m1.w + x] > 0.5) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-    }
-    if (x1 < 0 || (x1 - x0) * (y1 - y0) < m1.w * m1.h * 0.01) throw new Error("noperson");
-    const f = src.width / m1.w, padX = (x1 - x0) * 0.12 * f, padY = (y1 - y0) * 0.12 * f;
-    const rx = Math.max(0, x0 * f - padX), ry = Math.max(0, y0 * f - padY);
-    const rw = Math.min(src.width, (x1 + 1) * f + padX) - rx, rh = Math.min(src.height, (y1 + 1) * f + padY) - ry;
-    const crop = canvas(1, 1);
-    const ck = Math.min(1, 640 / Math.max(rw, rh));
-    crop.width = Math.max(1, Math.round(rw * ck)); crop.height = Math.max(1, Math.round(rh * ck));
-    const cx = crop.getContext("2d");
-    cx.imageSmoothingQuality = "high";
-    cx.drawImage(src, rx, ry, rw, rh, 0, 0, crop.width, crop.height);
-    const m2 = personMask(seg, crop);
-    const keep = mainBlob(m2);
-
-    // Mask as an alpha channel, with the soft edge tightened a little to reduce halos
-    const mc = canvas(m2.w, m2.h), mx = mc.getContext("2d"), id = mx.createImageData(m2.w, m2.h);
-    for (let i = 0; i < m2.data.length; i++) {
+  // Draw a matte into the mask canvas at a region (in source pixels)
+  function paintMatte(mask, m, keep, rx, ry, rw, rh, scale) {
+    const mc = canvas(m.w, m.h), mx = mc.getContext("2d"), id = mx.createImageData(m.w, m.h);
+    for (let i = 0; i < m.data.length; i++) {
       if (!keep[i]) continue;
-      let t = (m2.data[i] - 0.35) / 0.4;
-      t = t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
-      id.data[i * 4 + 3] = t * 255;
+      const v = m.data[i];
+      id.data[i * 4 + 3] = v < 0.04 ? 0 : v > 0.96 ? 255 : v * 255;
     }
     mx.putImageData(id, 0, 0);
-    const cut = canvas(src.width, src.height), cc = cut.getContext("2d");
-    cc.imageSmoothingQuality = "high";
-    cc.drawImage(mc, rx, ry, rw, rh);
-    cc.globalCompositeOperation = "source-in";
-    cc.drawImage(src, 0, 0);
+    const c = mask.getContext("2d");
+    c.clearRect(0, 0, mask.width, mask.height);
+    c.imageSmoothingQuality = "high";
+    c.drawImage(mc, rx * scale, ry * scale, rw * scale, rh * scale);
+  }
+
+  // Cut the person out of s.src. The first pass finds them; when they fill only part of the photo,
+  // a second pass on just that area gives the model more pixels and sharper hair.
+  async function buildCut(s) {
+    const m = await getModel();
+    const src = s.src, W = src.width, H = src.height;
+    setStatus("Finding you in the photo…");
+    const m1 = await matte(m, src, 0, 0, W, H);
+    const keep1 = mainBlob(m1);
+    let x0 = m1.w, y0 = m1.h, x1 = -1, y1 = -1, sum = 0;
+    for (let y = 0; y < m1.h; y++) for (let x = 0; x < m1.w; x++) {
+      const i = y * m1.w + x;
+      if (keep1[i] && m1.data[i] > 0.5) { sum++; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0 || sum < m1.w * m1.h * 0.01) throw new Error("noperson");
+    const scale = Math.min(1, MASK_MAX / Math.max(W, H));
+    const mask = canvas(Math.max(1, Math.round(W * scale)), Math.max(1, Math.round(H * scale)));
+    const fx = W / m1.w, fy = H / m1.h, padX = (x1 - x0 + 1) * 0.08 * fx, padY = (y1 - y0 + 1) * 0.08 * fy;
+    const rx = Math.max(0, x0 * fx - padX), ry = Math.max(0, y0 * fy - padY);
+    const rw = Math.min(W, (x1 + 1) * fx + padX) - rx, rh = Math.min(H, (y1 + 1) * fy + padY) - ry;
+    if (rw * rh < W * H * 0.6) {
+      setStatus("Refining the edges…");
+      const m2 = await matte(m, src, rx, ry, rw, rh);
+      paintMatte(mask, m2, mainBlob(m2), rx, ry, rw, rh, scale);
+    } else {
+      paintMatte(mask, m1, keep1, 0, 0, W, H, scale);
+    }
     if (s.src !== src) return; // rotated meanwhile; that rotation starts its own cut
-    s.cut = cut;
-    s.cutMips = [cut];
+    s.mask = mask;
+    s.history = [];
+    composeCut(s);
+  }
+
+  // Colours for the person that also reach past their edges. Soft edge pixels in the photo are a
+  // mix of the person and the old background, which shows as a dark or coloured halo on the new
+  // one. So take only the solid inside of the person and spread those colours outwards
+  // (push-pull: shrink by halves, then grow back, filling gaps from the coarser level).
+  function buildFill(s) {
+    const src = s.src, W = src.width, H = src.height, m = s.mask;
+    const hard = canvas(m.width, m.height), hx = hard.getContext("2d");
+    hx.drawImage(m, 0, 0);
+    const id = hx.getImageData(0, 0, m.width, m.height);
+    for (let i = 3; i < id.data.length; i += 4) id.data[i] = id.data[i] >= 235 ? 255 : 0;
+    hx.putImageData(id, 0, 0);
+    const solid = canvas(W, H), sx = solid.getContext("2d");
+    sx.drawImage(hard, 0, 0, W, H);
+    sx.globalCompositeOperation = "source-in";
+    sx.drawImage(src, 0, 0);
+    const levels = [solid];
+    while (levels[levels.length - 1].width > 1 || levels[levels.length - 1].height > 1) {
+      const last = levels[levels.length - 1];
+      const c = canvas(Math.max(1, Math.ceil(last.width / 2)), Math.max(1, Math.ceil(last.height / 2)));
+      c.getContext("2d").drawImage(last, 0, 0, c.width, c.height);
+      levels.push(c);
+    }
+    // The 1×1 level holds the average colour; make it opaque so the fill ends up opaque everywhere
+    const top = levels[levels.length - 1], tx = top.getContext("2d"), t = tx.getImageData(0, 0, 1, 1);
+    const a = t.data[3] || 1;
+    tx.fillStyle = `rgb(${Math.round((t.data[0] * 255) / a)},${Math.round((t.data[1] * 255) / a)},${Math.round((t.data[2] * 255) / a)})`;
+    tx.globalCompositeOperation = "copy";
+    tx.fillRect(0, 0, 1, 1);
+    let acc = top;
+    for (let i = levels.length - 2; i >= 0; i--) {
+      const c = canvas(levels[i].width, levels[i].height), x = c.getContext("2d");
+      x.imageSmoothingQuality = "high";
+      x.drawImage(acc, 0, 0, c.width, c.height);
+      x.drawImage(levels[i], 0, 0);
+      acc = c;
+    }
+    s.fill = acc;
+  }
+
+  // The person on a transparent background: the edge-safe colours, shaped by the soft mask.
+  // While a brush stroke is in progress (quick = true) the previous colours are reused.
+  function composeCut(s, quick) {
+    const src = s.src;
+    if (!quick || !s.fill) buildFill(s);
+    if (!s.cut) s.cut = canvas(src.width, src.height);
+    const cc = s.cut.getContext("2d");
+    cc.globalCompositeOperation = "copy";
+    cc.drawImage(s.fill, 0, 0);
+    cc.globalCompositeOperation = "destination-in";
+    cc.imageSmoothingQuality = "high";
+    cc.drawImage(s.mask, 0, 0, src.width, src.height);
+    cc.globalCompositeOperation = "source-over";
+    s.cutMips = [s.cut];
   }
 
   function setStatus(msg) { bgStatus.textContent = msg; bgStatus.hidden = !msg; }
@@ -327,15 +429,13 @@
   async function ensureCut(s) {
     if (!s.bg || s.cut) { setStatus(""); return; }
     const job = (cutJob = {});
-    setStatus(segmenter ? "Finding you in the photo…" : "Loading the background tool (first time only, about 4 MB)…");
+    setStatus(model ? "Finding you in the photo…" : "Loading the background tool…");
+    setBrush("");
     try {
-      await getSegmenter();
-      if (cutJob !== job) return;
-      setStatus("Finding you in the photo…");
-      await new Promise((r) => setTimeout(r, 30)); // let the status paint
       await buildCut(s);
       if (cutJob !== job) return;
       setStatus("");
+      syncFix(s);
     } catch (e) {
       if (cutJob !== job) return;
       setStatus("");
@@ -348,6 +448,67 @@
     if (states[mode] === s) changed();
   }
 
+  // ---------- Touch-up brush ----------
+  let brush = ""; // "", "erase" or "restore"
+  function setBrush(b) {
+    brush = b;
+    brushBtns.forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.brush === brush)));
+    brushHint.hidden = !brush;
+    moveHint.hidden = !!brush;
+    view.classList.toggle("painting", !!brush);
+  }
+  function syncFix(s) {
+    const on = !!(s && s.bg && s.cut && PRESETS[mode].bg);
+    fixRow.hidden = !on;
+    if (!on) setBrush("");
+    undoBtn.disabled = !(s && s.history && s.history.length);
+  }
+  brushBtns.forEach((x) => x.addEventListener("click", () => setBrush(brush === x.dataset.brush ? "" : x.dataset.brush)));
+  undoBtn.addEventListener("click", () => {
+    const s = states[mode];
+    if (!s || !s.history.length) return;
+    const prev = s.history.pop();
+    const c = s.mask.getContext("2d");
+    c.globalCompositeOperation = "copy";
+    c.drawImage(prev, 0, 0);
+    c.globalCompositeOperation = "source-over";
+    composeCut(s);
+    syncFix(s);
+    changed();
+  });
+
+  // Picture coordinates under a pointer position on the preview
+  function toSource(s, e) {
+    const r = view.getBoundingClientRect(), k = scaleFor(s, r.width, r.height);
+    return { x: s.cx + (e.clientX - r.left - r.width / 2) / k, y: s.cy + (e.clientY - r.top - r.height / 2) / k, k };
+  }
+  let stroke = null, strokeFrame = 0;
+  function startStroke(s, e) {
+    const snap = canvas(s.mask.width, s.mask.height);
+    snap.getContext("2d").drawImage(s.mask, 0, 0);
+    s.history.push(snap);
+    if (s.history.length > 15) s.history.shift();
+    stroke = toSource(s, e);
+    paintTo(s, e);
+  }
+  function paintTo(s, e) {
+    const p = toSource(s, e), scale = s.mask.width / s.src.width;
+    const c = s.mask.getContext("2d");
+    c.save();
+    c.globalCompositeOperation = brush === "erase" ? "destination-out" : "source-over";
+    c.strokeStyle = c.fillStyle = "#000";
+    c.lineCap = c.lineJoin = "round";
+    c.lineWidth = (Number(brushSize.value) / p.k) * scale;
+    c.beginPath();
+    c.moveTo(stroke.x * scale, stroke.y * scale);
+    c.lineTo(p.x * scale + 0.01, p.y * scale);
+    c.stroke();
+    c.restore();
+    stroke = p;
+    if (!strokeFrame) strokeFrame = requestAnimationFrame(() => { strokeFrame = 0; composeCut(s, true); render(); });
+  }
+  let cursor = null; // last pointer position over the preview, for the brush ring
+
   function syncSwatches(s) {
     const presets = swatches.map((b) => b.dataset.bg).filter((v) => v !== "custom");
     swatches.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.bg === "custom" ? !!s.bg && !presets.includes(s.bg) : b.dataset.bg === s.bg)));
@@ -359,6 +520,7 @@
     showError("");
     s.bg = color;
     syncSwatches(s);
+    syncFix(s);
     changed();
     ensureCut(s);
   }
@@ -430,6 +592,7 @@
 
   // ---------- Mode switching ----------
   function showMode() {
+    setBrush("");
     tabs.forEach((b) => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
     custom.hidden = mode !== "custom";
     dropTitle.textContent = PRESETS[mode].drop;
@@ -444,6 +607,7 @@
     bgRow.hidden = !PRESETS[mode].bg;
     syncSwatches(s);
     setStatus("");
+    syncFix(s);
     if (s.bg && !s.cut) ensureCut(s);
     sizeView();
     render();
@@ -490,7 +654,7 @@
   };
 
   zoom.addEventListener("input", () => { setZoom(zoom.value / 100); changed(); });
-  $("#rotate").addEventListener("click", () => { const s = states[mode]; rotate(s); zoom.value = 100; changed(); ensureCut(s); });
+  $("#rotate").addEventListener("click", () => { const s = states[mode]; rotate(s); syncFix(s); zoom.value = 100; changed(); ensureCut(s); });
   clean.addEventListener("change", () => { states[mode].clean = clean.checked; strengthRow.hidden = !clean.checked; changed(); });
   strength.addEventListener("input", () => { states[mode].strength = strength.value / 100; changed(); });
 
@@ -501,11 +665,19 @@
   view.addEventListener("pointerdown", (e) => {
     view.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 2) pinch = { d: spread(), z: states[mode].zoom };
+    const s = states[mode];
+    if (pointers.size === 2) { pinch = { d: spread(), z: s.zoom }; stroke = null; }
+    else if (brush && s && s.mask) startStroke(s, e);
   });
   view.addEventListener("pointermove", (e) => {
     const prev = pointers.get(e.pointerId), s = states[mode];
+    if (brush) { cursor = { x: e.clientX, y: e.clientY }; if (!prev && s) render(); }
     if (!prev || !s) return;
+    if (brush && stroke && pointers.size === 1) {
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      paintTo(s, e);
+      return;
+    }
     const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.size === 1) {
@@ -517,7 +689,19 @@
     }
     changed();
   });
-  const release = (e) => { pointers.delete(e.pointerId); if (pointers.size < 2) pinch = null; };
+  const release = (e) => {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (stroke) {
+      stroke = null;
+      const s = states[mode];
+      cancelAnimationFrame(strokeFrame); strokeFrame = 0;
+      composeCut(s); // full edge clean-up once the stroke is done
+      syncFix(s);
+      changed();
+    }
+  };
+  view.addEventListener("pointerleave", () => { if (cursor) { cursor = null; render(); } });
   view.addEventListener("pointerup", release);
   view.addEventListener("pointercancel", release);
   view.addEventListener("wheel", (e) => {

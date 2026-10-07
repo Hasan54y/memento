@@ -235,3 +235,14 @@ a.t-tile:hover .t-go .ms { transform: translateX(3px); }
 .t-foot-bottom a { color: var(--muted); text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+/* Background status + touch-up brush */
+.bg-status::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 8px; vertical-align: -1px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.fix-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 10px; margin-top: 12px; }
+.brush-btn { display: inline-flex; align-items: center; gap: 6px; }
+.brush-btn .ms { font-size: 18px; }
+.brush-btn.erase[aria-pressed="true"] { color: var(--danger); border-color: var(--danger); box-shadow: 0 0 0 3px rgba(180, 35, 24, .15); }
+.brush-size { flex: 1 1 160px; }
+#undo:disabled { opacity: .45; pointer-events: none; }
+#view.painting { cursor: none; }
