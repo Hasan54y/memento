@@ -1401,6 +1401,17 @@ toolPage(tool("id-copy"), {
             <label class="field">Colour<select id="color"><option value="color">Colour</option><option value="gray">Greyscale</option><option value="bw">Black &amp; white</option></select></label>
             <label class="field wide">Safe-copy watermark<input id="wm" type="text" maxlength="60" placeholder="e.g. For bank account opening only"></label>
             <label class="check wide"><input id="wm-date" type="checkbox" checked>Add today's date</label>
+            <div class="wm-style wide" hidden>
+              <label class="field">Position<select id="wm-pos"><option value="tile">Repeated across the card</option><option value="diag">Centre, diagonal</option><option value="center">Centre, straight</option><option value="bottom">Along the bottom</option></select></label>
+              <div class="wm-colors"><span>Colour</span><div class="swatches" role="group" aria-label="Watermark colour">
+                <button type="button" class="sw" data-wmc="#b4231b" style="--sw:#b4231b" title="Red" aria-label="Red" aria-pressed="true"></button>
+                <button type="button" class="sw" data-wmc="#1d4f8a" style="--sw:#1d4f8a" title="Blue" aria-label="Blue" aria-pressed="false"></button>
+                <button type="button" class="sw" data-wmc="#111111" style="--sw:#111111" title="Black" aria-label="Black" aria-pressed="false"></button>
+                <button type="button" class="sw" data-wmc="#7a8580" style="--sw:#7a8580" title="Grey" aria-label="Grey" aria-pressed="false"></button>
+              </div></div>
+              <label class="field range"><span>Opacity <b id="wm-op-val">25%</b></span><input id="wm-op" type="range" min="8" max="80" value="25"></label>
+              <label class="field range"><span>Size <b id="wm-size-val">100%</b></span><input id="wm-size" type="range" min="50" max="200" step="10" value="100"></label>
+            </div>
           </div>
           <div class="page-preview"><canvas id="page" aria-label="Page preview"></canvas></div>
           <p class="bg-status" id="status" hidden></p>

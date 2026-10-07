@@ -14,6 +14,8 @@
   const editor = $(".editor"), crop = $("#crop"), cctx = crop.getContext("2d"), card = $("#card"), kctx = card.getContext("2d");
   const redactBtn = $("#redact"), undoBox = $("#undo-box"), redactHint = $(".redact-hint");
   const docSel = $("#doc"), customBox = $(".custom-mm"), cmw = $("#cmw"), cmh = $("#cmh"), paper = $("#paper"), color = $("#color"), wm = $("#wm"), wmDate = $("#wm-date");
+  const wmStyle = $(".wm-style"), wmPos = $("#wm-pos"), wmOp = $("#wm-op"), wmSize = $("#wm-size"), wmColors = [...root.querySelectorAll("[data-wmc]")];
+  let wmColor = "#b4231b";
   const page = $("#page"), pctx = page.getContext("2d"), dlPdf = $("#dl-pdf"), dlJpg = $("#dl-jpg"), status = $("#status"), err = $("#err");
 
   const showError = (m) => { err.textContent = m; err.hidden = !m; };
@@ -236,18 +238,34 @@
     if (!t) return "";
     return wmDate.checked ? `${t} · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}` : t;
   }
+  // Colour, opacity, size and placement come from the watermark controls. On greyscale and
+  // black-and-white copies the colour is turned to its grey so it matches the page.
   function watermark(x, W, H) {
     const t = watermarkText();
     if (!t) return;
-    const size = Math.max(10, H * 0.075);
+    let [r, g, b] = [1, 3, 5].map((i) => parseInt(wmColor.slice(i, i + 2), 16));
+    if (color.value !== "color") r = g = b = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    const alpha = Number(wmOp.value) / 100, scale = Number(wmSize.value) / 100;
+    let size = Math.max(8, H * 0.06 * scale);
     x.save();
-    x.font = `700 ${size}px "Plus Jakarta Sans", Arial, sans-serif`;
-    x.fillStyle = color.value === "color" ? "rgba(180, 35, 24, .38)" : "rgba(0, 0, 0, .32)";
+    const font = (px) => `700 ${px}px "Plus Jakarta Sans", Arial, sans-serif`;
+    x.font = font(size);
+    x.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
     x.textAlign = "center"; x.textBaseline = "middle";
-    x.translate(W / 2, H / 2); x.rotate(-Math.PI / 9);
-    const step = x.measureText(t).width + size * 2, diag = Math.hypot(W, H);
-    for (let row = -diag / 2, r = 0; row < diag / 2; row += size * 2.4, r++) {
-      for (let col = -diag / 2 - (r % 2) * step / 2; col < diag / 2 + step; col += step) x.fillText(t, col, row);
+    const pos = wmPos.value;
+    if (pos === "tile") {
+      x.translate(W / 2, H / 2); x.rotate(-Math.PI / 9);
+      const step = x.measureText(t).width + size * 2, diag = Math.hypot(W, H);
+      for (let row = -diag / 2, n = 0; row < diag / 2; row += size * 2.6, n++) {
+        for (let col = -diag / 2 - (n % 2) * step / 2; col < diag / 2 + step; col += step) x.fillText(t, col, row);
+      }
+    } else {
+      // One line: shrink it if it wouldn't fit across the card
+      const room = pos === "diag" ? Math.hypot(W, H) * 0.86 : W * 0.92, wide = x.measureText(t).width;
+      if (wide > room) { size *= room / wide; x.font = font(size); }
+      if (pos === "bottom") { x.translate(W / 2, H - size * 0.9); }
+      else { x.translate(W / 2, H / 2); if (pos === "diag") x.rotate(-Math.atan2(H, W)); }
+      x.fillText(t, 0, 0);
     }
     x.restore();
   }
@@ -403,7 +421,14 @@
   $("#pick").addEventListener("click", () => fileInput.click());
   $("#remove").addEventListener("click", () => { sides[side] = null; showError(""); show(); });
   docSel.addEventListener("input", () => { customBox.hidden = docSel.value !== "custom"; schedule(); });
-  [cmw, cmh, paper, color, wm, wmDate].forEach((el) => el.addEventListener("input", () => schedule()));
+  [cmw, cmh, paper, color, wm, wmDate, wmPos, wmOp, wmSize].forEach((el) => el.addEventListener("input", () => { syncWm(); schedule(); }));
+  wmColors.forEach((b) => b.addEventListener("click", () => { wmColor = b.dataset.wmc; syncWm(); schedule(); }));
+  function syncWm() {
+    wmStyle.hidden = !wm.value.trim();
+    $("#wm-op-val").textContent = `${wmOp.value}%`;
+    $("#wm-size-val").textContent = `${wmSize.value}%`;
+    wmColors.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.wmc === wmColor)));
+  }
   fileInput.addEventListener("change", () => { load(fileInput.files[0]); fileInput.value = ""; });
   ["dragenter", "dragover"].forEach((ev) => root.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
   ["dragleave", "drop"].forEach((ev) => root.addEventListener(ev, () => drop.classList.remove("over")));

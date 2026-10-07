@@ -410,3 +410,11 @@ a.t-mini:hover { color: var(--brand-ink); }
 .page-preview canvas { display: block; width: 100%; box-shadow: 0 2px 10px rgba(15, 23, 19, .18); background: #fff; }
 .result .dl-jpg { margin-top: 8px; }
 #idcopy .result .note { margin-top: 12px; }
+
+/* ID copy: watermark style */
+.wm-style { display: grid; gap: 10px; padding: 12px; border-radius: 12px; background: #fff; border: 1px solid var(--line); }
+.wm-colors { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; color: var(--soft); }
+.wm-colors .sw { width: 28px; height: 28px; }
+.field.range span { display: flex; justify-content: space-between; }
+.field.range b { color: var(--text); }
+.field.range input { padding: 0; border: 0; accent-color: var(--brand-ink); }
