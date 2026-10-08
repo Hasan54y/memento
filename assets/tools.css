@@ -21,12 +21,12 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Plus Jakarta Sans", "Jakarta Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3 { font-family: "Outfit", system-ui, sans-serif; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+h1, h2, h3 { font-family: "Outfit", "Outfit Fallback", system-ui, sans-serif; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
 a { color: var(--brand-ink); }
 img { max-width: 100%; height: auto; display: block; }
 :focus-visible { outline: 2px solid var(--brand-ink); outline-offset: 2px; border-radius: 6px; }
@@ -55,7 +55,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* ---------- Header ---------- */
 .t-head { position: sticky; top: 0; z-index: 20; background: rgba(255, 255, 255, .94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
 .t-bar { display: flex; align-items: center; gap: 16px; height: 64px; }
-.t-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: "Outfit", sans-serif; font-size: 19px; font-weight: 600; flex: none; }
+.t-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-family: "Outfit", "Outfit Fallback", sans-serif; font-size: 19px; font-weight: 600; flex: none; }
 .t-brand img { width: 24px; height: 25px; }
 .t-brand b { font-weight: 800; color: var(--brand-ink); }
 .t-search { flex: 1; max-width: 460px; margin: 0 auto; display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
@@ -320,7 +320,7 @@ a.t-mini:hover { color: var(--brand-ink); }
 .age-limit h4 small { color: var(--muted); font-weight: 500; }
 .age-big { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .age-big span { display: grid; justify-items: center; padding: 12px 4px; border-radius: 12px; background: #fff; border: 1px solid var(--line); color: var(--muted); font-size: 13px; font-weight: 600; }
-.age-big b { font-family: "Outfit", sans-serif; font-size: 30px; line-height: 1.1; color: var(--text); }
+.age-big b { font-family: "Outfit", "Outfit Fallback", sans-serif; font-size: 30px; line-height: 1.1; color: var(--text); }
 .eligible { display: flex; gap: 8px; margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; font-size: 14px; }
 .eligible .ms { font-size: 22px; }
 .eligible.ok { background: var(--brand-soft); color: #0b5a2a; }

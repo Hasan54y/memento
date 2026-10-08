@@ -123,6 +123,9 @@ const LATIN_EXT = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02
 const face = (family, weight, file, range) => `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;src:url(/assets/fonts/${file}.woff2) format("woff2");unicode-range:${range}}`;
 const FONT_FACES = [face("Outfit", "600 800", "outfit-latin-ext", LATIN_EXT), face("Outfit", "600 800", "outfit-latin", LATIN),
   face("Plus Jakarta Sans", "400 700", "jakarta-latin-ext", LATIN_EXT), face("Plus Jakarta Sans", "400 700", "jakarta-latin", LATIN),
+  // Local fonts resized to the web fonts' measurements, so text barely moves when they swap in
+  '@font-face{font-family:"Jakarta Fallback";src:local("Arial"),local("Liberation Sans"),local("Helvetica"),local("Roboto");size-adjust:104.22%;ascent-override:99.8%;descent-override:21.1%;line-gap-override:0%}',
+  '@font-face{font-family:"Outfit Fallback";font-weight:600 800;src:local("Arial Bold"),local("Arial-BoldMT"),local("Liberation Sans Bold"),local("Helvetica Bold"),local("Roboto Bold");size-adjust:95.25%;ascent-override:105%;descent-override:27.3%;line-gap-override:0%}',
   '@font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:400 500;font-display:block;src:url(__ICON_FONT__) format("woff2")}'].join("");
 
 // Stylesheets go inline: one round trip less before the first paint (they are small)
