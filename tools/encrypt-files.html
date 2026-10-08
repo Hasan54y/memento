@@ -12,7 +12,7 @@
   <meta property="og:title" content="Encrypt Files with a Password, Free & Private | Memento Tools">
   <meta property="og:description" content="Encrypt files with a password for free: PDFs, photos and documents become one locked file that opens in any browser. AES-256 encryption on your device; nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/encrypt-files">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-encrypt-files.jpg?v=tmlb0c">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-encrypt-files.jpg?v=tmlbpb">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Encrypt Files with a Password, Free & Private | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Encrypt Files with a Password, Free & Private | Memento Tools">
   <meta name="twitter:description" content="Encrypt files with a password for free: PDFs, photos and documents become one locked file that opens in any browser. AES-256 encryption on your device; nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-encrypt-files.jpg?v=tmlb0c">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-encrypt-files.jpg?v=tmlbpb">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Encrypted document kit","item":"https://mementoapp.online/tools/encrypt-files"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How secure is the kit?","acceptedAnswer":{"@type":"Answer","text":"Files are encrypted with AES-256-GCM, with a key made from your password using PBKDF2-SHA256 and 600,000 rounds, all by your browser's built-in Web Crypto. Without the password the contents can't be read. A strong password matters most."}},{"@type":"Question","name":"Can you recover my password?","acceptedAnswer":{"@type":"Answer","text":"No. We never see your files or your password, so nobody can recover them. Write the password down somewhere safe."}},{"@type":"Question","name":"What does the person receiving it need?","acceptedAnswer":{"@type":"Answer","text":"Just a web browser. They open the .html file and type the password. No app or account is needed."}},{"@type":"Question","name":"Why won't my phone open the file?","acceptedAnswer":{"@type":"Answer","text":"Some phones show HTML files as text or won't run them from the Files app. Open mementoapp.online/tools/encrypt-files, choose Open a kit and pick the file: it's unlocked on your device and nothing is uploaded."}},{"@type":"Question","name":"Can I email or WhatsApp the kit?","acceptedAnswer":{"@type":"Answer","text":"Yes. It's a normal file. Some email services limit attachment size, so keep big kits under about 20 MB, or share through cloud storage."}},{"@type":"Question","name":"What is visible without the password?","acceptedAnswer":{"@type":"Answer","text":"Only the kit name and the hint, if you add them. File names, notes and the files themselves are all encrypted."}},{"@type":"Question","name":"Is it free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free, with no account."}}]},{"@type":"WebApplication","name":"Encrypted document kit","url":"https://mementoapp.online/tools/encrypt-files","inLanguage":"en","applicationCategory":"SecurityApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free tool to encrypt files and notes with a password (AES-256-GCM) into a single file that opens in any browser.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -693,6 +695,8 @@ body * { visibility: hidden; }
         <div class="t-more">
           <h3>Guides</h3>
           <a class="t-mini" href="/guides/leave-passwords-to-family"><span class="t-ico sm" style="--c:#ffb547"><span class="ms" aria-hidden="true">menu_book</span></span><span>Leave your passwords to your family<small>4 min read</small></span></a>
+          <a class="t-mini" href="/guides/safe-id-card-copy"><span class="t-ico sm" style="--c:#ffb547"><span class="ms" aria-hidden="true">menu_book</span></span><span>Share an ID copy safely<small>3 min read</small></span></a>
+          <a class="t-mini" href="/guides/send-id-documents-securely"><span class="t-ico sm" style="--c:#1fe05a"><span class="ms" aria-hidden="true">menu_book</span></span><span>Send ID documents securely<small>3 min read</small></span></a>
         </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">

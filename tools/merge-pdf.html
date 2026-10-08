@@ -12,7 +12,7 @@
   <meta property="og:title" content="Merge PDF Files Online, Free and Private | Memento Tools">
   <meta property="og:description" content="Merge PDF files into one, free and private. Add PDFs and images, drag them into order, and download a single PDF. Pages aren't re-compressed, and nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/merge-pdf">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-merge-pdf.jpg?v=tmlb0d">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-merge-pdf.jpg?v=tmlbpc">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Merge PDF Files Online, Free and Private | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Merge PDF Files Online, Free and Private | Memento Tools">
   <meta name="twitter:description" content="Merge PDF files into one, free and private. Add PDFs and images, drag them into order, and download a single PDF. Pages aren't re-compressed, and nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-merge-pdf.jpg?v=tmlb0d">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-merge-pdf.jpg?v=tmlbpc">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Merge PDF","item":"https://mementoapp.online/tools/merge-pdf"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I merge PDF files into one?","acceptedAnswer":{"@type":"Answer","text":"Add the PDFs (select several at once or drag them in), put them in order, and tap Merge PDF. Your merged file downloads as a single PDF."}},{"@type":"Question","name":"Will the quality change?","acceptedAnswer":{"@type":"Answer","text":"No. Pages are copied exactly as they are, without re-compressing, so text stays sharp and selectable and images keep their quality."}},{"@type":"Question","name":"Can I merge images with PDFs?","acceptedAnswer":{"@type":"Answer","text":"Yes. JPG and PNG images (and WebP) are added as A4 pages, sized to fit, in the position you put them."}},{"@type":"Question","name":"Is there a limit on files or size?","acceptedAnswer":{"@type":"Answer","text":"There's no set limit. Everything happens in your browser, so very large files depend on your device's memory; most phones handle dozens of normal PDFs easily."}},{"@type":"Question","name":"Are my files uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Merging happens inside your browser. Your files never reach our servers or anyone else's."}},{"@type":"Question","name":"Can I merge password-protected PDFs?","acceptedAnswer":{"@type":"Answer","text":"Not yet. Open the protected PDF, remove the password (or print it to a new PDF), then add that copy."}},{"@type":"Question","name":"Is it really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. No account, no watermark, no limits."}}]},{"@type":"WebApplication","name":"Merge PDF","url":"https://mementoapp.online/tools/merge-pdf","inLanguage":"en","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free private tool to merge PDF files and images into one PDF in the browser, keeping pages unchanged.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -672,7 +674,10 @@ body * { visibility: hidden; }
 
       <div class="t-side">
         <div class="ad" data-ad="box" data-slot="" hidden><span class="ad-label">Advertisement</span><div class="ad-box"></div></div>
-        
+        <div class="t-more">
+          <h3>Guides</h3>
+          <a class="t-mini" href="/guides/combine-documents-into-one-pdf"><span class="t-ico sm" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">menu_book</span></span><span>Put several documents into one PDF<small>2 min read</small></span></a>
+        </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">
         <h3>Keep every document in one place</h3>

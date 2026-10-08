@@ -12,7 +12,7 @@
   <meta property="og:title" content="Resize Photo & Signature for Online Forms (px & KB) | Memento Tools">
   <meta property="og:description" content="Resize a photo or signature for online forms: exact pixels under a KB limit, like 300×300 under 100 KB. Change the background to white or blue. Free, and nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/photo-signature-resizer">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-photo-signature-resizer.jpg?v=tmlb0b">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-photo-signature-resizer.jpg?v=tmlbpa">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Resize Photo & Signature for Online Forms (px & KB) | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Resize Photo & Signature for Online Forms (px & KB) | Memento Tools">
   <meta name="twitter:description" content="Resize a photo or signature for online forms: exact pixels under a KB limit, like 300×300 under 100 KB. Change the background to white or blue. Free, and nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-photo-signature-resizer.jpg?v=tmlb0b">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-photo-signature-resizer.jpg?v=tmlbpa">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Photo & signature resizer","item":"https://mementoapp.online/tools/photo-signature-resizer"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What photo and signature size do online forms ask for?","acceptedAnswer":{"@type":"Answer","text":"It depends on the form. Many application sites ask for a square photo such as 300×300 pixels under 100 KB and a signature around 300×80 pixels under 60 KB, while others want different sizes. Check the instructions, and use Custom size to set the exact width, height and KB limit."}},{"@type":"Question","name":"Can I change my photo background to white or blue?","acceptedAnswer":{"@type":"Answer","text":"Yes. After adding your photo, pick White, Light blue, Blue, Light grey or any colour under Background. The tool finds you in the photo and replaces everything behind you, right on your device. If a spot is missed, use Fix edges: Erase removes leftover background and Restore brings back anything that was cut off. The first time, the background tool downloads about 16 MB; after that it is saved in your browser."}},{"@type":"Question","name":"Is my picture uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. All the resizing happens inside your browser. Your picture never reaches our servers or anyone else's."}},{"@type":"Question","name":"Does it work on a phone?","acceptedAnswer":{"@type":"Answer","text":"Yes. Open it in your phone's browser and pick a photo from your gallery or take a new one. You can pinch with two fingers to zoom."}},{"@type":"Question","name":"Where do I find the downloaded file?","acceptedAnswer":{"@type":"Answer","text":"Usually in your phone's or computer's Downloads folder, named photo-300x300.jpg or signature-300x80.jpg."}},{"@type":"Question","name":"Why does my photo look blurry after resizing?","acceptedAnswer":{"@type":"Answer","text":"If the original is blurry or very small, the result will be too. Use a sharp photo taken in good light."}},{"@type":"Question","name":"Is it really free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free. No account or sign-in needed."}}]},{"@type":"WebApplication","name":"Photo & signature resizer","url":"https://mementoapp.online/tools/photo-signature-resizer","inLanguage":"en","applicationCategory":"MultimediaApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free tool to resize photos and signatures to exact pixel sizes under a KB limit for online forms, and change the photo background.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -707,6 +709,8 @@ body * { visibility: hidden; }
         <div class="t-more">
           <h3>Guides</h3>
           <a class="t-mini" href="/guides/passport-photo-size-by-country"><span class="t-ico sm" style="--c:#5ab8ff"><span class="ms" aria-hidden="true">menu_book</span></span><span>Passport photo size by country<small>5 min read</small></span></a>
+          <a class="t-mini" href="/guides/make-a-photo-smaller-in-kb"><span class="t-ico sm" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">menu_book</span></span><span>Make a photo smaller in KB<small>3 min read</small></span></a>
+          <a class="t-mini" href="/guides/calculate-age-for-age-limit"><span class="t-ico sm" style="--c:#ffb547"><span class="ms" aria-hidden="true">menu_book</span></span><span>Work out your age for an age limit<small>3 min read</small></span></a>
         </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">

@@ -12,7 +12,7 @@
   <meta property="og:title" content="Check if a PDF or Photo Has Been Edited, Free | Memento Tools">
   <meta property="og:description" content="Check if a PDF or photo has been edited: later saves, editing software, date gaps, mismatched fonts marked on the page, and an error level analysis heatmap for photos. Free, nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/tamper-check">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-tamper-check.jpg?v=tmlb0d">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-tamper-check.jpg?v=tmlbpc">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Check if a PDF or Photo Has Been Edited, Free | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Check if a PDF or Photo Has Been Edited, Free | Memento Tools">
   <meta name="twitter:description" content="Check if a PDF or photo has been edited: later saves, editing software, date gaps, mismatched fonts marked on the page, and an error level analysis heatmap for photos. Free, nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-tamper-check.jpg?v=tmlb0d">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-tamper-check.jpg?v=tmlbpc">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Document tamper check","item":"https://mementoapp.online/tools/tamper-check"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How can I tell if a PDF has been edited?","acceptedAnswer":{"@type":"Answer","text":"Choose the PDF here. The tool looks for later saves inside the file, editing software in its details, a change date long after the creation date, words in a different font from the rest, extra copies of the same font, and marks added on top of the page."}},{"@type":"Question","name":"Can it prove a document is fake?","acceptedAnswer":{"@type":"Answer","text":"No tool can. It shows the traces editing usually leaves. A clean result is a good sign but not proof, and a warning can have an innocent cause, like a form being filled in. Confirm important documents with whoever issued them."}},{"@type":"Question","name":"How do I check if a photo has been edited?","acceptedAnswer":{"@type":"Answer","text":"Choose the photo. The tool reads its hidden details (camera, editing software, dates) and makes an error level analysis heatmap, where pasted or retouched areas often look different from the rest of the picture."}},{"@type":"Question","name":"What is error level analysis?","acceptedAnswer":{"@type":"Answer","text":"The photo is saved again as a JPEG and compared with the original. Parts that were edited or pasted in usually compress differently, so they glow brighter or darker than similar surfaces nearby."}},{"@type":"Question","name":"Why are there no camera details in my photo?","acceptedAnswer":{"@type":"Answer","text":"Screenshots, messaging apps and most websites strip them. On its own, missing details don't mean the photo was edited."}},{"@type":"Question","name":"Is my document uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Everything is checked inside your browser, so it's safe to use with bank statements and other private papers."}}]},{"@type":"WebApplication","name":"Document tamper check","url":"https://mementoapp.online/tools/tamper-check","inLanguage":"en","applicationCategory":"SecurityApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free tool to check if a PDF or photo has been edited: incremental saves, editing software, font mismatches and error level analysis.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -661,6 +663,7 @@ body * { visibility: hidden; }
         <div class="t-more">
           <h3>Guides</h3>
           <a class="t-mini" href="/guides/spot-a-fake-bank-statement"><span class="t-ico sm" style="--c:#8b7bff"><span class="ms" aria-hidden="true">menu_book</span></span><span>How to spot a fake bank statement<small>4 min read</small></span></a>
+          <a class="t-mini" href="/guides/check-contract-changes-before-signing"><span class="t-ico sm" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">menu_book</span></span><span>Check a contract before you sign<small>3 min read</small></span></a>
         </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">

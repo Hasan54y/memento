@@ -12,7 +12,7 @@
   <meta property="og:title" content="Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools">
   <meta property="og:description" content="Check if your passport is valid for your trip: the 6-month rule, Schengen's 3-month rule and more, with days to spare and when to renew. Free.">
   <meta property="og:url" content="https://mementoapp.online/tools/passport-validity">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-passport-validity.jpg?v=tmlb0d">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-passport-validity.jpg?v=tmlbpd">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools">
   <meta name="twitter:description" content="Check if your passport is valid for your trip: the 6-month rule, Schengen's 3-month rule and more, with days to spare and when to renew. Free.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-passport-validity.jpg?v=tmlb0d">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-passport-validity.jpg?v=tmlbpd">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Passport validity checker","item":"https://mementoapp.online/tools/passport-validity"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the 6-month passport rule?","acceptedAnswer":{"@type":"Answer","text":"Many countries only let you in if your passport is still valid for at least 6 months, counted from the day you arrive (or, for some, from the day you leave). If it has less time left, you can be refused boarding or entry, even with a visa."}},{"@type":"Question","name":"How long must my passport be valid for Europe (Schengen)?","acceptedAnswer":{"@type":"Answer","text":"At least 3 months beyond the day you plan to leave the Schengen area, and the passport must have been issued within the last 10 years. Enter the issue date to check both."}},{"@type":"Question","name":"Do I need 6 months for the UK, Canada or Australia?","acceptedAnswer":{"@type":"Answer","text":"Usually not: for visitors, these countries generally require the passport to be valid for the whole stay. Rules can differ by nationality and visa, so confirm before travelling."}},{"@type":"Question","name":"What about the United States?","acceptedAnswer":{"@type":"Answer","text":"The general rule is 6 months beyond your stay, but citizens of many countries are exempt and only need the passport valid for the length of the stay. Check whether your country is on the exemption list."}},{"@type":"Question","name":"When should I renew my passport?","acceptedAnswer":{"@type":"Answer","text":"A good habit is to start about 9 months before it expires. That keeps you clear of 6-month rules and leaves time for processing."}},{"@type":"Question","name":"Is this official advice?","acceptedAnswer":{"@type":"Answer","text":"No. It applies the common rules for visitors to help you plan, but entry rules change and depend on your nationality and visa. Always confirm with the embassy or your airline."}}]},{"@type":"WebApplication","name":"Passport validity checker","url":"https://mementoapp.online/tools/passport-validity","inLanguage":"en","applicationCategory":"TravelApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free passport validity checker for the 6-month and Schengen 3-month rules, with days to spare and the date to renew.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -660,7 +662,10 @@ body * { visibility: hidden; }
 
       <div class="t-side">
         <div class="ad" data-ad="box" data-slot="" hidden><span class="ad-label">Advertisement</span><div class="ad-box"></div></div>
-        
+        <div class="t-more">
+          <h3>Guides</h3>
+          <a class="t-mini" href="/guides/passport-six-month-rule"><span class="t-ico sm" style="--c:#8b7bff"><span class="ms" aria-hidden="true">menu_book</span></span><span>The six-month passport rule<small>3 min read</small></span></a>
+        </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">
         <h3>Keep every document in one place</h3>

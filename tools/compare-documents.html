@@ -12,7 +12,7 @@
   <meta property="og:title" content="Compare Two Documents: PDF, Word & Text Diff, Free | Memento Tools">
   <meta property="og:description" content="Compare two documents for free: PDF, Word (.docx) or text. See every added and removed word highlighted, jump between changes and print a report. Nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/compare-documents">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-compare-documents.jpg?v=tmlb0c">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-compare-documents.jpg?v=tmlbpc">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Compare Two Documents: PDF, Word & Text Diff, Free | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Compare Two Documents: PDF, Word & Text Diff, Free | Memento Tools">
   <meta name="twitter:description" content="Compare two documents for free: PDF, Word (.docx) or text. See every added and removed word highlighted, jump between changes and print a report. Nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-compare-documents.jpg?v=tmlb0c">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-compare-documents.jpg?v=tmlbpc">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Compare documents","item":"https://mementoapp.online/tools/compare-documents"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I compare two PDF files?","acceptedAnswer":{"@type":"Answer","text":"Choose the original PDF on the left and the new one on the right. The tool reads the text from both and highlights every word that was added or removed."}},{"@type":"Question","name":"Can I compare Word documents?","acceptedAnswer":{"@type":"Answer","text":"Yes, .docx files work, and you can compare a Word file with a PDF or with pasted text. Old .doc files need saving as .docx first."}},{"@type":"Question","name":"Why does it say there's no text in my PDF?","acceptedAnswer":{"@type":"Answer","text":"Scanned PDFs are images of pages, without real text. Compare the original digital files, or paste the text instead."}},{"@type":"Question","name":"Does formatting count as a change?","acceptedAnswer":{"@type":"Answer","text":"No. Only the words are compared. Bold, fonts and layout aren't, and with Ignore spacing on, line breaks aren't either."}},{"@type":"Question","name":"Are my documents uploaded?","acceptedAnswer":{"@type":"Answer","text":"No. Both documents are read and compared inside your browser. Nothing reaches our servers or anyone else's."}},{"@type":"Question","name":"Is there a size limit?","acceptedAnswer":{"@type":"Answer","text":"Long documents work fine. Two completely different documents are refused, because a comparison wouldn't be meaningful."}}]},{"@type":"WebApplication","name":"Compare documents","url":"https://mementoapp.online/tools/compare-documents","inLanguage":"en","applicationCategory":"BusinessApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free tool to compare two documents (PDF, Word .docx or text) and highlight every added and removed word.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -672,7 +674,10 @@ body * { visibility: hidden; }
 
       <div class="t-side">
         <div class="ad" data-ad="box" data-slot="" hidden><span class="ad-label">Advertisement</span><div class="ad-box"></div></div>
-        
+        <div class="t-more">
+          <h3>Guides</h3>
+          <a class="t-mini" href="/guides/check-contract-changes-before-signing"><span class="t-ico sm" style="--c:#ff6b6b"><span class="ms" aria-hidden="true">menu_book</span></span><span>Check a contract before you sign<small>3 min read</small></span></a>
+        </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">
         <h3>Keep every document in one place</h3>

@@ -802,7 +802,7 @@ page("tools/index", "Free tools",
     <section class="t-section">
       <div class="t-section-head"><h2>Guides</h2><a class="t-count" href="/guides/">All guides</a></div>
       <div class="g-grid">
-        ${GUIDES.map((g) => guideCard(g, "h3")).join("\n        ")}
+        ${GUIDES.slice(0, 6).map((g) => guideCard(g, "h3")).join("\n        ")}
       </div>
     </section>
 

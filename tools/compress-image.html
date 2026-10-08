@@ -12,7 +12,7 @@
   <meta property="og:title" content="Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools">
   <meta property="og:description" content="Compress JPG, PNG and WebP images for free: choose quality or a target size like 100 KB, resize, convert format, and download all as a ZIP. Nothing is uploaded.">
   <meta property="og:url" content="https://mementoapp.online/tools/compress-image">
-  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-compress-image.jpg?v=tmlb0c">
+  <meta property="og:image" content="https://mementoapp.online/assets/og/tools-compress-image.jpg?v=tmlbpb">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools">
@@ -20,7 +20,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools">
   <meta name="twitter:description" content="Compress JPG, PNG and WebP images for free: choose quality or a target size like 100 KB, resize, convert format, and download all as a ZIP. Nothing is uploaded.">
-  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-compress-image.jpg?v=tmlb0c">
+  <meta name="twitter:image" content="https://mementoapp.online/assets/og/tools-compress-image.jpg?v=tmlbpb">
   
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mementoapp.online/#org","name":"HM Dev Studio","url":"https://mementoapp.online/","logo":"https://mementoapp.online/assets/logo.svg","email":"admin@mementoapp.online","sameAs":["https://www.trustpilot.com/review/mementoapp.online","https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"]},{"@type":"WebSite","@id":"https://mementoapp.online/#site","name":"Memento","url":"https://mementoapp.online/","publisher":{"@id":"https://mementoapp.online/#org"},"inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://mementoapp.online/"},{"@type":"ListItem","position":2,"name":"Free tools","item":"https://mementoapp.online/tools/"},{"@type":"ListItem","position":3,"name":"Compress Image","item":"https://mementoapp.online/tools/compress-image"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I compress an image to 100 KB?","acceptedAnswer":{"@type":"Answer","text":"Add the image, choose Target size and enter 100 (or tap 100 KB). The tool keeps the best quality that fits under 100 KB, and makes the picture smaller in pixels only if it has to."}},{"@type":"Question","name":"Will compressing make my photo look worse?","acceptedAnswer":{"@type":"Answer","text":"At quality 70–85 most people can't see a difference, while the file is usually 50–80% smaller. Very small targets can make photos look soft or blocky, so use the largest size you're allowed."}},{"@type":"Question","name":"Can I compress many images at once?","acceptedAnswer":{"@type":"Answer","text":"Yes. Add as many as you like; the same settings apply to all, and you can download them together as a ZIP."}},{"@type":"Question","name":"Why is my PNG still big?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, so it barely shrinks without resizing. Choose JPG or WebP for photos, or set a maximum width/height."}},{"@type":"Question","name":"Does it remove location data from photos?","acceptedAnswer":{"@type":"Answer","text":"Yes. The compressed images are newly encoded, so camera metadata such as GPS location isn't carried over."}},{"@type":"Question","name":"Are my images uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Compression happens inside your browser. Your images never reach our servers or anyone else's."}},{"@type":"Question","name":"Is it really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. No account, no watermark, no limits."}}]},{"@type":"WebApplication","name":"Compress Image","url":"https://mementoapp.online/tools/compress-image","inLanguage":"en","applicationCategory":"MultimediaApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Free tool to compress JPG, PNG and WebP images by quality or to a target size such as 100 KB, with resizing, format conversion and ZIP download.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://mementoapp.online/#org"}}]}</script>
   <meta name="google-adsense-account" content="ca-pub-9066794566087802">
@@ -549,12 +549,14 @@ body * { visibility: hidden; }
 .g-body li { margin: 7px 0; }
 .g-body a:not(.g-tool) { color: var(--brand-ink); }
 .g-body .ad { margin: 26px 0; }
+.g-quote { padding: 12px 16px; border-left: 3px solid var(--brand-ink); background: var(--card); border-radius: 0 10px 10px 0; font-weight: 600; }
 .g-small { font-size: 14.5px; color: var(--muted); }
 .g-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
 .g-table table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; min-width: 560px; }
 .g-table th, .g-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .g-table th { background: var(--bg); font-weight: 700; }
 .g-table tr:last-child td { border-bottom: 0; }
+.g-table table:not(:has(th:nth-child(3))) { min-width: 0; }
 .g-tool { display: flex; align-items: center; gap: 14px; margin: 20px 0 26px; padding: 16px; border: 1px solid #c4eed2; background: var(--brand-soft); border-radius: 14px; text-decoration: none; color: var(--text); line-height: 1.45; }
 .g-tool b { display: block; }
 .g-tool small { display: block; color: var(--soft); font-size: 14px; }
@@ -684,7 +686,10 @@ body * { visibility: hidden; }
 
       <div class="t-side">
         <div class="ad" data-ad="box" data-slot="" hidden><span class="ad-label">Advertisement</span><div class="ad-box"></div></div>
-        
+        <div class="t-more">
+          <h3>Guides</h3>
+          <a class="t-mini" href="/guides/make-a-photo-smaller-in-kb"><span class="t-ico sm" style="--c:#2dd4bf"><span class="ms" aria-hidden="true">menu_book</span></span><span>Make a photo smaller in KB<small>3 min read</small></span></a>
+        </div>
         <aside class="t-promo">
         <img src="/assets/logo.svg" alt="" width="40" height="42">
         <h3>Keep every document in one place</h3>
