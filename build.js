@@ -615,6 +615,8 @@ SEO_TITLES["tools/compress-pdf"] = "Compress PDF to 100 KB, 200 KB or 1 MB, Free
 SEO_TITLES["tools/passport-photo"] = "Passport & Visa Photo Maker: 2×2 in, 35×45 mm, Free | Memento Tools";
 SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Size, Free | Memento Tools";
 SEO_TITLES["tools/id-copy"] = "ID Card Copy: Front & Back on One Page, Real Size | Memento Tools";
+SEO_TITLES["tools/encrypt-files"] = "Encrypt Files with a Password, Free & Private | Memento Tools";
+SEO_TITLES["tools/compare-documents"] = "Compare Two Documents: PDF, Word & Text Diff, Free | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
 SEO_TITLES["tools/passport-validity"] = "Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools";
@@ -624,6 +626,7 @@ SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Imag
 const TOOL_CATS = [
   ["photo", "Photo", "image"],
   ["pdf", "PDF", "picture_as_pdf"],
+  ["docs", "Documents", "folder_open"],
   ["calc", "Calculators", "calculate"],
 ];
 const TOOLS = [
@@ -636,7 +639,13 @@ const TOOLS = [
   { slug: "compress-image", cat: "photo", icon: "photo_size_select_small", color: C.mint, title: "Compress Image",
     text: "Make JPG, PNG and WebP images smaller, or under a target like 100 KB. Resize and convert too, many at once.",
     keywords: "compress image photo picture jpg jpeg png webp reduce size kb mb resize convert optimize shrink" },
-  { slug: "id-copy", cat: "pdf", icon: "id_card", color: C.amber, title: "ID Copy Maker",
+  { slug: "encrypt-files", cat: "docs", icon: "enhanced_encryption", color: C.green, title: "Encrypted document kit",
+    text: "Lock files and notes with a password into one file that opens in any browser. Keep it, or send it safely.",
+    keywords: "encrypt password protect lock files documents pdf photos secure share email whatsapp aes emergency kit vault" },
+  { slug: "compare-documents", cat: "docs", icon: "difference", color: C.coral, title: "Compare documents",
+    text: "See exactly what changed between two versions of a PDF, Word or text document, word by word.",
+    keywords: "compare diff two documents pdf word docx text versions changes contract difference checker" },
+  { slug: "id-copy", cat: "docs", icon: "id_card", color: C.amber, title: "ID Copy Maker",
     text: "Front and back of an ID card on one page at real size, straightened, with a safe-copy watermark.",
     keywords: "id card copy front back one page photocopy driving licence license national id residence permit passport copy watermark a4 print real size" },
   { slug: "merge-pdf", cat: "pdf", icon: "merge", color: C.coral, title: "Merge PDF",
@@ -1351,6 +1360,167 @@ toolPage(tool("compress-image"), {
   scripts: ["pdf-lite.js", "compress-image.js"],
   appCategory: "MultimediaApplication",
   schemaDesc: "Free tool to compress JPG, PNG and WebP images by quality or to a target size such as 100 KB, with resizing, format conversion and ZIP download.",
+});
+
+// Encrypted document kit
+toolPage(tool("encrypt-files"), {
+  h1: "Encrypted Document Kit",
+  lead: "Lock important files and notes with a password into a single file. It opens in any web browser, even offline, and only someone with the password can see what's inside.",
+  description: "Encrypt files with a password for free: PDFs, photos and documents become one locked file that opens in any browser. AES-256 encryption on your device; nothing is uploaded.",
+  workspace: `    <div class="tool" id="vault">
+      <div class="modes" role="tablist" aria-label="Create or open">
+        <button type="button" role="tab" data-mode="create" aria-selected="true">${icon("lock")}Create a kit</button>
+        <button type="button" role="tab" data-mode="open" aria-selected="false">${icon("lock_open")}Open a kit</button>
+      </div>
+      <div class="create">
+        <div class="tool-grid">
+          <div class="stage">
+            <label class="drop" id="drop">
+              ${icon("note_add")}
+              <strong>Add the files to lock</strong>
+              <span class="sub">Passport and ID copies, certificates, insurance, anything. Any file type.</span>
+              <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select files</span>
+              <input id="file" type="file" multiple>
+            </label>
+            <div class="pages" hidden>
+              <div class="pages-head"><b id="p-count">0 files</b><span class="pages-actions"><button type="button" class="btn btn-ghost btn-sm" id="add-more">${icon("add")}Add more</button></span></div>
+              <ol class="ilist" id="ilist"></ol>
+            </div>
+            <label class="field notes-field">Notes <small>(optional, also locked)</small><textarea id="notes" rows="4" placeholder="e.g. Blood group, allergies, emergency contacts, insurance policy number…"></textarea></label>
+            <template>${icon("close")}${icon("description")}${icon("image")}</template>
+            <p class="err" id="err" role="alert" hidden></p>
+          </div>
+          <div class="result">
+            <h3>${icon("key")} Password</h3>
+            <div class="fields">
+              <label class="field wide">Kit name <small>(visible without password)</small><input id="kit-title" type="text" maxlength="60" placeholder="Document kit"></label>
+              <label class="field wide">Password<input id="pw" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters"></label>
+              <div class="meter wide" id="meter" data-level="0"><span></span></div>
+              <small class="meter-text wide" id="meter-text"></small>
+              <label class="field wide">Repeat password<input id="pw2" type="password" autocomplete="new-password"></label>
+              <small class="bad-text wide" id="pw-match" hidden>The passwords don't match.</small>
+              <label class="check wide"><input id="show-pw" type="checkbox">Show password</label>
+              <label class="field wide">Password hint <small>(optional, visible)</small><input id="hint" type="text" maxlength="80" placeholder="Something only you would understand"></label>
+            </div>
+            <ul class="facts">
+              <li><span>Files</span><b id="f-files">—</b></li>
+              <li><span>Kit size</span><b id="f-size">—</b></li>
+            </ul>
+            <p class="bg-status" id="status" hidden></p>
+            <button type="button" class="btn btn-primary" id="make" disabled>${icon("lock")}Create encrypted kit</button>
+            <a class="btn btn-primary" id="dl" href="#" hidden>${icon("download")}Download kit</a>
+            <p class="note">${icon("warning")} If you forget the password, nobody can open the kit, not even us. Store it somewhere safe.</p>
+          </div>
+        </div>
+      </div>
+      <div class="open" hidden>
+        <label class="drop compact-open" id="open-drop">
+          ${icon("lock_open")}
+          <strong>Choose a kit file (.html)</strong>
+          <span class="sub">Use this if a phone won't open the kit by itself. It's unlocked here, on your device.</span>
+          <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select kit</span>
+          <input id="open-file" type="file" accept=".html,text/html">
+        </label>
+        <p class="err" id="open-err" role="alert" hidden></p>
+        <iframe id="viewer" class="kit-viewer" title="Locked kit" sandbox="allow-scripts allow-forms allow-downloads allow-popups allow-popups-to-escape-sandbox" hidden></iframe>
+      </div>
+      <p class="privacy-note">${icon("lock")} Files are encrypted on your device with AES-256 before anything is saved. Nothing is uploaded.</p>
+    </div>`,
+  steps: [
+    ["Add files and notes.", "Pick the documents to protect: ID and passport copies, certificates, insurance, medical papers. Add notes like emergency contacts if you like."],
+    ["Choose a strong password.", "Use a few unrelated words or a long phrase. Enter it twice."],
+    ["Create and save the kit.", "You get one .html file. Keep it on your phone, a USB stick or in cloud storage, or send it to family."],
+    ["Open it anywhere.", "Open the file in any web browser and enter the password. If a phone won't open it, use Open a kit on this page."],
+  ],
+  tips: [
+    ["key", "Share the password separately.", "Send the kit by email or chat, but tell the password in person or by phone."],
+    ["family_restroom", "An emergency kit for family.", "Put copies of everyone's IDs, insurance and medical info in one kit and give it to someone you trust."],
+    ["cloud_upload", "Keep two copies.", "One on your phone and one in cloud storage, so a lost phone doesn't mean lost papers."],
+    ["update", "Update it now and then.", "Make a new kit when a document is renewed; old kits keep working with their own password."],
+  ],
+  faqs: [
+    ["How secure is the kit?", "Files are encrypted with AES-256-GCM, with a key made from your password using PBKDF2-SHA256 and 600,000 rounds, all by your browser's built-in Web Crypto. Without the password the contents can't be read. A strong password matters most."],
+    ["Can you recover my password?", "No. We never see your files or your password, so nobody can recover them. Write the password down somewhere safe."],
+    ["What does the person receiving it need?", "Just a web browser. They open the .html file and type the password. No app or account is needed."],
+    ["Why won't my phone open the file?", "Some phones show HTML files as text or won't run them from the Files app. Open mementoapp.online/tools/encrypt-files, choose Open a kit and pick the file: it's unlocked on your device and nothing is uploaded."],
+    ["Can I email or WhatsApp the kit?", "Yes. It's a normal file. Some email services limit attachment size, so keep big kits under about 20 MB, or share through cloud storage."],
+    ["What is visible without the password?", "Only the kit name and the hint, if you add them. File names, notes and the files themselves are all encrypted."],
+    ["Is it free?", "Yes, completely free, with no account."],
+  ],
+  scripts: ["encrypt-kit.js"],
+  appCategory: "SecurityApplication",
+  schemaDesc: "Free tool to encrypt files and notes with a password (AES-256-GCM) into a single file that opens in any browser.",
+});
+
+// Compare documents
+toolPage(tool("compare-documents"), {
+  h1: "Compare Documents",
+  lead: "Find exactly what changed between two versions of a contract, letter or report. Works with PDF, Word and plain text, and highlights every added and removed word.",
+  description: "Compare two documents for free: PDF, Word (.docx) or text. See every added and removed word highlighted, jump between changes and print a report. Nothing is uploaded.",
+  workspace: `    <div class="tool" id="compare">
+      <div class="cmp-inputs">
+        <div class="cmp-slot" data-slot="a">
+          <h3>${icon("history")} Original</h3>
+          <label class="drop cmp-drop">${icon("upload_file")}<strong>Choose a file</strong><span class="sub">PDF, Word (.docx) or text</span>
+            <input type="file" accept=".pdf,.docx,.txt,.md,.csv,.html,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
+          <button type="button" class="linkish" data-paste>or paste text</button>
+          <textarea rows="6" hidden placeholder="Paste the original text"></textarea>
+          <p class="slot-info" hidden></p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm cmp-swap" id="swap" aria-label="Swap original and changed">${icon("swap_horiz")}</button>
+        <div class="cmp-slot" data-slot="b">
+          <h3>${icon("edit_document")} Changed version</h3>
+          <label class="drop cmp-drop">${icon("upload_file")}<strong>Choose a file</strong><span class="sub">PDF, Word (.docx) or text</span>
+            <input type="file" accept=".pdf,.docx,.txt,.md,.csv,.html,application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
+          <button type="button" class="linkish" data-paste>or paste text</button>
+          <textarea rows="6" hidden placeholder="Paste the changed text"></textarea>
+          <p class="slot-info" hidden></p>
+        </div>
+      </div>
+      <div class="cmp-options">
+        <label class="check"><input id="ign-space" type="checkbox" checked>Ignore spacing and line breaks</label>
+        <label class="check"><input id="ign-case" type="checkbox">Ignore capital letters</label>
+      </div>
+      <p class="err" id="err" role="alert" hidden></p>
+      <div class="cmp-result" hidden>
+        <div class="cmp-bar">
+          <span id="cmp-summary"></span>
+          <span class="cmp-nav">
+            <label class="check"><input id="only-changes" type="checkbox">Only changes</label>
+            <button type="button" class="btn btn-ghost btn-sm" id="prev" aria-label="Previous change">${icon("arrow_upward")}</button>
+            <span id="pos" class="cmp-pos"></span>
+            <button type="button" class="btn btn-ghost btn-sm" id="next">${icon("arrow_downward")}Next change</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="print">${icon("print")}Print</button>
+          </span>
+        </div>
+        <div class="cmp-legend"><del>removed</del> <ins>added</ins></div>
+        <div class="cmp-doc" id="cmp-doc"></div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your documents are never uploaded. They're read and compared inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Add the original.", "Choose the first version (PDF, Word or text), or paste its text."],
+    ["Add the changed version.", "Choose the newer version the same way. The comparison appears straight away."],
+    ["Review the changes.", "Removed words are red and struck through, added words are green. Use Next change to jump through them, or tick Only changes."],
+    ["Save a report.", "Print it, or choose Save as PDF in the print dialog, to keep a record."],
+  ],
+  tips: [
+    ["gavel", "Before you sign.", "Compare the contract you agreed with the one sent for signing; small edits are easy to miss."],
+    ["format_line_spacing", "Different layouts are fine.", "With Ignore spacing on, re-wrapped lines and page breaks don't show up as changes."],
+    ["document_scanner", "Scanned PDFs need text.", "A scanned PDF is only pictures of text, so there's nothing to compare. Use the digital version."],
+    ["swap_horiz", "Mixed up the order?", "Tap the swap button to switch the original and the changed version."],
+  ],
+  faqs: [
+    ["How do I compare two PDF files?", "Choose the original PDF on the left and the new one on the right. The tool reads the text from both and highlights every word that was added or removed."],
+    ["Can I compare Word documents?", "Yes, .docx files work, and you can compare a Word file with a PDF or with pasted text. Old .doc files need saving as .docx first."],
+    ["Why does it say there's no text in my PDF?", "Scanned PDFs are images of pages, without real text. Compare the original digital files, or paste the text instead."],
+    ["Does formatting count as a change?", "No. Only the words are compared. Bold, fonts and layout aren't, and with Ignore spacing on, line breaks aren't either."],
+    ["Are my documents uploaded?", "No. Both documents are read and compared inside your browser. Nothing reaches our servers or anyone else's."],
+    ["Is there a size limit?", "Long documents work fine. Two completely different documents are refused, because a comparison wouldn't be meaningful."],
+  ],
+  scripts: ["pdf-lite.js", "compare.js"],
+  appCategory: "BusinessApplication",
+  schemaDesc: "Free tool to compare two documents (PDF, Word .docx or text) and highlight every added and removed word.",
 });
 
 // ID Copy Maker

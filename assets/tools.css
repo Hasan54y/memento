@@ -435,3 +435,56 @@ a.t-mini:hover { color: var(--brand-ink); }
 .verdict.bad .ms { color: var(--danger); }
 #pvalid .tool-grid { grid-template-columns: minmax(0, 1fr) 340px; }
 @media (max-width: 860px) { #pvalid .tool-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Encrypted document kit */
+#vault > .modes { margin-bottom: 16px; }
+#vault .drop.compact { display: none; }
+#vault .notes-field { margin-top: 14px; }
+#vault .notes-field textarea, .cmp-slot textarea { width: 100%; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 12px; resize: vertical; }
+.field small { color: var(--muted); font-weight: 500; }
+.i-ico { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 8px; background: #f1f4f2; color: var(--muted); }
+#vault .ilist li { grid-template-columns: 56px minmax(0, 1fr) 32px; }
+.meter { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.meter span { display: block; height: 100%; width: 0; border-radius: 99px; transition: width .2s, background .2s; }
+.meter[data-level="1"] span { width: 25%; background: #d4421d; }
+.meter[data-level="2"] span { width: 50%; background: #e0a100; }
+.meter[data-level="3"] span { width: 75%; background: #4caf50; }
+.meter[data-level="4"] span { width: 100%; background: var(--brand-ink); }
+.meter-text, .bad-text { font-size: 12.5px; color: var(--muted); margin-top: -4px; }
+.bad-text { color: var(--danger); }
+#vault .result .note { margin-top: 12px; }
+.kit-viewer { width: 100%; height: 560px; border: 1px solid var(--line); border-radius: 14px; background: #f4f7f5; margin-top: 12px; }
+/* Compare documents */
+.cmp-inputs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: start; }
+@media (max-width: 760px) { .cmp-inputs { grid-template-columns: 1fr; } .cmp-swap { justify-self: center; } }
+.cmp-slot h3 { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 10px; }
+.cmp-slot h3 .ms { color: var(--brand-ink); }
+.cmp-drop { min-height: 120px; padding: 16px; }
+.cmp-drop > .ms { font-size: 32px; }
+.cmp-slot .linkish { margin-top: 8px; font-size: 14px; }
+.cmp-slot textarea { margin-top: 8px; }
+.slot-info { margin: 8px 0 0; font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot-info b { color: var(--text); }
+.cmp-swap { margin-top: 64px; }
+.cmp-options { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 16px; }
+.cmp-result { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+.cmp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.cmp-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cmp-pos { font-size: 13px; color: var(--muted); min-width: 40px; text-align: center; }
+.cmp-chip { margin-left: 8px; padding: 2px 8px; border-radius: 99px; font-size: 13px; font-weight: 700; }
+.cmp-chip.add { background: #e3f7e9; color: #0a6b2f; }
+.cmp-chip.del { background: #fde8e6; color: #9b1c12; }
+.same { color: var(--brand-ink); }
+.cmp-legend { margin: 10px 0; font-size: 13px; color: var(--muted); }
+.cmp-doc { max-height: 70vh; overflow: auto; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: #fff; white-space: pre-wrap; word-wrap: break-word; font-size: 15px; line-height: 1.7; }
+.cmp-doc del, .cmp-legend del { background: #fde8e6; color: #9b1c12; text-decoration: line-through; text-decoration-color: rgba(155, 28, 18, .6); border-radius: 3px; }
+.cmp-doc ins, .cmp-legend ins { background: #d9f5e2; color: #0a5a28; text-decoration: none; border-radius: 3px; }
+.cmp-change.on { outline: 2px solid var(--brand-ink); outline-offset: 2px; border-radius: 3px; }
+.cmp-gap { display: block; margin: 8px 0; padding: 4px 10px; border-radius: 8px; background: var(--bg); color: var(--muted); font-size: 13px; text-align: center; }
+@media print {
+  body * { visibility: hidden; }
+  .cmp-result, .cmp-result * { visibility: visible; }
+  .cmp-result { position: absolute; left: 0; top: 0; width: 100%; border: 0; }
+  .cmp-nav { display: none; }
+  .cmp-doc { max-height: none; overflow: visible; border: 0; }
+}

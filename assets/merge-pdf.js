@@ -35,7 +35,7 @@
           const first = (await doc.getPage(1)).getViewport({ scale: 1 });
           const { canvas } = await MiniPDF.renderPage(doc, 1, 220 / Math.max(first.width, first.height));
           items.push({ id: nextId++, file, kind: "pdf", pages: doc.numPages, thumb: canvas.toDataURL("image/jpeg", 0.8) });
-          doc.destroy();
+          MiniPDF.closePdf(doc);
         } else if (isImg(file)) {
           items.push({ id: nextId++, file, kind: "image", pages: 1, thumb: await imageThumb(file) });
         } else bad.push(`${file.name} (not a PDF or image)`);

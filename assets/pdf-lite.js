@@ -121,6 +121,11 @@
     }).promise;
   }
 
+  // Free a document's memory and worker. pdf.js 6 has destroy() on the loading task, not the document.
+  function closePdf(doc) {
+    try { const t = doc && (doc.loadingTask || doc); if (t && typeof t.destroy === "function") t.destroy(); } catch { /* already closed */ }
+  }
+
   // One page onto a white canvas at `scale` (1 = 72 DPI)
   async function renderPage(doc, n, scale) {
     const page = await doc.getPage(n);
@@ -167,7 +172,7 @@
     return groups.length ? { groups } : { error: "Type the pages to split out, like 1-3, 5, 8-end." };
   }
 
-  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES, openPdf, renderPage, loadPdfLib, parseRanges };
+  window.MiniPDF = { build, jpeg, whiten, grayscale, makePdf, SIZES, openPdf, closePdf, renderPage, loadPdfLib, parseRanges };
 
   // ---------- MiniZip: a "stored" ZIP (JPG/PNG are already compressed) ----------
   const CRC = new Uint32Array(256);

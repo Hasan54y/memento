@@ -22,7 +22,7 @@
     if (f.type !== "application/pdf" && !/\.pdf$/i.test(f.name)) { showError("Choose a PDF file."); return; }
     setStatus("Opening the PDF…");
     try {
-      if (doc) { doc.destroy(); doc = null; }
+      if (doc) { MiniPDF.closePdf(doc); doc = null; }
       doc = await MiniPDF.openPdf(f);
       file = f;
       fName.textContent = f.name;
