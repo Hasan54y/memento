@@ -4,6 +4,7 @@
 // Run: node build.js
 const fs = require("fs");
 const path = require("path");
+const GUIDES = require("./guides-content.js"); // articles at /guides/
 
 const SITE = "https://mementoapp.online";
 const EMAIL = "admin@mementoapp.online";
@@ -99,6 +100,7 @@ function jsonLd(slug, title, url, faqs = [], extra = []) {
   if (slug !== "index" && slug !== "404") {
     const crumbs = [["Home", `${SITE}/`]];
     if (slug.startsWith("tools/") && slug !== "tools/index") crumbs.push(["Free tools", urlOf("tools/index")]);
+    if (slug.startsWith("guides/") && slug !== "guides/index") crumbs.push(["Guides", urlOf("guides/index")]);
     crumbs.push([title, url]);
     graph.push({ "@type": "BreadcrumbList", itemListElement: crumbs.map(([name, item], i) => ({ "@type": "ListItem", position: i + 1, name, item })) });
   }
@@ -161,7 +163,7 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   ${slug === "404" ? '<meta name="robots" content="noindex">' : ""}
   ${jsonLd(slug, title, url, faqs, schema)}
   <meta name="google-adsense-account" content="${ADSENSE.client}">${adsense ? `
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.client}" crossorigin="anonymous"></script>` : ""}
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ""}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -201,7 +203,7 @@ ${body}
         <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
         <p class="tagline">More than a notepad. Your paperwork, remembered.</p>
       </div>
-      <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a></div>
+      <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Company</h2><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
@@ -731,6 +733,7 @@ ${headTags(p, { themeColor: "#ffffff", css: "tools.css", scripts: ["tools.js", .
     </div>
     <nav class="t-wrap t-cats" aria-label="Tool categories">
       <a href="/tools/" data-cat="all" data-label="All tools"${slug === "tools/index" ? ' class="on"' : ""}>${icon("apps")}All tools</a>${TOOL_CATS.map(catLink).join("")}
+      <a href="/guides/"${cat === "guides" ? ' class="on" aria-current="page"' : ""}>${icon("menu_book")}Guides</a>
     </nav>
   </header>
   <main class="t-wrap">
@@ -742,7 +745,7 @@ ${body}
         <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
         <p>Free tools for everyday paperwork, by HM Dev Studio. Everything runs in your browser, so your files never leave your device.</p>
       </div>
-      <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a></div>
+      <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Memento</h2><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
@@ -751,6 +754,18 @@ ${body}
 </body>
 </html>
 `;
+}
+
+// ---------- Guides ----------
+const readMin = (html) => Math.max(1, Math.round(html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length / 220));
+const longDate = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+const guideCard = (g, h = "h2") => `<a class="g-card" href="/guides/${g.slug}"><span class="t-ico" style="--c:${g.color}">${icon(g.icon)}</span><${h}>${g.h1}</${h}><p>${g.description}</p><span class="g-card-meta">${readMin(g.body)} min read</span></a>`;
+function relatedGuides(slug) {
+  const list = GUIDES.filter((g) => g.tools.includes(slug));
+  return list.length ? `<div class="t-more">
+          <h3>Guides</h3>
+          ${list.map((g) => `<a class="t-mini" href="/guides/${g.slug}"><span class="t-ico sm" style="--c:${g.color}">${icon("menu_book")}</span><span>${g.title}<small>${readMin(g.body)} min read</small></span></a>`).join("\n          ")}
+        </div>` : "";
 }
 
 function memoPromo() {
@@ -782,6 +797,13 @@ page("tools/index", "Free tools",
       </div>
       <p class="t-empty" data-empty hidden>${icon("search_off")} No tools match your search yet. <a href="/contact">Tell us what you need</a>.</p>
       ${adSlot("leader")}
+    </section>
+
+    <section class="t-section">
+      <div class="t-section-head"><h2>Guides</h2><a class="t-count" href="/guides/">All guides</a></div>
+      <div class="g-grid">
+        ${GUIDES.map((g) => guideCard(g, "h3")).join("\n        ")}
+      </div>
     </section>
 
     <section class="t-section">
@@ -861,6 +883,7 @@ ${workspace}
 
       <div class="t-side">
         ${adSlot("box")}
+        ${relatedGuides(t.slug)}
         ${memoPromo()}
         <div class="t-more">
           <h3>More tools</h3>
@@ -2068,6 +2091,61 @@ page("404", "Page not found", "This page doesn't exist.",
 
 // ---------- Share images ----------
 // Main-site pages: [headline, line, app screenshot]. Tools pages use their entry in TOOLS.
+SEO_TITLES["guides/index"] = "Guides: Passport Photos, PDFs, Documents and Digital Legacy | Memento Tools";
+page("guides/index", "Guides",
+  "Plain-language guides to the paperwork our free tools help with: passport photo sizes, getting PDFs under upload limits, checking documents for edits, and leaving your passwords to your family.",
+  `    <section class="t-hero">
+      <h1>Guides</h1>
+      <p>Plain-language help with the paperwork our tools are for. Each guide explains the rules and the reasons, then points you to a free tool that does the fiddly part.</p>
+    </section>
+
+    <section class="t-section">
+      <div class="g-grid">
+        ${GUIDES.map((g) => guideCard(g)).join("\n        ")}
+      </div>
+      ${adSlot("leader")}
+    </section>`, { shell: "tools", cat: "guides" });
+
+for (const g of GUIDES) {
+  const slug = `guides/${g.slug}`, url = urlOf(slug);
+  SEO_TITLES[slug] = g.seo;
+  const toolBox = (s) => { const t = tool(s); return `<a class="g-tool" href="/tools/${s}"><span class="t-ico" style="--c:${t.color}">${icon(t.icon)}</span><span><b>Try it: ${t.title}</b><small>${t.text}</small></span>${icon("arrow_forward")}</a>`; };
+  const body = g.body.trim().replace(/\[\[tool:([a-z-]+)\]\]/g, (_, s) => toolBox(s)).replace(/\[\[ad\]\]/g, adSlot("article"));
+  const more = GUIDES.filter((o) => o !== g);
+  page(slug, g.title, g.description,
+    `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/guides/">Guides</a>${icon("chevron_right")}<span>${esc(g.title)}</span></nav>
+    <div class="t-cols g-cols">
+      <article class="g-article">
+        <header class="g-head">
+          <span class="t-ico big" style="--c:${g.color}">${icon(g.icon)}</span>
+          <h1>${g.h1}</h1>
+          <p class="g-lead">${g.description}</p>
+          <p class="g-meta">By HM Dev Studio · Updated ${longDate(g.updated)} · ${readMin(g.body)} min read</p>
+        </header>
+        <div class="g-body">
+${body}
+        </div>
+      </article>
+
+      <div class="t-side">
+        ${adSlot("box")}
+        <div class="t-more">
+          <h2 class="g-side-h">Tools for this</h2>
+          ${g.tools.map((s) => { const t = tool(s); return `<a class="t-mini" href="/tools/${s}"><span class="t-ico sm" style="--c:${t.color}">${icon(t.icon)}</span><span>${t.title}<small>Open tool</small></span></a>`; }).join("\n          ")}
+        </div>
+        ${memoPromo()}
+        <div class="t-more">
+          <h2 class="g-side-h">More guides</h2>
+          ${more.map((o) => `<a class="t-mini" href="/guides/${o.slug}"><span class="t-ico sm" style="--c:${o.color}">${icon(o.icon)}</span><span>${o.title}<small>${readMin(o.body)} min read</small></span></a>`).join("\n          ")}
+        </div>
+      </div>
+    </div>`, {
+    shell: "tools", cat: "guides",
+    schema: [{ "@type": "Article", headline: g.h1, description: g.description, url, mainEntityOfPage: url, inLanguage: "en",
+      datePublished: g.updated, dateModified: g.updated, image: ogImage(slug), author: { "@id": `${SITE}/#org` }, publisher: { "@id": `${SITE}/#org` } }],
+  });
+}
+
 const OG = {
   index: ["Capture anything. Find it forever.", "Memento reads your receipts, warranties and bills, reminds you before dates expire, and backs it all up.", "screen-home.png"],
   features: ["Everything your paperwork needs.", "Scan, search, reminders, notes, PDF and Excel export, and Google Drive backup.", "screen-ai.png"],
@@ -2086,6 +2164,9 @@ function ogCard(p) {
   if (p.shell === "tools") {
     const t = TOOLS.find((x) => `tools/${x.slug}` === p.slug);
     if (t) return { kind: "tools", title: t.title, sub: t.text, icon: t.icon, color: t.color };
+    const g = GUIDES.find((x) => `guides/${x.slug}` === p.slug);
+    if (g) return { kind: "tools", title: g.h1, sub: g.description, icon: g.icon, color: g.color };
+    if (p.slug === "guides/index") return { kind: "tools", title: "Guides for everyday paperwork", sub: "Passport photo sizes, PDF upload limits, checking documents for edits and more.", icon: "menu_book", color: C.green };
     if (p.slug === "tools/index") return { kind: "tools", title: "Free online tools for everyday paperwork", sub: "Merge, split and compress PDFs, convert images, resize photos for forms and more.", icon: "handyman", color: C.green };
     return { kind: "tools", title: p.title, sub: p.description.split(". ")[0] + ".", icon: "policy", color: C.green };
   }

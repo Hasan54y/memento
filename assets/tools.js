@@ -4,6 +4,16 @@
   if (year) year.textContent = new Date().getFullYear();
 
   // ---------- Ads (Google AdSense) ----------
+  // The AdSense script loads on the visitor's first scroll, tap or key press, so it never slows
+  // down the first paint of a tool. Units queued below wait for it.
+  let adsLoaded = false;
+  const loadAds = () => {
+    if (adsLoaded) return;
+    adsLoaded = true;
+    const s = Object.assign(document.createElement("script"), { async: true, crossOrigin: "anonymous", src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9066794566087802" });
+    document.head.appendChild(s);
+  };
+  ["scroll", "pointerdown", "keydown", "touchstart"].forEach((ev) => addEventListener(ev, loadAds, { once: true, passive: true }));
   // A placement only shows once it has an ad unit (data-slot); AdSense handles consent in Europe.
   document.querySelectorAll("[data-ad]").forEach((slot) => {
     const id = slot.dataset.slot;
