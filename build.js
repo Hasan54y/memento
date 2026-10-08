@@ -201,9 +201,9 @@ ${body}
         <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
         <p class="tagline">More than a notepad. Your paperwork, remembered.</p>
       </div>
-      <div><h4>Product</h4><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a></div>
-      <div><h4>Company</h4><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
-      <div><h4>Legal</h4><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
+      <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a></div>
+      <div><h2>Company</h2><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
+      <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
     <div class="bottom">
       <span>© <span id="year">2026</span> HM Dev Studio</span>
@@ -359,6 +359,7 @@ page("how-it-works", "How it works",
   `    ${pageHero({ eyebrow: "How it works", eyebrowIcon: "tips_and_updates", title: "From photo to <em>organized</em> in seconds.", lead: "No typing, no folders, no spreadsheets. Here's what happens when you add something to Memento." })}
 
     <section>
+      <h2 class="sr-only">The steps</h2>
       <div class="steps four">
         <div class="step glass spot reveal">${icon("login", "step-icon")}<h3>Sign in</h3><p>Create an account with email or continue with Google. Your documents stay tied to you.</p></div>
         <div class="step glass spot reveal">${icon("add_a_photo", "step-icon")}<h3>Capture</h3><p>Tap +, then scan with the camera, import photos, or write a note.</p></div>
@@ -431,6 +432,7 @@ page("reviews", "Reviews",
   `    ${pageHero({ eyebrow: "Reviews", eyebrowIcon: "rate_review", title: "Tell us what you <em>think.</em>", lead: "Good or bad, honest reviews help other people decide and help us build a better Memento." })}
 
     <section>
+      <h2 class="sr-only">Where to share your opinion</h2>
       <div class="grid">
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("rate_review")}</div><h3>Trustpilot</h3><p>Share your honest experience publicly on Trustpilot.</p><div style="margin-top:18px"><div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6ab5020f20b30165e430b08f" data-style-height="52px" data-style-width="100%" data-token="eab3e8b8-be97-44ea-b1a7-c9f49fda1ae9"><a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a></div></div><div class="cta" style="margin-top:14px">${btn(TRUSTPILOT_READ, "Read reviews", "ghost", "", ' target="_blank" rel="noopener"')}</div></article>
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("shop")}</div><h3>Google Play</h3><p>Rate Memento on the Play Store once it's published.</p><div style="margin-top:18px"><span class="badge-soon">${icon("schedule")} Coming soon</span></div></article>
@@ -550,6 +552,7 @@ page("contact", "Contact",
           <p class="hint">Sending opens your email app with the message ready to go to ${EMAIL}.</p>
         </form>
         <div class="side">
+          <h2 class="sr-only">Other ways to reach us</h2>
           <div class="card glass spot reveal"><div class="icon">${icon("mail")}</div><h3>Email us</h3><p><a href="mailto:${EMAIL}">${EMAIL}</a></p></div>
           <div class="card glass spot reveal"><div class="icon" style="--c:${C.mint}">${icon("forum")}</div><h3>From the app</h3><p>Profile → Send feedback or Contact us. Your app version is included automatically.</p></div>
           <a class="card glass spot reveal" href="/faq"><div class="icon" style="--c:${C.sky}">${icon("help")}</div><h3>Quick answers</h3><p>Many questions are already answered in the FAQ.</p></a>
@@ -724,7 +727,7 @@ ${headTags(p, { themeColor: "#ffffff", css: "tools.css", scripts: ["tools.js", .
     <div class="t-wrap t-bar">
       <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
       <form class="t-search" action="/tools/" method="get" role="search">${icon("search")}<input name="q" type="search" placeholder="Search tools…" aria-label="Search tools" autocomplete="off"></form>
-      <a class="t-app" href="/">${icon("smartphone")}<span>Memento app</span></a>
+      <a class="t-app" href="/" aria-label="Memento app">${icon("smartphone")}<span>Memento app</span></a>
     </div>
     <nav class="t-wrap t-cats" aria-label="Tool categories">
       <a href="/tools/" data-cat="all" data-label="All tools"${slug === "tools/index" ? ' class="on"' : ""}>${icon("apps")}All tools</a>${TOOL_CATS.map(catLink).join("")}
@@ -739,9 +742,9 @@ ${body}
         <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
         <p>Free tools for everyday paperwork, by HM Dev Studio. Everything runs in your browser, so your files never leave your device.</p>
       </div>
-      <div><h4>Tools</h4>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a></div>
-      <div><h4>Memento</h4><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
-      <div><h4>Legal</h4><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
+      <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a></div>
+      <div><h2>Memento</h2><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
+      <div><h2>Legal</h2><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
     <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> HM Dev Studio</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
   </footer>
@@ -832,6 +835,7 @@ function toolPage(t, { h1, lead, description, workspace, steps, tips, faqs, scri
       </div>
     </div>
 
+    <h2 class="sr-only">${h1} tool</h2>
 ${workspace}
 
     ${adSlot("leader")}
@@ -2000,7 +2004,7 @@ toolPage(tool("age-calculator"), {
             <div class="chips wide"><button type="button" data-on="today">${icon("today")}Today</button></div>
           </div>
           <div class="age-limit">
-            <h4>${icon("rule")} Age limit <small>(optional)</small></h4>
+            <h3>${icon("rule")} Age limit <small>(optional)</small></h3>
             <div class="fields">
               <label class="field">Minimum age<input id="minage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 18"></label>
               <label class="field">Maximum age<input id="maxage" type="number" inputmode="numeric" min="0" max="120" placeholder="e.g. 30"></label>
