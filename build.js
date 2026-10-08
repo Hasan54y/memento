@@ -41,10 +41,10 @@ function showcase({ id, tag, title, text, bullets = [], img, alt, flip, more, sc
 
 function pageHero({ eyebrow, eyebrowIcon = "auto_awesome", title, lead, cta = "", badge = "" }) {
   return `<div class="page-hero">
-      <div class="reveal">${badge || `<span class="eyebrow">${icon(eyebrowIcon)} ${eyebrow}</span>`}</div>
-      <h1 class="reveal">${title}</h1>
-      <p class="lead reveal">${lead}</p>
-      ${cta ? `<div class="cta reveal">${cta}</div>` : ""}
+      <div class="rise">${badge || `<span class="eyebrow">${icon(eyebrowIcon)} ${eyebrow}</span>`}</div>
+      <h1 class="rise" style="--i:1">${title}</h1>
+      <p class="lead rise" style="--i:2">${lead}</p>
+      ${cta ? `<div class="cta rise" style="--i:3">${cta}</div>` : ""}
     </div>`;
 }
 
@@ -116,6 +116,20 @@ function ogImage(slug) {
 }
 
 // <head> shared by the main site and the tools section
+// Self-hosted fonts (SIL Open Font License; assets/fonts). The icon font file is fetched by the
+// build for exactly the icons the site uses (see "Render" below).
+const LATIN = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
+const LATIN_EXT = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF";
+const face = (family, weight, file, range) => `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;src:url(/assets/fonts/${file}.woff2) format("woff2");unicode-range:${range}}`;
+const FONT_FACES = [face("Outfit", "600 800", "outfit-latin-ext", LATIN_EXT), face("Outfit", "600 800", "outfit-latin", LATIN),
+  face("Plus Jakarta Sans", "400 700", "jakarta-latin-ext", LATIN_EXT), face("Plus Jakarta Sans", "400 700", "jakarta-latin", LATIN),
+  '@font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:400 500;font-display:block;src:url(__ICON_FONT__) format("woff2")}'].join("");
+
+// Stylesheets go inline: one round trip less before the first paint (they are small)
+const cssCache = {};
+const inlineCss = (file) => (cssCache[file] ||= fs.readFileSync(path.join(__dirname, "assets", file), "utf8")
+  .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s*\n\s*/g, "\n").trim());
+
 function headTags({ slug, title, description, lang = "en", faqs, schema }, { themeColor, css, scripts, adsense = false }) {
   const url = urlOf(slug);
   const bn = lang === "bn";
@@ -146,11 +160,11 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   <meta name="google-adsense-account" content="${ADSENSE.client}">${adsense ? `
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.client}" crossorigin="anonymous"></script>` : ""}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700${bn ? "&family=Hind+Siliguri:wght@400;500;600;700" : ""}&display=swap" rel="stylesheet">
-  <link href="__ICON_FONT__" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/${css}">${scripts.map((s) => `
+  <link rel="preload" href="/assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>${FONT_FACES}</style>${bn ? `
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">` : ""}
+  <style>${inlineCss(css)}</style>${scripts.map((s) => `
   <script src="${s.startsWith("http") ? s : "/assets/" + s}" ${s.startsWith("http") ? "async" : "defer"}></script>`).join("")}
 </head>`;
 }
@@ -219,15 +233,15 @@ page("index", "Home",
   "Memento captures receipts, warranties, bills and IDs, reads them with AI, reminds you before dates expire and backs everything up to your Google Drive.",
   `    <div class="hero">
       <div>
-        <span class="eyebrow reveal">${icon("edit_note")} More than a notepad</span>
-        <h1 class="reveal">Capture anything.<br><em>Find it forever.</em></h1>
-        <p class="lead reveal">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>. Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
-        <div class="cta reveal">${btn("/download", "Get early access", "primary", "rocket_launch")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
-        <div class="meta reveal"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>Google Play soon</span></div>
+        <span class="eyebrow rise">${icon("edit_note")} More than a notepad</span>
+        <h1 class="rise" style="--i:1">Capture anything.<br><em>Find it forever.</em></h1>
+        <p class="lead rise" style="--i:2"><span class="nowrap">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>.</span><br>Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
+        <div class="cta rise" style="--i:3">${btn("/download", "Get early access", "primary", "rocket_launch")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
+        <div class="meta rise" style="--i:4"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>Google Play soon</span></div>
       </div>
-      <div class="phones reveal" aria-hidden="true">
+      <div class="phones rise" style="--i:2" aria-hidden="true">
         <div class="phone back"><img src="/assets/screen-detail.png" alt="" width="540" height="1200"></div>
-        <div class="phone front"><img src="/assets/screen-home.png" alt="" width="540" height="1200"></div>
+        <div class="phone front"><img src="/assets/screen-home.png" alt="" width="540" height="1200" fetchpriority="high"></div>
       </div>
     </div>
 
@@ -2141,11 +2155,22 @@ const rendered = pages.map((p) => ({ ...p, html: p.shell === "tools" ? toolsLayo
 const names = new Set();
 for (const p of rendered) for (const m of p.html.matchAll(/<span class="ms[^"]*" aria-hidden="true">([a-z0-9_]+)<\/span>/g)) names.add(m[1]);
 ["report", "error", "check", "close"].forEach((n) => names.add(n)); // only set by tamper-check.js and secret-splitter.js
-const iconUrl = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&amp;icon_names=${[...names].sort().join(",")}&amp;display=block`;
+const iconCss = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&icon_names=${[...names].sort().join(",")}&display=block`;
+const iconFile = `icons-${require("crypto").createHash("sha1").update(iconCss).digest("hex").slice(0, 10)}.woff2`;
+const fontDir = path.join(__dirname, "assets", "fonts");
+if (!fs.existsSync(path.join(fontDir, iconFile))) {
+  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
+  const css = await (await fetch(iconCss, { headers: { "User-Agent": UA } })).text();
+  const src = (/url\((https:[^)]+)\)/.exec(css) || [])[1];
+  if (!src) throw new Error("Icon font: unexpected response from Google Fonts");
+  fs.writeFileSync(path.join(fontDir, iconFile), Buffer.from(await (await fetch(src)).arrayBuffer()));
+  for (const old of fs.readdirSync(fontDir)) if (/^icons-.*\.woff2$/.test(old) && old !== iconFile) fs.unlinkSync(path.join(fontDir, old));
+}
+const iconUrl = `/assets/fonts/${iconFile}`;
 
 for (const p of rendered) {
   fs.mkdirSync(path.dirname(path.join(__dirname, p.slug)), { recursive: true });
-  fs.writeFileSync(path.join(__dirname, `${p.slug}.html`), p.html.replace("__ICON_FONT__", iconUrl));
+  fs.writeFileSync(path.join(__dirname, `${p.slug}.html`), p.html.replace("__ICON_FONT__", iconUrl).replace(/(src="\/assets\/screen-[a-z-]+)\.png"/g, '$1.webp"'));
 }
 
 // Sitemap + robots
