@@ -2120,7 +2120,7 @@ for (const g of GUIDES) {
           <span class="t-ico big" style="--c:${g.color}">${icon(g.icon)}</span>
           <h1>${g.h1}</h1>
           <p class="g-lead">${g.description}</p>
-          <p class="g-meta">By HM Dev Studio · Updated ${longDate(g.updated)} · ${readMin(g.body)} min read</p>
+          <p class="g-meta">By Memento · Updated ${longDate(g.updated)} · ${readMin(g.body)} min read</p>
         </header>
         <div class="g-body">
 ${body}
@@ -2142,7 +2142,7 @@ ${body}
     </div>`, {
     shell: "tools", cat: "guides",
     schema: [{ "@type": "Article", headline: g.h1, description: g.description, url, mainEntityOfPage: url, inLanguage: "en",
-      datePublished: g.updated, dateModified: g.updated, image: ogImage(slug), author: { "@id": `${SITE}/#org` }, publisher: { "@id": `${SITE}/#org` } }],
+      datePublished: g.updated, dateModified: g.updated, image: ogImage(slug), author: { "@type": "Organization", name: "Memento", url: `${SITE}/` }, publisher: { "@id": `${SITE}/#org` } }],
   });
 }
 
