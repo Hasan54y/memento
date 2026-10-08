@@ -655,8 +655,8 @@ const TOOLS = [
     text: "Turn PDF pages into JPG or PNG images, one page or all of them, with an optional KB limit.",
     keywords: "pdf to jpg png image picture convert pages extract save" },
   { slug: "passport-validity", cat: "calc", icon: "flight_takeoff", color: C.violet, title: "Passport validity checker",
-    text: "Is your passport valid long enough for your trip? Checks the 6-month and 3-month rules, and sets renewal reminders.",
-    keywords: "passport validity expiry 6 month rule six months schengen 3 months travel check renew reminder trip calendar" },
+    text: "Is your passport valid long enough for your trip? Checks the 6-month and 3-month rules and tells you when to renew.",
+    keywords: "passport validity expiry 6 month rule six months schengen 3 months travel check renew trip" },
   { slug: "age-calculator", cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
     text: "Your exact age in years, months and days on any date, and whether you're within an age limit.",
     keywords: "age calculator date of birth exact age eligibility limit cut off date years months days" },
@@ -1602,8 +1602,8 @@ toolPage(tool("split-pdf"), {
 // Passport validity checker
 toolPage(tool("passport-validity"), {
   h1: "Passport Validity Checker",
-  lead: "Check whether your passport is valid long enough for your trip under the destination's 6-month or 3-month rule, find out when to renew, and add reminders to your calendar.",
-  description: "Check if your passport is valid for your trip: the 6-month rule, Schengen's 3-month rule and more. See when to renew and add free reminders to your phone's calendar.",
+  lead: "Check whether your passport is valid long enough for your trip under the destination's 6-month or 3-month rule, and find out when to renew.",
+  description: "Check if your passport is valid for your trip: the 6-month rule, Schengen's 3-month rule and more, with days to spare and when to renew. Free.",
   workspace: `    <div class="tool" id="pvalid">
       <div class="tool-grid">
         <div class="stage">
@@ -1630,8 +1630,6 @@ toolPage(tool("passport-validity"), {
             <li><span>Under 6 months from</span><b id="f-six">—</b></li>
             <li><span>Suggested renewal</span><b id="f-renew">—</b></li>
           </ul>
-          <button type="button" class="btn btn-primary" id="ics" disabled>${icon("event")}Add reminders to calendar</button>
-          <a class="btn btn-ghost btn-sm gcal" id="gcal" target="_blank" rel="noopener" aria-disabled="true">${icon("calendar_add_on")}Google Calendar</a>
           <p class="note">${icon("info")} Entry rules depend on your nationality and visa, and airlines check them at check-in. Confirm with the embassy or your airline before you travel.</p>
         </div>
       </div>
@@ -1641,7 +1639,6 @@ toolPage(tool("passport-validity"), {
     ["Enter the expiry date.", "It's on your passport's photo page. Add the issue date too if you're going to Europe."],
     ["Pick where you're going.", "Then enter the dates you arrive and leave. The tool applies that destination's rule."],
     ["Read the result.", "You'll see whether the passport is valid long enough, how many days you have to spare, and when to renew."],
-    ["Set reminders.", "Add renewal reminders to your phone's calendar so the date never sneaks up on you."],
   ],
   tips: [
     ["schedule", "Renew early.", "Renewals can take weeks or months. Starting about 9 months before expiry keeps every trip open."],
@@ -1655,12 +1652,11 @@ toolPage(tool("passport-validity"), {
     ["Do I need 6 months for the UK, Canada or Australia?", "Usually not: for visitors, these countries generally require the passport to be valid for the whole stay. Rules can differ by nationality and visa, so confirm before travelling."],
     ["What about the United States?", "The general rule is 6 months beyond your stay, but citizens of many countries are exempt and only need the passport valid for the length of the stay. Check whether your country is on the exemption list."],
     ["When should I renew my passport?", "A good habit is to start about 9 months before it expires. That keeps you clear of 6-month rules and leaves time for processing."],
-    ["How do the calendar reminders work?", "Tap Add reminders to calendar to download a small calendar file with reminders to renew, for the 6-month limit and for expiry. Open it and your phone or computer adds them to your calendar. Nothing is sent to us."],
     ["Is this official advice?", "No. It applies the common rules for visitors to help you plan, but entry rules change and depend on your nationality and visa. Always confirm with the embassy or your airline."],
   ],
   scripts: ["passport-validity.js"],
   appCategory: "TravelApplication",
-  schemaDesc: "Free passport validity checker for the 6-month and Schengen 3-month rules, with renewal dates and calendar reminders.",
+  schemaDesc: "Free passport validity checker for the 6-month and Schengen 3-month rules, with days to spare and the date to renew.",
 });
 
 // Age calculator

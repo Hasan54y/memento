@@ -1,5 +1,5 @@
 // Passport Validity Checker (/tools/passport-validity): does a passport stay valid long enough for
-// a trip under the destination's entry rule, and when to renew it, plus calendar reminders.
+// a trip under the destination's entry rule, and when to renew it.
 // Pure date arithmetic in the browser; nothing is sent anywhere.
 (() => {
   const root = document.getElementById("pvalid");
@@ -30,7 +30,7 @@
 
   const expiry = $("#expiry"), issued = $("#issued"), dest = $("#dest"), arrive = $("#arrive"), leave = $("#leave"), tripBox = $(".trip");
   const verdict = $("#verdict"), fNeed = $("#f-need"), fLeft = $("#f-left"), fSix = $("#f-six"), fRenew = $("#f-renew"), ruleText = $("#rule-text");
-  const ics = $("#ics"), gcal = $("#gcal"), err = $("#err");
+  const err = $("#err");
 
   // Dates as UTC midnights so time zones never shift a day
   const parse = (v) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ""); return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : null; };
@@ -42,7 +42,6 @@
   }
   const DAY = 86400000, days = (a, b) => Math.round((b - a) / DAY);
   const fmt = (d) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-  const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
   function span(n) {
     const a = Math.abs(n);
     if (a < 62) return `${a} day${a === 1 ? "" : "s"}`;
@@ -50,14 +49,13 @@
     return mo < 24 ? `about ${mo} months` : `about ${(a / 365.25).toFixed(1)} years`;
   }
 
-  let reminders = [];
   function update() {
     err.hidden = true;
     const exp = parse(expiry.value), t = today(), r = RULES[dest.value], a = parse(arrive.value), l = parse(leave.value) || a;
     tripBox.hidden = !r;
     ruleText.textContent = r ? `${r.name[0].toUpperCase() + r.name.slice(1)}: ${r.text}.` : "";
     ruleText.hidden = !r;
-    if (!exp) { verdict.className = "verdict"; verdict.innerHTML = "<span>Enter your passport's expiry date to start.</span>"; [fNeed, fLeft, fSix, fRenew].forEach((e) => (e.textContent = "—")); setReminders([]); return; }
+    if (!exp) { verdict.className = "verdict"; verdict.innerHTML = "<span>Enter your passport's expiry date to start.</span>"; [fNeed, fLeft, fSix, fRenew].forEach((e) => (e.textContent = "—")); return; }
 
     // General picture, trip or not
     const six = addMonths(exp, -6), renew = addMonths(exp, -9), left = days(t, exp);
@@ -87,40 +85,7 @@
     verdict.className = `verdict ${cls}`;
     verdict.innerHTML = `<span class="ms" aria-hidden="true">${cls === "ok" ? "check_circle" : cls === "warn" ? "warning" : "cancel"}</span><span>${msg}</span>`;
 
-    setReminders(left < 0 ? [] : [
-      [renew, "Renew your passport", `Start your passport renewal now: it expires on ${fmt(exp)} and many countries need 6 months' validity.`],
-      [six, "Passport: 6 months left", `From today many countries won't accept your passport (it expires on ${fmt(exp)}).`],
-      [exp, "Passport expires today", "Your passport expires today."],
-    ].filter(([d]) => d > t));
   }
-
-  // ---------- Reminders ----------
-  function setReminders(list) {
-    reminders = list;
-    ics.disabled = !list.length;
-    gcal.setAttribute("aria-disabled", String(!list.length));
-    if (!list.length) { gcal.removeAttribute("href"); return; }
-    const [d, title, text] = list[0], end = new Date(d.getTime() + DAY);
-    gcal.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${ymd(d)}/${ymd(end)}&details=${encodeURIComponent(text + "\n\nMade with Memento Tools: mementoapp.online/tools")}`;
-    ics.lastChild.textContent = `Add ${list.length} reminder${list.length > 1 ? "s" : ""} to calendar`;
-  }
-  ics.addEventListener("click", () => {
-    if (!reminders.length) return;
-    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
-    const esc = (s) => s.replace(/[\\,;]/g, (c) => "\\" + c);
-    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Memento Tools//Passport reminder//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
-    reminders.forEach(([d, title, text], i) => {
-      lines.push("BEGIN:VEVENT", `UID:passport-${ymd(d)}-${i}-${Math.random().toString(36).slice(2)}@mementoapp.online`, `DTSTAMP:${stamp}`,
-        `DTSTART;VALUE=DATE:${ymd(d)}`, `DTEND;VALUE=DATE:${ymd(new Date(d.getTime() + DAY))}`, `SUMMARY:${esc(title)}`,
-        `DESCRIPTION:${esc(text + " (Memento Tools: mementoapp.online/tools)")}`, "TRANSP:TRANSPARENT",
-        "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${esc(title)}`, "TRIGGER:PT9H", "END:VALARM", "END:VEVENT");
-    });
-    lines.push("END:VCALENDAR");
-    const url = URL.createObjectURL(new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar" }));
-    const link = Object.assign(document.createElement("a"), { href: url, download: "passport-reminders.ics" });
-    document.body.appendChild(link); link.click(); link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  });
 
   [expiry, issued, dest, arrive, leave].forEach((el) => el.addEventListener("input", update));
   arrive.addEventListener("input", () => { if (arrive.value && (!leave.value || leave.value < arrive.value)) leave.value = arrive.value; update(); });

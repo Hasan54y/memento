@@ -433,7 +433,5 @@ a.t-mini:hover { color: var(--brand-ink); }
 .verdict.warn .ms { color: #c27c00; }
 .verdict.bad { background: #fef1f0; color: #8f1d14; }
 .verdict.bad .ms { color: var(--danger); }
-.result .gcal { margin-top: 8px; width: 100%; }
-.result .gcal[aria-disabled="true"] { opacity: .45; pointer-events: none; }
 #pvalid .tool-grid { grid-template-columns: minmax(0, 1fr) 340px; }
 @media (max-width: 860px) { #pvalid .tool-grid { grid-template-columns: minmax(0, 1fr); } }
