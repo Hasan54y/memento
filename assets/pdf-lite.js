@@ -109,7 +109,7 @@
   const PDFJS = "/assets/vendor/pdfjs/";
   const PDFJS_CDN = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/";
   let pdfjs = null;
-  async function openPdf(file) {
+  async function openPdf(file, opts = {}) {
     if (!pdfjs) {
       pdfjs = await import(`${PDFJS}pdf.min.mjs`);
       pdfjs.GlobalWorkerOptions.workerSrc = `${PDFJS}pdf.worker.min.mjs`;
@@ -117,7 +117,7 @@
     return pdfjs.getDocument({
       data: new Uint8Array(await file.arrayBuffer()),
       cMapUrl: `${PDFJS_CDN}cmaps/`, cMapPacked: true, standardFontDataUrl: `${PDFJS_CDN}standard_fonts/`,
-      wasmUrl: `${PDFJS_CDN}wasm/`, iccUrl: `${PDFJS_CDN}iccs/`,
+      wasmUrl: `${PDFJS_CDN}wasm/`, iccUrl: `${PDFJS_CDN}iccs/`, ...opts,
     }).promise;
   }
 

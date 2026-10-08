@@ -617,6 +617,8 @@ SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Si
 SEO_TITLES["tools/id-copy"] = "ID Card Copy: Front & Back on One Page, Real Size | Memento Tools";
 SEO_TITLES["tools/encrypt-files"] = "Encrypt Files with a Password, Free & Private | Memento Tools";
 SEO_TITLES["tools/compare-documents"] = "Compare Two Documents: PDF, Word & Text Diff, Free | Memento Tools";
+SEO_TITLES["tools/tamper-check"] = "Check if a PDF or Photo Has Been Edited, Free | Memento Tools";
+SEO_TITLES["tools/secret-splitter"] = "Secret Splitter: Split a Password or Recovery Phrase into Pieces | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
 SEO_TITLES["tools/passport-validity"] = "Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools";
@@ -645,6 +647,12 @@ const TOOLS = [
   { slug: "compare-documents", cat: "docs", icon: "difference", color: C.coral, title: "Compare documents",
     text: "See exactly what changed between two versions of a PDF, Word or text document, word by word.",
     keywords: "compare diff two documents pdf word docx text versions changes contract difference checker" },
+  { slug: "secret-splitter", cat: "docs", icon: "key", color: C.amber, title: "Secret splitter",
+    text: "Split a password, recovery phrase or code into pieces for family or friends. Any few of them bring it back.",
+    keywords: "secret split share password recovery phrase seed crypto wallet pin shamir secret sharing inheritance family backup pieces qr" },
+  { slug: "tamper-check", cat: "docs", icon: "plagiarism", color: C.violet, title: "Document tamper check",
+    text: "Spot signs that a PDF or photo was edited: later saves, editing software, odd fonts and retouched areas.",
+    keywords: "tamper check edited fake forged pdf photo document verify authentic bank statement payslip certificate receipt metadata font error level analysis ela photoshop" },
   { slug: "id-copy", cat: "docs", icon: "id_card", color: C.amber, title: "ID Copy Maker",
     text: "Front and back of an ID card on one page at real size, straightened, with a safe-copy watermark.",
     keywords: "id card copy front back one page photocopy driving licence license national id residence permit passport copy watermark a4 print real size" },
@@ -1523,6 +1531,138 @@ toolPage(tool("compare-documents"), {
   schemaDesc: "Free tool to compare two documents (PDF, Word .docx or text) and highlight every added and removed word.",
 });
 
+// Secret splitter
+toolPage(tool("secret-splitter"), {
+  h1: "Secret Splitter",
+  lead: "Split a password, recovery phrase or safe code into pieces and give them to people you trust. Any few of them together bring it back; one piece alone reveals nothing.",
+  description: "Split a password, crypto recovery phrase or any secret into 2 to 10 pieces with Shamir's secret sharing. Any chosen number of pieces recovers it; fewer reveal nothing. Printable pieces with QR codes. Free, nothing is uploaded.",
+  workspace: `    <div class="tool" id="splitter">
+      <div class="modes" role="tablist" aria-label="What do you want to do?">
+        <button type="button" role="tab" data-mode="split" aria-selected="true">${icon("call_split")}Split a secret</button>
+        <button type="button" role="tab" data-mode="recover" aria-selected="false">${icon("merge")}Recover</button>
+      </div>
+      <div class="ss-split">
+        <label class="field ss-secret-field">The secret
+          <textarea id="secret" rows="4" spellcheck="false" autocomplete="off" placeholder="A password, a recovery phrase, a PIN, a safe combination or short instructions"></textarea>
+          <span class="ss-count" id="count">0 / 1000 bytes</span>
+        </label>
+        <div class="fields ss-fields">
+          <label class="field">Name on the pieces (optional)<input id="label" type="text" maxlength="40" placeholder="e.g. Family safe"></label>
+          <label class="field">Number of pieces<select id="n">${[2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => `<option value="${n}"${n === 3 ? " selected" : ""}>${n}</option>`).join("")}</select></label>
+          <label class="field">Pieces needed to recover<select id="k"><option value="2" selected>2</option></select></label>
+        </div>
+        <button type="button" class="btn btn-primary" id="make" disabled>${icon("call_split")}Split into pieces</button>
+        <p class="err" id="err" role="alert" hidden></p>
+        <div class="ss-out" hidden>
+          <div class="ss-out-head">
+            <p id="ss-summary"></p>
+            <button type="button" class="btn btn-primary btn-sm" id="pdf">${icon("picture_as_pdf")}Download PDF (one piece per page)</button>
+          </div>
+          <ul class="ss-cards" id="cards"></ul>
+          <p class="note">${icon("info")} Give each piece to a different person, or keep them in different places. Test recovery once now, then clear this page. Nobody, including us, can recover the secret without enough pieces.</p>
+        </div>
+      </div>
+      <div class="ss-recover" hidden>
+        <label class="field">Paste the pieces, one per line
+          <textarea id="pieces" rows="6" spellcheck="false" autocomplete="off" placeholder="MSS1-…"></textarea>
+        </label>
+        <div class="ss-scan">
+          <label class="btn btn-ghost btn-sm">${icon("qr_code_scanner")}Scan QR from a photo<input id="scan-file" type="file" accept="image/*" multiple hidden></label>
+          <span class="sub">Photograph the printed pieces. Several photos at once are fine.</span>
+        </div>
+        <p class="bg-status ss-scan-status" id="scan-status" hidden></p>
+        <div class="ss-found" id="found"></div>
+        <p class="err" id="r-err" role="alert" hidden></p>
+        <div class="ss-secret" hidden>
+          <div class="verdict ok">${icon("lock_open")}<span><b>Secret recovered.</b></span></div>
+          <pre id="secret-out"></pre>
+          <button type="button" class="btn btn-ghost btn-sm" id="copy-secret">${icon("content_copy")}Copy</button>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Everything happens in your browser. Your secret and the pieces are never uploaded.</p>
+    </div>`,
+  steps: [
+    ["Type the secret.", "A password, a crypto wallet's recovery phrase, a safe combination, or a short note on where things are."],
+    ["Choose the pieces.", "For example 3 pieces, any 2 needed: you can lose one piece and still recover, and nobody can do it alone."],
+    ["Hand them out.", "Download the PDF and give each page to a different person, or keep them in different places."],
+    ["Recover when needed.", "Open this page, choose Recover, and paste or scan enough pieces. The secret appears straight away."],
+  ],
+  tips: [
+    ["family_restroom", "For your family.", "Give pieces to a partner, a sibling and a lawyer, so your family can reach important accounts if something happens to you."],
+    ["currency_bitcoin", "Crypto recovery phrases.", "Split a seed phrase instead of keeping it in one place where it can be stolen, lost or burned."],
+    ["checklist", "Test it once.", "Before handing out the pieces, recover the secret from two of them to make sure everything works."],
+    ["edit_note", "Write the rules down.", "Tell each person how many pieces are needed and where to recover them, so they know what to do."],
+  ],
+  faqs: [
+    ["How does secret splitting work?", "It uses Shamir's secret sharing, a well-known method from 1979. The secret becomes points on a random curve; any chosen number of pieces is enough to rebuild it, and fewer give no information at all, not even a hint."],
+    ["Is one piece safe if someone finds it?", "Yes. Below the number of pieces needed, the pieces reveal nothing about the secret. Someone would need enough pieces together."],
+    ["What happens if I lose a piece?", "As long as enough pieces remain, you can still recover the secret. That's why 3 pieces with any 2 needed is a popular choice."],
+    ["Can I recover it without this website?", "The method is standard, so other Shamir tools with the same settings can rebuild it, though their piece formats differ. Keeping a copy of this page saved works offline too."],
+    ["Is my secret uploaded?", "No. Splitting and recovering happen entirely inside your browser. Nothing is sent to our servers or anyone else's."],
+    ["What can I split?", "Any text up to 1000 bytes: passwords, recovery phrases, PINs, combinations or short instructions."],
+  ],
+  scripts: ["pdf-lite.js", "vendor/qrcode/qrcode.min.js", "secret-splitter.js"],
+  appCategory: "SecurityApplication",
+  schemaDesc: "Free tool to split a password or recovery phrase into pieces with Shamir's secret sharing, with printable QR code pieces.",
+});
+
+// Document tamper check
+toolPage(tool("tamper-check"), {
+  h1: "Document Tamper Check",
+  lead: "Got a bank statement, payslip, certificate or receipt and want to know if it's genuine? Check a PDF or photo for the traces editing usually leaves behind.",
+  description: "Check if a PDF or photo has been edited: later saves, editing software, date gaps, mismatched fonts marked on the page, and an error level analysis heatmap for photos. Free, nothing is uploaded.",
+  workspace: `    <div class="tool" id="tamper">
+      <label class="drop" id="drop">
+        ${icon("plagiarism")}
+        <strong>Choose a PDF or photo to check</strong>
+        <span class="sub">Bank statements, payslips, invoices, certificates, receipts, screenshots… or drag it here.</span>
+        <span class="btn btn-primary btn-sm drop-btn">${icon("upload")}Select file</span>
+        <input id="file" type="file" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp">
+      </label>
+      <p class="bg-status" id="status" hidden></p>
+      <p class="err" id="err" role="alert" hidden></p>
+      <div class="tc-result" hidden>
+        <div class="pdf-info">
+          <span class="t-ico" style="--c:${C.violet}">${icon("description")}</span>
+          <div id="tc-file"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="pick">${icon("swap_horiz")}Check another</button>
+        </div>
+        <div class="verdict" id="verdict"></div>
+        <ul class="tc-findings" id="findings"></ul>
+        <div class="tc-visual" id="visual"></div>
+        <details class="tc-details">
+          <summary>${icon("info")}All file details</summary>
+          <table><tbody id="details"></tbody></table>
+        </details>
+        <p class="note">${icon("balance")} These are signs, not proof. Many have innocent causes, and a skilled forger can hide them. For anything important, confirm with whoever issued the document.</p>
+      </div>
+      <p class="privacy-note">${icon("lock")} Your file is never uploaded. It's checked inside your browser.</p>
+    </div>`,
+  steps: [
+    ["Choose the file.", "Pick the PDF or photo you were sent. Use the original file, not a screenshot or a re-saved copy."],
+    ["Read the result.", "Red items are strong signs of editing, amber ones are worth a closer look, and each one says why it matters."],
+    ["Look at the marks.", "In PDFs, text set in a different font from the rest is boxed in red on the page. For photos, the heatmap shows areas that behave differently."],
+    ["Confirm at the source.", "If something looks wrong, ask the bank, employer or office that issued it to confirm the details."],
+  ],
+  tips: [
+    ["file_present", "Ask for the original.", "Forwarding through chat apps or printing to PDF wipes most traces. The file as it was downloaded tells you the most."],
+    ["font_download", "Fonts give edits away.", "When someone changes an amount or a name in a PDF editor, the new text often ends up in a slightly different font."],
+    ["history", "Later saves.", "Statements and certificates from a system are usually created in one go. Extra saves mean someone opened the file in an editor."],
+    ["verified", "Signed PDFs.", "If the PDF carries a digital signature, a PDF reader can tell you whether anything changed after signing. That's the strongest check there is."],
+  ],
+  faqs: [
+    ["How can I tell if a PDF has been edited?", "Choose the PDF here. The tool looks for later saves inside the file, editing software in its details, a change date long after the creation date, words in a different font from the rest, extra copies of the same font, and marks added on top of the page."],
+    ["Can it prove a document is fake?", "No tool can. It shows the traces editing usually leaves. A clean result is a good sign but not proof, and a warning can have an innocent cause, like a form being filled in. Confirm important documents with whoever issued them."],
+    ["How do I check if a photo has been edited?", "Choose the photo. The tool reads its hidden details (camera, editing software, dates) and makes an error level analysis heatmap, where pasted or retouched areas often look different from the rest of the picture."],
+    ["What is error level analysis?", "The photo is saved again as a JPEG and compared with the original. Parts that were edited or pasted in usually compress differently, so they glow brighter or darker than similar surfaces nearby."],
+    ["Why are there no camera details in my photo?", "Screenshots, messaging apps and most websites strip them. On its own, missing details don't mean the photo was edited."],
+    ["Is my document uploaded?", "No. Everything is checked inside your browser, so it's safe to use with bank statements and other private papers."],
+  ],
+  scripts: ["pdf-lite.js", "tamper-check.js"],
+  appCategory: "SecurityApplication",
+  schemaDesc: "Free tool to check if a PDF or photo has been edited: incremental saves, editing software, font mismatches and error level analysis.",
+});
+
 // ID Copy Maker
 toolPage(tool("id-copy"), {
   h1: "ID Copy Maker",
@@ -2000,6 +2140,7 @@ const rendered = pages.map((p) => ({ ...p, html: p.shell === "tools" ? toolsLayo
 // Load only the icons the site uses (Google Fonts needs the list sorted)
 const names = new Set();
 for (const p of rendered) for (const m of p.html.matchAll(/<span class="ms[^"]*" aria-hidden="true">([a-z0-9_]+)<\/span>/g)) names.add(m[1]);
+["report", "error", "check", "close"].forEach((n) => names.add(n)); // only set by tamper-check.js and secret-splitter.js
 const iconUrl = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&amp;icon_names=${[...names].sort().join(",")}&amp;display=block`;
 
 for (const p of rendered) {
