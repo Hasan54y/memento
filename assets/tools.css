@@ -418,3 +418,22 @@ a.t-mini:hover { color: var(--brand-ink); }
 .field.range span { display: flex; justify-content: space-between; }
 .field.range b { color: var(--text); }
 .field.range input { padding: 0; border: 0; accent-color: var(--brand-ink); }
+
+/* Passport validity checker */
+.pv-fields { grid-template-columns: 1fr 1fr; }
+.pv-fields small { color: var(--muted); font-weight: 500; }
+.trip { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 480px) { .pv-fields, .trip { grid-template-columns: 1fr; } }
+#pvalid .note { margin-top: 12px; }
+.verdict { display: flex; gap: 10px; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; font-size: 14.5px; background: var(--bg); color: var(--soft); }
+.verdict .ms { font-size: 24px; flex: none; }
+.verdict.ok { background: var(--brand-soft); color: #0b5a2a; }
+.verdict.ok .ms { color: var(--brand-ink); }
+.verdict.warn { background: #fff6e0; color: #6b4300; }
+.verdict.warn .ms { color: #c27c00; }
+.verdict.bad { background: #fef1f0; color: #8f1d14; }
+.verdict.bad .ms { color: var(--danger); }
+.result .gcal { margin-top: 8px; width: 100%; }
+.result .gcal[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+#pvalid .tool-grid { grid-template-columns: minmax(0, 1fr) 340px; }
+@media (max-width: 860px) { #pvalid .tool-grid { grid-template-columns: minmax(0, 1fr); } }

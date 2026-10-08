@@ -617,6 +617,7 @@ SEO_TITLES["tools/compress-image"] = "Compress Image to 100 KB, 200 KB or Any Si
 SEO_TITLES["tools/id-copy"] = "ID Card Copy: Front & Back on One Page, Real Size | Memento Tools";
 SEO_TITLES["tools/merge-pdf"] = "Merge PDF Files Online, Free and Private | Memento Tools";
 SEO_TITLES["tools/split-pdf"] = "Split PDF: Extract Pages or Split by Range, Free | Memento Tools";
+SEO_TITLES["tools/passport-validity"] = "Passport Validity Checker: 6-Month Rule for Your Trip | Memento Tools";
 SEO_TITLES["tools/age-calculator"] = "Age Calculator: Exact Age on Any Date & Age Limit Check | Memento Tools";
 SEO_TITLES["tools/pdf-to-image"] = "PDF to JPG or PNG: Convert PDF Pages to Images, Free | Memento Tools";
 
@@ -653,6 +654,9 @@ const TOOLS = [
   { slug: "pdf-to-image", cat: "pdf", icon: "photo_library", color: C.sky, title: "PDF to Image",
     text: "Turn PDF pages into JPG or PNG images, one page or all of them, with an optional KB limit.",
     keywords: "pdf to jpg png image picture convert pages extract save" },
+  { slug: "passport-validity", cat: "calc", icon: "flight_takeoff", color: C.violet, title: "Passport validity checker",
+    text: "Is your passport valid long enough for your trip? Checks the 6-month and 3-month rules, and sets renewal reminders.",
+    keywords: "passport validity expiry 6 month rule six months schengen 3 months travel check renew reminder trip calendar" },
   { slug: "age-calculator", cat: "calc", icon: "cake", color: C.amber, title: "Age calculator",
     text: "Your exact age in years, months and days on any date, and whether you're within an age limit.",
     keywords: "age calculator date of birth exact age eligibility limit cut off date years months days" },
@@ -1593,6 +1597,70 @@ toolPage(tool("split-pdf"), {
   ],
   scripts: ["pdf-lite.js", "split-pdf.js"],
   schemaDesc: "Free private tool to split PDF files: extract selected pages, split every page, by page ranges or every N pages.",
+});
+
+// Passport validity checker
+toolPage(tool("passport-validity"), {
+  h1: "Passport Validity Checker",
+  lead: "Check whether your passport is valid long enough for your trip under the destination's 6-month or 3-month rule, find out when to renew, and add reminders to your calendar.",
+  description: "Check if your passport is valid for your trip: the 6-month rule, Schengen's 3-month rule and more. See when to renew and add free reminders to your phone's calendar.",
+  workspace: `    <div class="tool" id="pvalid">
+      <div class="tool-grid">
+        <div class="stage">
+          <div class="fields pv-fields">
+            <label class="field">Passport expiry date<input id="expiry" type="date" min="2000-01-01" required></label>
+            <label class="field">Issue date <small>(optional)</small><input id="issued" type="date" min="1990-01-01"></label>
+            <label class="field wide">Where are you going?<select id="dest"><option value="">Not planning a trip yet</option><option value="schengen">Schengen area (most of Europe)</option><option value="us">United States</option><option value="uk">United Kingdom</option><option value="canada">Canada</option><option value="australia">Australia</option><option value="japan">Japan</option><option value="uae">United Arab Emirates</option><option value="saudi">Saudi Arabia</option><option value="qatar">Qatar</option><option value="singapore">Singapore</option><option value="malaysia">Malaysia</option><option value="thailand">Thailand</option><option value="indonesia">Indonesia</option><option value="india">India</option><option value="china">China</option><option value="other">Somewhere else</option></select></label>
+            <div class="trip wide" hidden>
+              <label class="field">Arriving<input id="arrive" type="date"></label>
+              <label class="field">Leaving<input id="leave" type="date"></label>
+            </div>
+          </div>
+          <p class="note" id="rule-text" hidden></p>
+          <p class="err" id="err" role="alert" hidden></p>
+        </div>
+
+        <div class="result" aria-live="polite">
+          <h3>${icon("verified")} Result</h3>
+          <p class="verdict" id="verdict"></p>
+          <template>${icon("check_circle")}${icon("warning")}${icon("cancel")}</template>
+          <ul class="facts">
+            <li><span>Must be valid until</span><b id="f-need">—</b></li>
+            <li><span>Time left</span><b id="f-left">—</b></li>
+            <li><span>Under 6 months from</span><b id="f-six">—</b></li>
+            <li><span>Suggested renewal</span><b id="f-renew">—</b></li>
+          </ul>
+          <button type="button" class="btn btn-primary" id="ics" disabled>${icon("event")}Add reminders to calendar</button>
+          <a class="btn btn-ghost btn-sm gcal" id="gcal" target="_blank" rel="noopener" aria-disabled="true">${icon("calendar_add_on")}Google Calendar</a>
+          <p class="note">${icon("info")} Entry rules depend on your nationality and visa, and airlines check them at check-in. Confirm with the embassy or your airline before you travel.</p>
+        </div>
+      </div>
+      <p class="privacy-note">${icon("lock")} Nothing you enter leaves your device.</p>
+    </div>`,
+  steps: [
+    ["Enter the expiry date.", "It's on your passport's photo page. Add the issue date too if you're going to Europe."],
+    ["Pick where you're going.", "Then enter the dates you arrive and leave. The tool applies that destination's rule."],
+    ["Read the result.", "You'll see whether the passport is valid long enough, how many days you have to spare, and when to renew."],
+    ["Set reminders.", "Add renewal reminders to your phone's calendar so the date never sneaks up on you."],
+  ],
+  tips: [
+    ["schedule", "Renew early.", "Renewals can take weeks or months. Starting about 9 months before expiry keeps every trip open."],
+    ["flight", "Airlines check too.", "If your passport is too short, the airline can refuse to board you, even with a ticket and visa."],
+    ["public", "Transit counts.", "Changing planes in another country can bring that country's rules into play as well."],
+    ["notifications_active", "Never miss a date.", "Memento reminds you about passports, visas, IDs and warranties automatically."],
+  ],
+  faqs: [
+    ["What is the 6-month passport rule?", "Many countries only let you in if your passport is still valid for at least 6 months, counted from the day you arrive (or, for some, from the day you leave). If it has less time left, you can be refused boarding or entry, even with a visa."],
+    ["How long must my passport be valid for Europe (Schengen)?", "At least 3 months beyond the day you plan to leave the Schengen area, and the passport must have been issued within the last 10 years. Enter the issue date to check both."],
+    ["Do I need 6 months for the UK, Canada or Australia?", "Usually not: for visitors, these countries generally require the passport to be valid for the whole stay. Rules can differ by nationality and visa, so confirm before travelling."],
+    ["What about the United States?", "The general rule is 6 months beyond your stay, but citizens of many countries are exempt and only need the passport valid for the length of the stay. Check whether your country is on the exemption list."],
+    ["When should I renew my passport?", "A good habit is to start about 9 months before it expires. That keeps you clear of 6-month rules and leaves time for processing."],
+    ["How do the calendar reminders work?", "Tap Add reminders to calendar to download a small calendar file with reminders to renew, for the 6-month limit and for expiry. Open it and your phone or computer adds them to your calendar. Nothing is sent to us."],
+    ["Is this official advice?", "No. It applies the common rules for visitors to help you plan, but entry rules change and depend on your nationality and visa. Always confirm with the embassy or your airline."],
+  ],
+  scripts: ["passport-validity.js"],
+  appCategory: "TravelApplication",
+  schemaDesc: "Free passport validity checker for the 6-month and Schengen 3-month rules, with renewal dates and calendar reminders.",
 });
 
 // Age calculator
