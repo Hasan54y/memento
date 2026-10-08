@@ -208,7 +208,7 @@ ${body}
       <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
     <div class="bottom">
-      <span>© <span id="year">2026</span> HM Dev Studio</span>
+      <span>© <span id="year">2026</span> Memento</span>
       <a href="mailto:${EMAIL}">${EMAIL}</a>
     </div>
   </footer>
@@ -743,13 +743,13 @@ ${body}
     <div class="t-wrap t-foot-cols">
       <div>
         <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
-        <p>Free tools for everyday paperwork, by HM Dev Studio. Everything runs in your browser, so your files never leave your device.</p>
+        <p>Free tools for everyday paperwork, by Memento. Everything runs in your browser, so your files never leave your device.</p>
       </div>
       <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Memento</h2><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
-    <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> HM Dev Studio</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
+    <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> Memento</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
   </footer>
 </body>
 </html>
