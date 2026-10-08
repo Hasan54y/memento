@@ -10,6 +10,10 @@ const SITE = "https://mementoapp.online";
 const EMAIL = "admin@mementoapp.online";
 const TRUSTPILOT_WRITE = "https://www.trustpilot.com/evaluate/mementoapp.online";
 const TRUSTPILOT_READ = "https://www.trustpilot.com/review/mementoapp.online";
+const FACEBOOK = "https://www.facebook.com/mementoapp";
+// Facebook's "f" logo (24 × 24), for links to the page
+const FB_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971H15.83c-1.491 0-1.956.93-1.956 1.886v2.264h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>';
+const fbLink = (cls) => `<a class="${cls}" href="${FACEBOOK}" target="_blank" rel="noopener">${FB_SVG}<span>Facebook</span></a>`;
 const EARLY_ACCESS = `mailto:${EMAIL}?subject=Memento%20early%20access&amp;body=Hi!%20I%27d%20like%20to%20try%20Memento%20when%20it%27s%20available.`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
@@ -85,7 +89,7 @@ const SEO_TITLES = {
   reviews: "Memento Reviews | Memento",
 };
 const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Studio", url: `${SITE}/`, logo: `${SITE}/assets/logo.svg`, email: EMAIL,
-  sameAs: [TRUSTPILOT_READ, "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"] };
+  sameAs: [FACEBOOK, TRUSTPILOT_READ, "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"] };
 const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Memento", operatingSystem: "Android 8.0+", applicationCategory: "ProductivityApplication",
   description: "Scan receipts, warranty cards, bills and IDs. Memento reads the details, reminds you before dates expire and backs everything up to your own Google Drive.",
   url: `${SITE}/`, image: `${SITE}/assets/og.png`, publisher: { "@id": `${SITE}/#org` },
@@ -202,13 +206,14 @@ ${body}
       <div>
         <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="26" height="27">Memento</a>
         <p class="tagline">More than a notepad. Your paperwork, remembered.</p>
+        ${fbLink("social")}
       </div>
       <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Company</h2><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
     <div class="bottom">
-      <span>© <span id="year">2026</span> Memento</span>
+      <span>© <span id="year">2026</span> Memento. All rights reserved.</span>
       <a href="mailto:${EMAIL}">${EMAIL}</a>
     </div>
   </footer>
@@ -556,6 +561,7 @@ page("contact", "Contact",
         <div class="side">
           <h2 class="sr-only">Other ways to reach us</h2>
           <div class="card glass spot reveal"><div class="icon">${icon("mail")}</div><h3>Email us</h3><p><a href="mailto:${EMAIL}">${EMAIL}</a></p></div>
+          <a class="card glass spot reveal" href="${FACEBOOK}" target="_blank" rel="noopener"><div class="icon" style="--c:#4c8dff">${FB_SVG}</div><h3>Facebook</h3><p>Follow Memento for news, or send us a message on our page.</p></a>
           <div class="card glass spot reveal"><div class="icon" style="--c:${C.mint}">${icon("forum")}</div><h3>From the app</h3><p>Profile → Send feedback or Contact us. Your app version is included automatically.</p></div>
           <a class="card glass spot reveal" href="/faq"><div class="icon" style="--c:${C.sky}">${icon("help")}</div><h3>Quick answers</h3><p>Many questions are already answered in the FAQ.</p></a>
           <a class="card glass spot reveal" href="/privacy"><div class="icon" style="--c:${C.violet}">${icon("policy")}</div><h3>Privacy requests</h3><p>See how we handle your data, or choose “Privacy request” above.</p></a>
@@ -744,12 +750,13 @@ ${body}
       <div>
         <a class="t-brand" href="/tools/"><img src="/assets/logo-ink.svg" alt="" width="24" height="25"><span>Memento <b>Tools</b></span></a>
         <p>Free tools for everyday paperwork, by Memento. Everything runs in your browser, so your files never leave your device.</p>
+        ${fbLink("t-social")}
       </div>
       <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Memento</h2><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
-    <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> Memento</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
+    <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> Memento. All rights reserved.</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
   </footer>
 </body>
 </html>

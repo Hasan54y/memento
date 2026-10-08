@@ -219,6 +219,10 @@ a.card:hover { transform: translateY(-3px); border-color: rgba(31, 224, 90, 0.35
 
 /* Footer */
 footer { padding: 56px 0 40px; color: var(--muted); font-size: 14px; }
+footer.wrap { padding-top: 56px; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+footer .cols a.social { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); color: var(--soft); text-decoration: none; font-weight: 600; }
+footer .cols a.social:hover { color: #fff; border-color: #4c8dff; background: rgba(76, 141, 255, .12); }
+@media (max-width: 560px) { footer .bottom { flex-direction: column; gap: 6px; } }
 footer .cols { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; padding-top: 32px; border-top: 1px solid var(--border); }
 @media (max-width: 760px) { footer .cols { grid-template-columns: 1fr 1fr; } footer .cols > div:first-child { grid-column: 1 / -1; } }
 footer h2 { font-family: inherit; letter-spacing: normal; line-height: 1.4;  margin: 0 0 12px; color: var(--text); font-size: 14px; font-weight: 700; }
