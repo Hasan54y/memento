@@ -29,6 +29,14 @@
   addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  // Trustpilot widgets: load their script only when one comes near the screen
+  const tp = document.querySelector(".trustpilot-widget");
+  if (tp) {
+    const load = () => { io2.disconnect(); document.head.appendChild(Object.assign(document.createElement("script"), { src: "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js", async: true })); };
+    const io2 = new IntersectionObserver((e) => e.some((x) => x.isIntersecting) && load(), { rootMargin: "800px 0px" });
+    document.querySelectorAll(".trustpilot-widget").forEach((el) => io2.observe(el));
+  }
+
   // Staggered scroll reveal: siblings come in one after another
   const reveals = document.querySelectorAll(".reveal");
   reveals.forEach((el) => {

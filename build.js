@@ -126,7 +126,7 @@ const FONT_FACES = [face("Outfit", "600 800", "outfit-latin-ext", LATIN_EXT), fa
   // Local fonts resized to the web fonts' measurements, so text barely moves when they swap in
   '@font-face{font-family:"Jakarta Fallback";src:local("Arial"),local("Liberation Sans"),local("Helvetica"),local("Roboto");size-adjust:104.22%;ascent-override:99.8%;descent-override:21.1%;line-gap-override:0%}',
   '@font-face{font-family:"Outfit Fallback";font-weight:600 800;src:local("Arial Bold"),local("Arial-BoldMT"),local("Liberation Sans Bold"),local("Helvetica Bold"),local("Roboto Bold");size-adjust:95.25%;ascent-override:105%;descent-override:27.3%;line-gap-override:0%}',
-  '@font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:400 500;font-display:block;src:url(__ICON_FONT__) format("woff2")}'].join("");
+  '@font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:400;font-display:block;src:url(__ICON_FONT__) format("woff2")}'].join("");
 
 // Stylesheets go inline: one round trip less before the first paint (they are small)
 const cssCache = {};
@@ -179,7 +179,7 @@ function layout(p) {
     `<a href="/${s}"${isActive(s) ? ' class="active" aria-current="page"' : ""}>${mobile ? icon(ic) : ""}${label}${pill ? `<span class="nav-pill">${pill}</span>` : ""}</a>`;
   return `<!doctype html>
 <html lang="${lang}">
-${headTags(p, { themeColor: "#000000", css: "site.css", scripts: ["site.js", ...scripts, "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"] })}
+${headTags(p, { themeColor: "#000000", css: "site.css", scripts: ["site.js", ...scripts] })}
 <body>
   <div class="progress" aria-hidden="true"></div>
   <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -244,7 +244,7 @@ page("index", "Home",
       </div>
       <div class="phones rise" style="--i:2" aria-hidden="true">
         <div class="phone back"><img src="/assets/screen-detail.png" alt="" width="540" height="1200"></div>
-        <div class="phone front"><img src="/assets/screen-home.png" alt="" width="540" height="1200" fetchpriority="high"></div>
+        <div class="phone front"><img src="/assets/screen-home.png" alt="" width="540" height="1200"></div>
       </div>
     </div>
 
@@ -2158,7 +2158,7 @@ const rendered = pages.map((p) => ({ ...p, html: p.shell === "tools" ? toolsLayo
 const names = new Set();
 for (const p of rendered) for (const m of p.html.matchAll(/<span class="ms[^"]*" aria-hidden="true">([a-z0-9_]+)<\/span>/g)) names.add(m[1]);
 ["report", "error", "check", "close"].forEach((n) => names.add(n)); // only set by tamper-check.js and secret-splitter.js
-const iconCss = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400..500,0..1,0&icon_names=${[...names].sort().join(",")}&display=block`;
+const iconCss = `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=${[...names].sort().join(",")}&display=block`;
 const iconFile = `icons-${require("crypto").createHash("sha1").update(iconCss).digest("hex").slice(0, 10)}.woff2`;
 const fontDir = path.join(__dirname, "assets", "fonts");
 if (!fs.existsSync(path.join(fontDir, iconFile))) {

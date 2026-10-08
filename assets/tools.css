@@ -224,6 +224,8 @@ a.t-tile:hover .t-go .ms { transform: translateX(3px); }
 .t-mini small { display: block; color: var(--muted); font-weight: 500; font-size: 12.5px; }
 
 /* ---------- Footer ---------- */
+/* Below the tool: laid out only as it comes near the screen (not the sidebar, where ads measure their width) */
+.t-article, .t-foot { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 .t-foot { margin-top: 32px; padding: 40px 0 28px; background: #fff; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
 .t-foot-cols { display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 28px; }
 @media (max-width: 760px) { .t-foot-cols { grid-template-columns: 1fr 1fr; } .t-foot-cols > div:first-child { grid-column: 1 / -1; } }
