@@ -11,6 +11,14 @@ const EMAIL = "admin@mementoapp.online";
 const TRUSTPILOT_WRITE = "https://www.trustpilot.com/evaluate/mementoapp.online";
 const TRUSTPILOT_READ = "https://www.trustpilot.com/review/mementoapp.online";
 const FACEBOOK = "https://www.facebook.com/mementoapp";
+const GA_ID = "G-6HCYDVQMCH"; // Google Analytics 4
+// Google tag: consent defaults first (denied in the EEA, UK and Switzerland until the visitor
+// agrees), then gtag.js is fetched on the first scroll, tap or key press, or 4 s after the page has
+// loaded, so it never competes with the first paint.
+const GA_TAG = `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag("consent","default",{ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",analytics_storage:"denied",region:["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH"]});
+gtag("js",new Date());gtag("config","${GA_ID}");
+(function(){var done=0,ev=["scroll","pointerdown","keydown","touchstart"];function go(){if(done++)return;var s=document.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}";document.head.appendChild(s)}ev.forEach(function(e){addEventListener(e,go,{once:true,passive:true})});addEventListener("load",function(){setTimeout(go,4000)},{once:true})})();</script>`;
 // Facebook's "f" logo (24 × 24), for links to the page
 const FB_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.971H15.83c-1.491 0-1.956.93-1.956 1.886v2.264h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>';
 const INSTAGRAM = "https://www.instagram.com/getmementoapp/";
@@ -171,6 +179,7 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   ${jsonLd(slug, title, url, faqs, schema)}
   <meta name="google-adsense-account" content="${ADSENSE.client}">${adsense ? `
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ""}
+  ${GA_TAG}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -213,7 +222,7 @@ ${body}
       </div>
       <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Company</h2><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
-      <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
+      <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/tools/privacy">Website privacy &amp; ads</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
     <div class="bottom">
       <span>© <span id="year">2026</span> Memento. All rights reserved.</span>
@@ -758,7 +767,7 @@ ${body}
       </div>
       <div><h2>Tools</h2>${live.map((t) => `<a href="/tools/${t.slug}">${t.title}</a>`).join("")}<a href="/tools/">All tools</a><a href="/guides/">Guides</a></div>
       <div><h2>Memento</h2><a href="/">Memento app</a><a href="/features">Features</a><a href="/download">Get the app</a><a href="/contact">Contact</a></div>
-      <div><h2>Legal</h2><a href="/tools/privacy">Tools privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
+      <div><h2>Legal</h2><a href="/tools/privacy">Website privacy &amp; ads</a><a href="/privacy">Memento app privacy</a><a href="/terms">Terms of Service</a></div>
     </div>
     <div class="t-wrap t-foot-bottom"><span>© <span id="year">2026</span> Memento. All rights reserved.</span><a href="mailto:${EMAIL}">${EMAIL}</a></div>
   </footer>
@@ -829,22 +838,26 @@ page("tools/index", "Free tools",
     </section>`, { shell: "tools" });
 
 // Privacy for the tools section (the app has its own policy at /privacy)
-page("tools/privacy", "Tools privacy & ads",
-  "How Memento Tools handles your files (they never leave your device) and how ads on the tools pages work.",
-  `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<span>Privacy &amp; ads</span></nav>
-    <div class="t-title"><span class="t-ico big" style="--c:${C.green}">${icon("policy")}</span><div><h1>Privacy &amp; ads</h1><p>For the free tools at mementoapp.online/tools. The Memento app has its own <a href="/privacy">privacy policy</a>.</p></div></div>
+page("tools/privacy", "Website privacy & ads",
+  "How mementoapp.online handles your files (they never leave your device), the visitor statistics we collect, and how ads on the tools and guides pages work.",
+  `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/tools/">Tools</a>${icon("chevron_right")}<span>Website privacy &amp; ads</span></nav>
+    <div class="t-title"><span class="t-ico big" style="--c:${C.green}">${icon("policy")}</span><div><h1>Website privacy &amp; ads</h1><p>For the mementoapp.online website, including the free tools and guides. The Memento app has its own <a href="/privacy">privacy policy</a>.</p></div></div>
     <article class="t-article t-legal">
       <h2>Your files stay on your device</h2>
       <p>Every tool works inside your browser. Photos, PDFs and the details you type are processed on your phone or computer and are never uploaded to us or anyone else. We don't keep copies, and we can't see them.</p>
-      <h2>No accounts, no tracking by us</h2>
-      <p>The tools don't need an account. We don't run analytics on the tools pages. Your browser may keep the background-removal model in its cache so it doesn't download again; you can clear it with your browser data.</p>
+      <h2>No accounts</h2>
+      <p>The tools don't need an account. Your browser may keep the background-removal model in its cache so it doesn't download again; you can clear it with your browser data.</p>
+      <h2>Visitor statistics</h2>
+      <p>We use Google Analytics to understand how the website is used: how many people visit, which pages, guides and tools they open, roughly which country they're in, and what kind of device and browser they use. It uses cookies and similar technology to tell visits apart. Google Analytics 4 doesn't store IP addresses.</p>
+      <p>Analytics never receives your files or anything you type into a tool, because those never leave your device.</p>
+      <p>In the European Economic Area, the UK and Switzerland, analytics cookies stay off unless you agree to them. Anywhere, you can opt out with Google's <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener" target="_blank">opt-out browser add-on</a>, by blocking cookies, or with a content blocker. Learn more in <a href="https://policies.google.com/technologies/partner-sites" rel="noopener" target="_blank">How Google uses information from sites that use its services</a>.</p>
       <h2>Ads and cookies</h2>
-      <p>To keep the tools free, the tools pages show ads served by Google AdSense. The Memento app and the rest of mementoapp.online don't show ads.</p>
+      <p>To keep the tools free, the tools and guides pages show ads served by Google AdSense. The Memento app and the rest of mementoapp.online don't show ads.</p>
       <p>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to you based on your visits to this site and/or other sites on the Internet.</p>
       <p>You may opt out of personalised advertising by visiting Google's <a href="https://adssettings.google.com/" rel="noopener" target="_blank">Ads Settings</a>, or opt out of some third-party vendors' use of cookies for personalised advertising at <a href="https://www.aboutads.info/choices/" rel="noopener" target="_blank">www.aboutads.info</a>. Learn more in <a href="https://policies.google.com/technologies/ads" rel="noopener" target="_blank">how Google uses information from sites that use its services</a>.</p>
       <p>Ads and cookies never get your files: what you open in a tool is processed on your device and isn't sent to us, to Google or to anyone else.</p>
       <h2>Your choice</h2>
-      <p>Visitors in the European Economic Area, the UK and Switzerland are asked for consent through Google's consent message before personalised ads are shown. Ad blockers also work on these pages; the tools keep working either way.</p>
+      <p>Visitors in the European Economic Area, the UK and Switzerland are asked for consent through Google's consent message before analytics or personalised ads use cookies. Ad blockers also work on these pages; the tools keep working either way.</p>
       <h2>Contact</h2>
       <p>Questions? Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
     </article>`, { shell: "tools", cat: "" });
