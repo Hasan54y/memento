@@ -95,7 +95,7 @@ const MOBILE_EXTRA = [["about", "About", "info"], ["download", "Get the app", "r
 
 // Titles shown in Google results: lead with what people search for, keep under ~60 characters.
 const SEO_TITLES = {
-  index: "Memento: Receipt, Warranty & Bill Reminder App for Android",
+  index: "Memento App: Receipt, Warranty & Bill Reminder for Android",
   features: "Scan Receipts, Track Warranties & Bills | Memento",
   "how-it-works": "How Memento Reads Receipts & Documents | Memento",
   backup: "Back Up Receipts & Documents to Google Drive | Memento",
@@ -103,9 +103,9 @@ const SEO_TITLES = {
   download: "Download Memento Free on Google Play | Memento",
   reviews: "Memento Reviews | Memento",
 };
-const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Studio", url: `${SITE}/`, logo: `${SITE}/assets/logo.svg`, email: EMAIL,
+const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Studio", url: `${SITE}/`, logo: { "@type": "ImageObject", url: `${SITE}/assets/logo-512.png`, width: 512, height: 512 }, email: EMAIL,
   sameAs: [FACEBOOK, INSTAGRAM, TRUSTPILOT_READ, "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento"] };
-const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Memento", operatingSystem: "Android 8.0+", applicationCategory: "ProductivityApplication",
+const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Memento", alternateName: ["Memento App", "Memento: Your paperwork, remembered"], sameAs: [PLAY_URL, FACEBOOK, INSTAGRAM], operatingSystem: "Android 8.0+", applicationCategory: "ProductivityApplication",
   description: "Scan receipts, warranty cards, bills and IDs. Memento reads the details, reminds you before dates expire and backs everything up to your own Google Drive.",
   url: `${SITE}/`, image: `${SITE}/assets/og.png`, publisher: { "@id": `${SITE}/#org` },
   installUrl: PLAY_URL, downloadUrl: PLAY_URL,
@@ -114,7 +114,7 @@ const FAQS = [];
 // "tools/index" is served at /tools/, everything else at its clean slug
 const urlOf = (slug) => slug === "index" ? `${SITE}/` : slug.endsWith("/index") ? `${SITE}/${slug.slice(0, -5)}` : `${SITE}/${slug}`;
 function jsonLd(slug, title, url, faqs = [], extra = []) {
-  const graph = [ORG, { "@type": "WebSite", "@id": `${SITE}/#site`, name: "Memento", url: `${SITE}/`, publisher: { "@id": `${SITE}/#org` }, inLanguage: "en" }];
+  const graph = [ORG, { "@type": "WebSite", "@id": `${SITE}/#site`, name: "Memento", alternateName: ["Memento App", "mementoapp.online"], url: `${SITE}/`, publisher: { "@id": `${SITE}/#org` }, inLanguage: "en" }];
   if (slug === "index" || slug === "download" || slug === "features") graph.push(APP);
   if (slug !== "index" && slug !== "404") {
     const crumbs = [["Home", `${SITE}/`]];
@@ -185,6 +185,8 @@ function headTags({ slug, title, description, lang = "en", faqs, schema }, { the
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ""}
   ${GA_TAG}
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/logo-512.png" type="image/png" sizes="512x512">
+  <link rel="apple-touch-icon" href="/assets/logo-512.png">
   <link rel="preload" href="/assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin>
   <style>${FONT_FACES}</style>${bn ? `
@@ -259,7 +261,7 @@ page("index", "Home",
   "Free on Google Play. Memento scans receipts, warranties, bills and IDs, reminds you before dates expire and backs everything up to your own Google Drive.",
   `    <div class="hero">
       <div>
-        <span class="eyebrow rise">${icon("edit_note")} More than a notepad</span>
+        <span class="eyebrow rise">${icon("edit_note")} Memento · More than a notepad</span>
         <h1 class="rise" style="--i:1">Capture anything.<br><em>Find it forever.</em></h1>
         <p class="lead rise" style="--i:2"><span class="nowrap">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>.</span><br>Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
         <div class="cta rise" style="--i:3">${playBadge("home_hero")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
