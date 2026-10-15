@@ -25,7 +25,11 @@ const INSTAGRAM = "https://www.instagram.com/getmementoapp/";
 // Instagram's camera glyph, drawn as an outline
 const IG_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>';
 const socialLinks = (cls) => `<div class="${cls}s"><a class="${cls}" href="${FACEBOOK}" target="_blank" rel="noopener">${FB_SVG}<span>Facebook</span></a><a class="${cls}" href="${INSTAGRAM}" target="_blank" rel="noopener">${IG_SVG}<span>Instagram</span></a></div>`;
-const EARLY_ACCESS = `mailto:${EMAIL}?subject=Memento%20early%20access&amp;body=Hi!%20I%27d%20like%20to%20try%20Memento%20when%20it%27s%20available.`;
+const PLAY_URL = "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento";
+const PLAY_LINK = (source) => `${PLAY_URL}&amp;referrer=utm_source%3Dmementoapp.online%26utm_medium%3D${source}`;
+// Official Google Play badge (Google's brand rules: use the badge as supplied, don't redraw it)
+const playBadge = (source, h = 64) =>
+  `<a class="play-badge" href="${PLAY_LINK(source)}" target="_blank" rel="noopener" aria-label="Get it on Google Play"><img src="/assets/gp-badge.png" alt="Get it on Google Play" width="${Math.round(h * 646 / 250)}" height="${h}"></a>`;
 const TODAY = new Date().toISOString().slice(0, 10);
 
 const C = { green: "#1fe05a", mint: "#2dd4bf", sky: "#5ab8ff", amber: "#ffb547", violet: "#a78bfa", coral: "#ff6b6b" };
@@ -67,11 +71,11 @@ function pageHero({ eyebrow, eyebrowIcon = "auto_awesome", title, lead, cta = ""
 const btn = (href, label, kind = "primary", ic = "", extra = "") =>
   `<a class="btn btn-${kind}" href="${href}"${extra}>${ic ? icon(ic) : ""}${label}</a>`;
 
-function ctaBand(title = "Ready when your paperwork is.", text = "Memento is coming to Google Play. Get early access and we'll tell you the moment it's ready.") {
+function ctaBand(title = "Ready when your paperwork is.", text = "Memento is free on Google Play. Install it, snap your first receipt, and let it remember the rest.") {
   return `<section><div class="cta-band glass spot reveal">
       <h2>${title}</h2>
       <p>${text}</p>
-      <div class="cta">${btn("/download", "Get the app", "primary", "rocket_launch")}${btn("/features", "Explore features", "ghost")}</div>
+      <div class="cta">${playBadge("cta_band")}${btn("/features", "Explore features", "ghost")}</div>
     </div></section>`;
 }
 
@@ -96,7 +100,7 @@ const SEO_TITLES = {
   "how-it-works": "How Memento Reads Receipts & Documents | Memento",
   backup: "Back Up Receipts & Documents to Google Drive | Memento",
   faq: "FAQ: Document Organizer & Warranty Tracker App | Memento",
-  download: "Download Memento for Android | Memento",
+  download: "Download Memento Free on Google Play | Memento",
   reviews: "Memento Reviews | Memento",
 };
 const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Studio", url: `${SITE}/`, logo: `${SITE}/assets/logo.svg`, email: EMAIL,
@@ -104,7 +108,7 @@ const ORG = { "@type": "Organization", "@id": `${SITE}/#org`, name: "HM Dev Stud
 const APP = { "@type": "MobileApplication", "@id": `${SITE}/#app`, name: "Memento", operatingSystem: "Android 8.0+", applicationCategory: "ProductivityApplication",
   description: "Scan receipts, warranty cards, bills and IDs. Memento reads the details, reminds you before dates expire and backs everything up to your own Google Drive.",
   url: `${SITE}/`, image: `${SITE}/assets/og.png`, publisher: { "@id": `${SITE}/#org` },
-  installUrl: "https://play.google.com/store/apps/details?id=com.hmdevstudio.memento",
+  installUrl: PLAY_URL, downloadUrl: PLAY_URL,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
 const FAQS = [];
 // "tools/index" is served at /tools/, everything else at its clean slug
@@ -252,14 +256,14 @@ const chip = ([i, label, color]) => `<span class="chip glass" style="--c:${color
 
 // Home
 page("index", "Home",
-  "Memento captures receipts, warranties, bills and IDs, reads them with AI, reminds you before dates expire and backs everything up to your Google Drive.",
+  "Free on Google Play. Memento scans receipts, warranties, bills and IDs, reminds you before dates expire and backs everything up to your own Google Drive.",
   `    <div class="hero">
       <div>
         <span class="eyebrow rise">${icon("edit_note")} More than a notepad</span>
         <h1 class="rise" style="--i:1">Capture anything.<br><em>Find it forever.</em></h1>
         <p class="lead rise" style="--i:2"><span class="nowrap">Snap a <span class="rotator" data-words="receipt,warranty card,bill,boarding pass,ID card,certificate">receipt</span>.</span><br>Memento reads it with AI, organizes the details for you, reminds you before dates expire, and keeps it all backed up in your own Google Drive.</p>
-        <div class="cta rise" style="--i:3">${btn("/download", "Get early access", "primary", "rocket_launch")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
-        <div class="meta rise" style="--i:4"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>Google Play soon</span></div>
+        <div class="cta rise" style="--i:3">${playBadge("home_hero")}${btn("/how-it-works", "See how it works", "ghost", "play_circle")}</div>
+        <div class="meta rise" style="--i:4"><span>Free</span><span>No ads</span><span>Android 8.0+</span><span>On Google Play</span></div>
       </div>
       <div class="phones rise" style="--i:2" aria-hidden="true">
         <div class="phone back"><img src="/assets/screen-detail.png" alt="" width="540" height="1200"></div>
@@ -454,7 +458,7 @@ page("reviews", "Reviews",
       <h2 class="sr-only">Where to share your opinion</h2>
       <div class="grid">
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("rate_review")}</div><h3>Trustpilot</h3><p>Share your honest experience publicly on Trustpilot.</p><div style="margin-top:18px"><div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6ab5020f20b30165e430b08f" data-style-height="52px" data-style-width="100%" data-token="eab3e8b8-be97-44ea-b1a7-c9f49fda1ae9"><a href="https://www.trustpilot.com/review/mementoapp.online" target="_blank" rel="noopener">Trustpilot</a></div></div><div class="cta" style="margin-top:14px">${btn(TRUSTPILOT_READ, "Read reviews", "ghost", "", ' target="_blank" rel="noopener"')}</div></article>
-        <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("shop")}</div><h3>Google Play</h3><p>Rate Memento on the Play Store once it's published.</p><div style="margin-top:18px"><span class="badge-soon">${icon("schedule")} Coming soon</span></div></article>
+        <article class="card glass spot reveal"><div class="icon" style="--c:${C.green}">${icon("shop")}</div><h3>Google Play</h3><p>Using Memento? Rate it and write a review on the Play Store.</p><a class="more" href="${PLAY_LINK("reviews")}" target="_blank" rel="noopener">Rate on Google Play</a></article>
         <article class="card glass spot reveal"><div class="icon" style="--c:${C.mint}">${icon("forum")}</div><h3>In the app</h3><p>Profile → Send feedback. Rate with stars and tell us what to improve.</p><a class="more" href="/contact">Or contact us</a></article>
       </div>
     </section>
@@ -473,7 +477,7 @@ page("faq", "FAQ",
       <div class="faq-group"><h2 class="reveal">General</h2>
         ${faq("Is Memento free?", "Yes. Memento is free to download and use, with no ads.")}
         ${faq("Which phones does it work on?", "Android phones running Android 8.0 or newer.")}
-        ${faq("When can I get it?", `Memento is coming to Google Play soon. <a href="/download">Get early access</a> and we'll let you know as soon as it's available.`)}
+        ${faq("Where can I get it?", `Memento is free on <a href="${PLAY_LINK("faq")}" target="_blank" rel="noopener">Google Play</a> for Android 8.0 and newer.`)}
         ${faq("Does it work offline?", "You can browse, search and edit what you've saved without internet. Reading new documents with AI and backing up need a connection.")}
       </div>
       <div class="faq-group"><h2 class="reveal">Account</h2>
@@ -501,13 +505,13 @@ ${ctaBand()}`, { faqs: FAQS });
 
 // Download
 page("download", "Get the app",
-  "Memento is coming to Google Play. Get early access to Memento, the app that remembers your paperwork.",
+  "Download Memento free on Google Play. Scan receipts, warranties and bills, get reminders before they expire and back everything up to Google Drive.",
   `    <div class="hero">
       <div>
-        <span class="badge-soon reveal">${icon("schedule")} Coming soon to Google Play</span>
+        <span class="eyebrow reveal">${icon("check_circle")} Now on Google Play</span>
         <h1 class="reveal" style="margin-top:20px">Get <em>Memento.</em></h1>
-        <p class="lead reveal">Memento is almost ready for Google Play. Leave your email and we'll tell you the moment you can install it.</p>
-        <div class="cta reveal">${btn(EARLY_ACCESS, "Get early access", "primary", "mark_email_unread")}${btn("/contact", "Ask a question", "ghost", "chat")}</div>
+        <p class="lead reveal">Free on Google Play for Android phones. Install it, sign in, and save your first receipt in under a minute.</p>
+        <div class="cta reveal">${playBadge("download", 72)}${btn("/contact", "Ask a question", "ghost", "chat")}</div>
         <div class="meta reveal"><span>Free</span><span>No ads</span><span>Android 8.0+</span></div>
       </div>
       <div class="reveal">${shot("screen-home.png", "Memento home screen")}</div>
@@ -522,7 +526,7 @@ page("download", "Get the app",
         ${card({ icon: "add_to_drive", color: C.violet, title: "Google Drive (optional)", text: "Only if you want backups and to restore on a new phone." })}
       </div>
     </section>
-${ctaBand("Be first in line.", "Early access is free. We'll only email you about Memento.")}`);
+${ctaBand("Your paperwork, remembered.", "Free, no ads. Your documents stay on your phone and in your own Google Drive.")}`);
 
 // About
 page("about", "About",
