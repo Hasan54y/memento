@@ -227,6 +227,7 @@ ${body}
         ${socialLinks("social")}
       </div>
       <div><h2>Product</h2><a href="/features">Features</a><a href="/how-it-works">How it works</a><a href="/backup">Google Drive backup</a><a href="/download">Get the app</a><a href="/tools/">Free tools</a><a href="/guides/">Guides</a></div>
+      <div><h2>Guides</h2><a href="/guides/how-to-keep-track-of-warranties">Track warranties</a><a href="/guides/how-to-organize-receipts-on-your-phone">Organize receipts</a><a href="/guides/never-miss-a-bill-due-date">Bill reminders</a><a href="/guides/important-documents-to-keep-digital-copies-of">Important documents</a></div>
       <div><h2>Company</h2><a href="/about">About</a><a href="/reviews">Reviews</a><a href="/faq">FAQ</a><a href="/contact">Contact</a></div>
       <div><h2>Legal</h2><a href="/privacy">Privacy Policy</a><a href="/tools/privacy">Website privacy &amp; ads</a><a href="/terms">Terms of Service</a><a href="/delete-account">Delete account</a><a href="${TRUSTPILOT_READ}" target="_blank" rel="noopener">Trustpilot</a></div>
     </div>
@@ -799,7 +800,7 @@ function memoPromo() {
         <img src="/assets/logo.svg" alt="" width="40" height="42">
         <h3>Keep every document in one place</h3>
         <p>Certificates, IDs, receipts: snap them into Memento, and it fills in the details and finds any of them in one search.</p>
-        <a class="btn btn-primary btn-sm" href="/">${icon("rocket_launch")}Meet Memento</a>
+        <a class="btn btn-primary btn-sm" href="${PLAY_LINK("tools_sidebar")}" target="_blank" rel="noopener">${icon("rocket_launch")}Get it free on Google Play</a>
       </aside>`;
 }
 
@@ -2121,12 +2122,12 @@ page("404", "Page not found", "This page doesn't exist.",
 
 // ---------- Share images ----------
 // Main-site pages: [headline, line, app screenshot]. Tools pages use their entry in TOOLS.
-SEO_TITLES["guides/index"] = "Guides: Passport Photos, PDFs, Documents and Digital Legacy | Memento Tools";
+SEO_TITLES["guides/index"] = "Guides: Warranties, Receipts, Bills, Passport Photos & PDFs | Memento";
 page("guides/index", "Guides",
-  "Plain-language guides to the paperwork our free tools help with: passport photo sizes, getting PDFs under upload limits, checking documents for edits, and leaving your passwords to your family.",
+  "Plain-language guides to everyday paperwork: keeping track of warranties and receipts, never missing a bill, passport photo sizes, getting PDFs under upload limits, and keeping important documents safe.",
   `    <section class="t-hero">
       <h1>Guides</h1>
-      <p>Plain-language help with the paperwork our tools are for. Each guide explains the rules and the reasons, then points you to a free tool that does the fiddly part.</p>
+      <p>Plain-language help with everyday paperwork. Each guide explains the rules and the reasons, then points you to a free tool or to Memento for the fiddly part.</p>
     </section>
 
     <section class="t-section">
@@ -2140,7 +2141,8 @@ for (const g of GUIDES) {
   const slug = `guides/${g.slug}`, url = urlOf(slug);
   SEO_TITLES[slug] = g.seo;
   const toolBox = (s) => { const t = tool(s); return `<a class="g-tool" href="/tools/${s}"><span class="t-ico" style="--c:${t.color}">${icon(t.icon)}</span><span><b>Try it: ${t.title}</b><small>${t.text}</small></span>${icon("arrow_forward")}</a>`; };
-  const body = g.body.trim().replace(/\[\[tool:([a-z-]+)\]\]/g, (_, s) => toolBox(s)).replace(/\[\[ad\]\]/g, adSlot("article"));
+  const appBox = `<a class="g-tool g-app" href="${PLAY_LINK(`guide_${g.slug}`)}" target="_blank" rel="noopener"><img src="/assets/logo.svg" alt="" width="44" height="46"><span><b>Memento: receipts, warranties and bills, remembered</b><small>Snap it, and Memento fills in the details, reminds you before dates run out, and backs up to your own Google Drive. Free for Android.</small></span><span class="g-app-cta">${icon("download")}Get it free</span></a>`;
+  const body = g.body.trim().replace(/\[\[tool:([a-z-]+)\]\]/g, (_, s) => toolBox(s)).replace(/\[\[app\]\]/g, appBox).replace(/\[\[ad\]\]/g, adSlot("article"));
   const more = GUIDES.filter((o) => o !== g);
   page(slug, g.title, g.description,
     `    <nav class="t-crumbs" aria-label="Breadcrumb"><a href="/guides/">Guides</a>${icon("chevron_right")}<span>${esc(g.title)}</span></nav>
@@ -2159,10 +2161,10 @@ ${body}
 
       <div class="t-side">
         ${adSlot("box")}
-        <div class="t-more">
+        ${g.tools.length ? `<div class="t-more">
           <h2 class="g-side-h">Tools for this</h2>
           ${g.tools.map((s) => { const t = tool(s); return `<a class="t-mini" href="/tools/${s}"><span class="t-ico sm" style="--c:${t.color}">${icon(t.icon)}</span><span>${t.title}<small>Open tool</small></span></a>`; }).join("\n          ")}
-        </div>
+        </div>` : ""}
         ${memoPromo()}
         <div class="t-more">
           <h2 class="g-side-h">More guides</h2>

@@ -1,6 +1,271 @@
 // Guides at /guides/: long-form help articles that go with the tools. Bodies are HTML;
-// [[tool:slug]] becomes a box linking to that tool, [[ad]] an ad placement (build.js).
+// [[tool:slug]] becomes a box linking to that tool, [[app]] a Google Play box for Memento, [[ad]] an ad placement (build.js).
 module.exports = [
+  {
+    slug: "how-to-keep-track-of-warranties",
+    title: "How to keep track of warranties",
+    h1: "How to keep track of your warranties (and actually use them)",
+    seo: "How to Keep Track of Warranties: A Simple System That Works | Memento",
+    description: "Most warranty claims fail for boring reasons: no proof of purchase, a faded receipt, or the warranty ran out last month. Here's a simple system to keep every warranty ready to use.",
+    icon: "verified_user", color: "#1fe05a", tools: ["image-to-pdf"],
+    updated: "2026-11-01",
+    body: `
+<p>You pay for a warranty every time you buy a fridge, a phone or a laptop. It's built into the price. Yet when something breaks, a lot of people never claim it. The product still had months of cover left, but the receipt was nowhere, or nobody remembered when it was bought.</p>
+<p>A warranty only helps you if you can prove it. This guide shows what to keep, where to keep it, and how to make sure you know before a warranty runs out.</p>
+
+<h2>Why warranty claims fail</h2>
+<ul>
+<li><b>No proof of purchase.</b> Almost every manufacturer and shop asks for the receipt or invoice. Without it, many will refuse, or only offer a paid repair.</li>
+<li><b>The receipt faded.</b> Most till receipts are printed on thermal paper. Heat, sunlight and time turn the print pale, and after a year or two some are blank. A receipt you kept carefully can still be useless.</li>
+<li><b>Nobody knew the dates.</b> The fault started in month 23 of a 24-month warranty, but by the time anyone checked, it was month 26.</li>
+<li><b>Missing details.</b> Some claims need the model and serial number, or the warranty card stamped by the shop. Those get lost with the box.</li>
+</ul>
+
+<h2>What to keep for every warranty</h2>
+<p>For anything you'd be upset to pay for twice, keep these together:</p>
+<ol>
+<li><b>The receipt or invoice</b>, showing the shop, date and price.</li>
+<li><b>The warranty card</b>, if there is one, with the shop's stamp or signature.</li>
+<li><b>The model and serial number.</b> They're on a sticker on the back or bottom of the product, and often on the box.</li>
+<li><b>The warranty length</b> and what it covers: parts, labour, or both.</li>
+<li><b>Any registration email</b>, if you registered the product with the manufacturer.</li>
+</ol>
+
+<h2>Make a digital copy on the day you buy</h2>
+<p>The single best habit is to photograph the receipt and the warranty card the same day, before the print has a chance to fade. A clear photo is accepted by most shops and service centres, and you can't lose it in a drawer.</p>
+<p>Take the photo flat, in good light, with all four corners in the frame. If the invoice runs over several pages, keep them together as one file rather than three loose photos. Keep the paper original too, somewhere dry and away from heat; a digital copy is your backup, not a reason to throw the original away.</p>
+[[tool:image-to-pdf]]
+
+<h2>Know when each warranty ends</h2>
+<p>A pile of receipts doesn't tell you anything about dates. Work out the end date once, when you save it: the purchase date plus the warranty length. Then set a reminder a few weeks before that day.</p>
+<p>Why a few weeks before? Because that's when to check the product properly. Small problems that you've been living with, a noisy compressor, a weak battery, a sticky key, are still free to fix inside the warranty and expensive the day after.</p>
+[[app]]
+
+<h2>Making a claim</h2>
+<ol>
+<li>Check the warranty is still valid and the fault is covered. Accidental damage and water damage usually aren't.</li>
+<li>Contact the shop or the manufacturer's service centre. The warranty card or the manufacturer's website says which one handles claims.</li>
+<li>Send or show the receipt, the warranty card and the serial number. Describe the fault and when it started.</li>
+<li>Keep a note of every call and email, with dates and reference numbers.</li>
+</ol>
+<p>If the shop says the warranty is the manufacturer's problem, or the other way round, ask them to put it in writing. In many countries consumer law gives you rights against the seller as well, separate from the manufacturer's warranty. Your local consumer protection office can tell you what applies where you live.</p>
+[[ad]]
+
+<h2>A system that takes one minute per purchase</h2>
+<p>When you buy something with a warranty: photograph the receipt and card, note the model, the end date and the reminder, and put the paper in one folder at home. That's it. When something breaks, everything you need is in one place, and you'll know the answer to "is it still under warranty?" in seconds.</p>
+<p>Memento was built for exactly this. Snap the receipt, and it reads the shop, price, date and warranty length for you, works out when the warranty ends, and reminds you before it does.</p>
+[[app]]`,
+  },
+  {
+    slug: "how-to-organize-receipts-on-your-phone",
+    title: "How to organize receipts on your phone",
+    h1: "How to organize receipts on your phone",
+    seo: "How to Organize Receipts on Your Phone (Without the Shoebox) | Memento",
+    description: "A simple way to stop losing receipts: what to keep, what to throw away, how to name and sort them on your phone, and a five-minute monthly routine.",
+    icon: "receipt_long", color: "#5ab8ff", tools: ["image-to-pdf", "merge-pdf"],
+    updated: "2026-11-01",
+    body: `
+<p>Most receipts are useless a week after you get them. A few are worth real money: the ones you need for a return, a warranty, an expense claim or your taxes. The trouble is that they all look the same in a wallet, and the important one is always the one that's missing.</p>
+<p>Your phone can fix this, but only if the photos don't disappear into a camera roll of thousands of pictures. Here's how to set it up.</p>
+
+<h2>Decide what's worth keeping</h2>
+<p>You don't need to save every coffee. Keep receipts for:</p>
+<ul>
+<li><b>Anything with a warranty</b>: electronics, appliances, furniture, tools.</li>
+<li><b>Things you might return</b>, until the return window has passed.</li>
+<li><b>Work expenses</b> you'll claim back from an employer or client.</li>
+<li><b>Tax-related spending</b>, if your country lets you deduct it: medical bills, donations, business costs. How long to keep these depends on local tax rules, so check with your tax office.</li>
+<li><b>Big purchases</b> you'd need to prove for insurance after a theft or a fire.</li>
+</ul>
+<p>Everything else, groceries, meals, small shopping, can go once you've checked it against your bank statement.</p>
+
+<h2>Why the camera roll doesn't work</h2>
+<p>Taking a photo is the easy part. Finding it again is the problem. In a gallery, a receipt is just one picture among holiday photos and screenshots, with no name, no category and no way to search for "fridge" or "2,450". A year later you scroll for ten minutes and give up.</p>
+<p>A receipt only becomes useful when it's saved with the details you'll search for later: the shop, what you bought, the amount and the date.</p>
+
+<h2>A simple way to sort them</h2>
+<p>Keep the categories few and obvious. Five is plenty:</p>
+<ul>
+<li>Warranties</li>
+<li>Bills</li>
+<li>Work expenses</li>
+<li>Medical</li>
+<li>Everything else worth keeping</li>
+</ul>
+<p>If you use folders or file names, a pattern like <b>2026-10-12 ABC Electronics fridge 849.99</b> sorts by date and can be searched by shop, item or amount.</p>
+[[app]]
+
+<h2>Capture it before you leave the shop</h2>
+<p>The receipt that gets lost is the one that went into a pocket "to deal with later". Photograph it at the counter or as soon as you get home, flat on a table, with the whole receipt in the frame. If it's long, take it in two parts and keep both together.</p>
+<p>For an expense report or an accountant, you'll often need the receipts as one document. Turn the photos into a single PDF instead of sending fifteen separate images.</p>
+[[tool:image-to-pdf]]
+[[ad]]
+
+<h2>A five-minute monthly routine</h2>
+<ol>
+<li>Open your bank or card statement for the month.</li>
+<li>For every purchase that matters, check you have the receipt saved.</li>
+<li>Throw away paper receipts you no longer need, and any whose return window has passed.</li>
+<li>Note any warranty end dates or bill due dates coming up next month.</li>
+</ol>
+<p>Done every month, this takes minutes. Done once a year, it takes a weekend.</p>
+
+<h2>Let your phone do the filing</h2>
+<p>Memento turns a receipt photo into a searchable record. It reads the shop, the items, the amount and the date, files it in the right category, and finds it again when you type any of them. If the receipt has a warranty or a due date, it reminds you before it runs out.</p>
+[[app]]`,
+  },
+  {
+    slug: "never-miss-a-bill-due-date",
+    title: "Never miss a bill due date",
+    h1: "How to never miss a bill due date again",
+    seo: "Never Miss a Bill Due Date: A Simple Bill Reminder System | Memento",
+    description: "Late fees usually come from forgetting, not from not having the money. Here's a simple bill tracking system: list every bill, set reminders at the right time, and decide what to put on autopay.",
+    icon: "notifications_active", color: "#ffb547", tools: [],
+    updated: "2026-11-01",
+    body: `
+<p>Most late fees aren't about money. The money was there; the date just slipped by. Electricity, internet, phone, rent, insurance, school fees, a credit card: each one arrives on its own schedule, by paper, email or text, and it only takes one busy week to miss one.</p>
+<p>A missed bill can cost more than the fee. Some providers cut the service, and some report late payments to credit bureaus. The fix is a simple system that doesn't rely on your memory.</p>
+
+<h2>Step 1: List every bill once</h2>
+<p>Sit down with your bank statement for the last two or three months and write down every regular payment:</p>
+<ul>
+<li>Who it's to, and what it's for</li>
+<li>How often it comes: monthly, every three months, yearly</li>
+<li>The usual due date, or how many days after the bill arrives</li>
+<li>The usual amount</li>
+<li>How you pay it: bank transfer, card, mobile banking, in person</li>
+</ul>
+<p>Don't forget the yearly ones. Insurance renewals, vehicle tax and subscriptions catch people out precisely because they come once a year.</p>
+
+<h2>Step 2: Set reminders at the right time</h2>
+<p>A reminder on the due date is too late; payments can take a day or two to arrive. Set it three to five days before. For big yearly bills, add a second reminder a few weeks ahead, so the money is ready.</p>
+<p>The reminder works best when it comes with the bill itself: the amount, the account number and where to pay. Then you can pay it in one go instead of hunting for the paper.</p>
+[[app]]
+
+<h2>Step 3: Decide what goes on autopay</h2>
+<p>Automatic payments are great for bills that are the same every month and that you never want to miss: rent, a loan, insurance. They're riskier for bills that change a lot, like electricity in summer, because a surprise amount can empty your account before you notice.</p>
+<p>Even on autopay, keep a reminder. Autopay fails more often than people think: an expired card, a changed account, a provider that switched systems.</p>
+[[ad]]
+
+<h2>Step 4: Keep the paid bills</h2>
+<p>When a bill is paid, keep a copy of it and the payment confirmation. You'll need them if a provider claims you didn't pay, and some landlords, visa offices and banks ask for recent utility bills as proof of address.</p>
+<p>A photo of the bill and a screenshot of the payment are enough. Keep them together so you can find them in seconds.</p>
+
+<h2>The five-minute weekly check</h2>
+<p>Once a week, look at what's due in the next ten days. Pay what you can now, and make sure the money is there for the rest. Five minutes on a Sunday is cheaper than any late fee.</p>
+<p>Memento does the remembering for you: snap the bill, and it reads the amount and the due date and reminds you before it's due, with the bill right there when you open the reminder.</p>
+[[app]]`,
+  },
+  {
+    slug: "important-documents-to-keep-digital-copies-of",
+    title: "Important documents to keep digital copies of",
+    h1: "The important documents everyone should keep a digital copy of",
+    seo: "Important Documents Checklist: What to Keep a Digital Copy Of | Memento",
+    description: "A checklist of the documents that are slow, expensive or impossible to replace, from ID and certificates to property papers and medical records, and how to keep safe digital copies of them.",
+    icon: "folder_special", color: "#c58bff", tools: ["id-copy", "encrypt-files"],
+    updated: "2026-11-01",
+    body: `
+<p>Losing an important document is rarely a disaster on the day. The trouble starts later: a job application that needs your certificate by Friday, a hospital asking for a list of medicines, a bank that wants proof of address. Getting a replacement can take weeks, cost money and mean visiting several offices.</p>
+<p>A digital copy won't replace the original for every purpose, but it tells you exactly what you had, lets you apply for a replacement quickly, and is often accepted on its own for online forms.</p>
+
+<h2>The checklist</h2>
+<h3>Identity</h3>
+<ul>
+<li>National ID card, both sides</li>
+<li>Passport: the photo page, and any visas you're using</li>
+<li>Birth certificate</li>
+<li>Driving licence, both sides</li>
+<li>Marriage certificate, if you have one</li>
+</ul>
+<h3>Education and work</h3>
+<ul>
+<li>School and university certificates and mark sheets</li>
+<li>Registration and roll numbers for exams</li>
+<li>Employment contracts and experience letters</li>
+<li>Professional licences</li>
+</ul>
+<h3>Money and property</h3>
+<ul>
+<li>Property deeds and land records</li>
+<li>Rental agreements</li>
+<li>Vehicle registration and insurance papers</li>
+<li>Bank account and loan documents</li>
+<li>Insurance policies of every kind</li>
+<li>Tax returns and receipts</li>
+</ul>
+<h3>Health</h3>
+<ul>
+<li>Prescriptions, especially for long-term medicines</li>
+<li>Test reports and discharge summaries</li>
+<li>Vaccination records</li>
+<li>Health insurance cards</li>
+</ul>
+<h3>Everyday paperwork</h3>
+<ul>
+<li>Receipts and warranty cards for expensive things</li>
+<li>Recent utility bills, often needed as proof of address</li>
+</ul>
+[[app]]
+
+<h2>How to make good copies</h2>
+<p>Use good daylight and lay the document flat on a dark surface, so the edges are clear. Photograph both sides of cards. Check every copy is sharp enough to read the small print and the numbers; a blurry copy of an ID number is no use at all.</p>
+<p>For ID cards, a copy with the front and back on one page at real size is what most offices ask for.</p>
+[[tool:id-copy]]
+[[ad]]
+
+<h2>Keep the copies safe</h2>
+<p>These copies are exactly what identity thieves want, so treat them carefully:</p>
+<ul>
+<li>Don't leave them loose in your phone's gallery, where they sync to every device and show up when you share photos.</li>
+<li>Keep a backup in an account you control, such as your own Google Drive, so losing your phone doesn't mean losing everything.</li>
+<li>When you send a copy by email or chat, send it only to the office that needs it. If you can, add "copy for [purpose] only" across the image.</li>
+<li>For the most sensitive files, encrypt them with a password before you store or send them.</li>
+</ul>
+[[tool:encrypt-files]]
+
+<h2>Tell someone you trust</h2>
+<p>In an emergency, the person who needs your documents might not be you. Make sure one family member knows where the originals are kept and how to reach the digital copies.</p>
+<p>Memento keeps all of these in one place on your phone, reads the important details like numbers and expiry dates, reminds you before a passport or licence expires, and backs everything up to your own Google Drive.</p>
+[[app]]`,
+  },
+  {
+    slug: "lost-receipt-warranty-claim",
+    title: "Lost the receipt? Warranty claims without it",
+    h1: "Lost the receipt? How to still make a warranty claim",
+    seo: "Lost Receipt Warranty Claim: How to Prove Purchase Without It | Memento",
+    description: "No receipt doesn't always mean no warranty. Here are the other ways to prove when and where you bought something, and how to make sure it never happens again.",
+    icon: "search", color: "#ff7a6b", tools: [],
+    updated: "2026-11-01",
+    body: `
+<p>Something breaks, it should still be under warranty, and the receipt is gone. Before you give up, know that the receipt is just one way to prove the purchase. What the shop or manufacturer really needs is evidence of when, where and for how much you bought it, and that evidence often exists somewhere else.</p>
+
+<h2>Other ways to prove the purchase</h2>
+<ul>
+<li><b>Your bank or card statement.</b> If you paid by card or bank transfer, the statement shows the shop, the date and the amount. Many shops and manufacturers accept it, especially with the product's serial number.</li>
+<li><b>The order confirmation email.</b> For anything bought online, search your email for the shop's name or the product. The confirmation usually lists the exact model.</li>
+<li><b>Your account with the shop.</b> Online stores keep your order history, and you can often download the invoice again. Some physical shops can find a sale by your phone number or loyalty card.</li>
+<li><b>The shop's own records.</b> Go back to the shop with the date and the payment method. Many can look up the sale and print a copy of the invoice.</li>
+<li><b>Product registration.</b> If you registered the product with the manufacturer, they already have the purchase date.</li>
+<li><b>Mobile payment history.</b> Payment apps and mobile banking keep a record of every transaction.</li>
+</ul>
+
+<h2>The serial number can help</h2>
+<p>Some manufacturers can tell from the serial number when a product was made or shipped. If you have no proof at all, they may agree to work out the warranty from that date instead. It's not guaranteed and not every brand does it, but it's always worth asking. The serial number is on a sticker on the product, and often on the box.</p>
+[[ad]]
+
+<h2>Asking for help the right way</h2>
+<ol>
+<li>Collect whatever you have: statement line, email, photos of the serial number and the fault.</li>
+<li>Contact the manufacturer's support and the shop, and explain that the receipt is lost but you have other proof.</li>
+<li>Be polite and specific: the date you bought it, where, what it cost, and what went wrong.</li>
+<li>If they say no, ask whether they'd repair it at a reduced price, and check what your local consumer law says about the seller's responsibility.</li>
+</ol>
+
+<h2>Make sure it never happens again</h2>
+<p>The fix is a thirty-second habit: photograph the receipt and warranty card on the day you buy, and keep the photo somewhere you can search. A photo can't fade, and it doesn't live in a drawer.</p>
+<p>Memento does this for you. Snap the receipt, and it saves the shop, the price, the date and the warranty period, reminds you before the warranty ends, and finds it in one search, even years later.</p>
+[[app]]`,
+  },
   {
     slug: "passport-photo-size-by-country",
     title: "Passport photo size by country",

@@ -227,7 +227,7 @@ footer .socials { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 footer .cols a.social { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); color: var(--soft); text-decoration: none; font-weight: 600; }
 footer .cols a.social:hover { color: #fff; border-color: var(--green); background: rgba(31, 224, 90, .1); }
 @media (max-width: 560px) { footer .bottom { flex-direction: column; gap: 6px; } }
-footer .cols { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; padding-top: 32px; border-top: 1px solid var(--border); }
+footer .cols { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; padding-top: 32px; border-top: 1px solid var(--border); }
 @media (max-width: 760px) { footer .cols { grid-template-columns: 1fr 1fr; } footer .cols > div:first-child { grid-column: 1 / -1; } }
 footer h2 { font-family: inherit; letter-spacing: normal; line-height: 1.4;  margin: 0 0 12px; color: var(--text); font-size: 14px; font-weight: 700; }
 footer .cols a { display: block; color: var(--muted); text-decoration: none; padding: 4px 0; }
