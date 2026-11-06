@@ -2302,6 +2302,8 @@ fs.writeFileSync(path.join(__dirname, "sitemap.xml"),
 fs.writeFileSync(path.join(__dirname, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
 // Authorised ad sellers (AdSense checks it; without it earnings can be held back)
 fs.writeFileSync(path.join(__dirname, "ads.txt"), `google.com, ${ADSENSE.client.replace("ca-", "")}, DIRECT, f08c47fec0942fa0\n`);
+// Same for the app's AdMob ads: AdMob reads app-ads.txt from the developer website in the Play listing
+fs.writeFileSync(path.join(__dirname, "app-ads.txt"), `google.com, ${ADSENSE.client.replace("ca-", "")}, DIRECT, f08c47fec0942fa0\n`);
 
 console.log(`Built ${rendered.length} pages: ${rendered.map((p) => urlOf(p.slug).slice(SITE.length)).join(" ")}`);
 console.log(`Legal: privacy ${nPrivacy} sections, terms ${nTerms} sections. Icons: ${names.size}`);
